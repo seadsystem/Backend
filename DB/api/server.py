@@ -1,9 +1,13 @@
+# Python 3
+
 import http.server
 import socketserver
 
-PORT = 80
+import handler
 
-Handler = http.server.SimpleHTTPRequestHandler
+PORT = 8080
+
+Handler = handler.ApiHandler
 
 httpd = socketserver.TCPServer(("", PORT), Handler)
 
