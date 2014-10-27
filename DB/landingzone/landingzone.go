@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+    "log"
     "net"
 )
 
@@ -21,9 +21,9 @@ func handleRequest (conn net.Conn) {
     buffer := make ([]byte, INPUT_BUFFER_SIZE)
     requestLength, err := conn.Read (buffer)
     if err != nil {
-        fmt.Println ("Error handling request: " + err.Error())
+        log.Println ("Error handling request: " + err.Error())
     } else if requestLength < 1 {
-        fmt.Println ("Error: expected to receive request but got empty request")
+        log.Println ("Error: expected to receive request but got empty request")
     }
 
     conn.Write ([]byte("Response"))
@@ -33,8 +33,8 @@ func handleRequest (conn net.Conn) {
 func main() {
     listener, err := net.Listen ("tcp", HOST + ":" + PORT)
     if err != nil {
-        fmt.Println ("Failed to open listener on port " + PORT)
-        fmt.Println ("Error was: " + err.Error())
+        log.Println ("Failed to open listener on port " + PORT)
+        log.Panic ("Error was: " + err.Error())
     }
     defer listener.Close()
 
@@ -42,7 +42,7 @@ func main() {
     for {
         conn, err := listener.Accept()
         if err != nil {
-            fmt.Println ("Failed to accept request: " + err.Error())
+            log.Println ("Failed to accept request: " + err.Error())
         }
         handleRequest (conn);
     }
