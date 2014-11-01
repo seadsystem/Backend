@@ -31,7 +31,8 @@ func HandleRequest(conn net.Conn) {
 	if len(buffer) < 1 {
 		log.Println("Error: received empty request")
 	} else {
-		log.Println(buffer)
+		log.Println("Received data:")
+		log.Println(string(buffer))
 	}
 
 	conn.Write([]byte("Response"))
