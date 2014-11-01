@@ -10,10 +10,13 @@ import (
 
 // Handle a client's request
 func HandleRequest(conn net.Conn) {
+	log.Println("Got a connection.")
+	
 	var buffer []byte
 	tempbuf := make([]byte, constants.INPUT_BUFFER_SIZE)
 
 	for {
+		log.Println("Reading bytes...")
 		n, err := conn.Read(tempbuf)
 		if err != nil {
 			if err != io.EOF {
