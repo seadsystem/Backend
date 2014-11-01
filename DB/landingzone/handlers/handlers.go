@@ -1,20 +1,34 @@
-package main
+package handlers
 
 import (
 	"log"
 	"net"
+	"io"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
 
 // Handle a client's request
-func handleRequest(conn net.Conn) {
-	buffer := make([]byte, constants.INPUT_BUFFER_SIZE)
-	requestLength, err := conn.Read(buffer)
-	if err != nil {
-		log.Println("Error handling request: " + err.Error())
-	} else if requestLength < 1 {
-		log.Println("Error: expected to receive request but got empty request")
+func HandleRequest(conn net.Conn) {
+	var buffer []byte
+	tempbuf := make([]byte, constants.INPUT_BUFFER_SIZE)
+
+	for {
+		n, err := conn.Read(tempbuf)
+		if err != nil {
+			if err != io.EOF {
+				log.Println("read error:", err)
+			}
+			break
+		}
+		buffer = append(buffer, tempbuf[:n]...)
+
+	}
+
+	if len(buffer) < 1 {
+		log.Println("Error: received empty request")
+	} else {
+		log.Println(buffer)
 	}
 
 	conn.Write([]byte("Response"))
