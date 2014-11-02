@@ -5,7 +5,7 @@ import (
 	"net"
 	"io"
 
-	//"github.com/seadsystem/Backend/DB/landingzone/constants"
+	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
 
 // Handle a client's request
@@ -14,6 +14,9 @@ func HandleRequest(conn net.Conn) {
 	
 	var buffer []byte
 	tempbuf := make([]byte, 1)
+	
+	log.Println("Sending HEAD.")
+	conn.Write([]byte(constants.HEAD))
 
 	for {
 		log.Println("Reading bytes...")
