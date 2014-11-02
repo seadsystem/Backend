@@ -21,7 +21,7 @@ func HandleRequest(conn net.Conn) {
 	for {
 		log.Println("Reading bytes...")
 		n, err := conn.Read(tempbuf)
-		log.Printf("Read byte: %s\n", tempbuf[0])
+		log.Printf("Read byte: %c\n", tempbuf[0])
 		if err != nil {
 			if err != io.EOF {
 				log.Println("Read error:", err)
