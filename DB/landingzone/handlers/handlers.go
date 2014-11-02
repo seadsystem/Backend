@@ -20,7 +20,7 @@ func HandleRequest(conn net.Conn) {
 		n, err := conn.Read(tempbuf)
 		if err != nil {
 			if err != io.EOF {
-				log.Println("read error:", err)
+				log.Println("Read error:", err)
 			}
 			break
 		}
