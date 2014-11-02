@@ -16,11 +16,14 @@ func HandleRequest(conn net.Conn) {
 	tempbuf := make([]byte, constants.INPUT_BUFFER_SIZE)
 
 	for {
-		log.Println("Reading bytes...")
+		log.Println("Reading bytes....")
 		n, err := conn.Read(tempbuf)
+		log.Println("Read some bytes...")
 		if err != nil {
 			if err != io.EOF {
 				log.Println("Read error:", err)
+			} else {
+				log.Println("Done reading bytes.")
 			}
 			break
 		}
