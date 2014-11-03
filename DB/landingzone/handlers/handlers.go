@@ -10,14 +10,23 @@ import (
 
 // Handle a client's request
 func HandleRequest(conn net.Conn) {
+	log.Println("Got a connection.")
+	
 	var buffer []byte
-	tempbuf := make([]byte, constants.INPUT_BUFFER_SIZE)
+	tempbuf := make([]byte, 1)
+	
+	log.Println("Sending HEAD.")
+	conn.Write([]byte(constants.HEAD))
 
 	for {
+		log.Println("Reading bytes...")
 		n, err := conn.Read(tempbuf)
+		log.Printf("Read byte: %c\n", tempbuf[0])
 		if err != nil {
 			if err != io.EOF {
-				log.Println("read error:", err)
+				log.Println("Read error:", err)
+			} else {
+				log.Println("Done reading bytes.")
 			}
 			break
 		}
@@ -28,7 +37,8 @@ func HandleRequest(conn net.Conn) {
 	if len(buffer) < 1 {
 		log.Println("Error: received empty request")
 	} else {
-		log.Println(buffer)
+		log.Println("Received data:")
+		log.Println(string(buffer))
 	}
 
 	conn.Write([]byte("Response"))
