@@ -16,7 +16,7 @@ func main() {
 		log.Panic("Error was: " + err.Error())
 	}
 	defer listener.Close()
-	
+
 	log.Println("Listening for connections...")
 
 	// Handle requests in a go routine
