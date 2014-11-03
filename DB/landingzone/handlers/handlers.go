@@ -99,4 +99,6 @@ func read_bytes(conn net.Conn, bytes int) (data []byte, err error) {
 		// Read timed out
 		err = Timeout
 	}
+
+	return
 }
