@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net"
+	"time"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
@@ -26,7 +28,7 @@ func HandleRequest(conn net.Conn) {
 			break
 		}
 
-		data_length := length_header[1]
+		data_length := int(length_header[1])
 
 		// Check that we got a length header
 		if length_header[0] != 'L' || data_length == 0 {
@@ -75,7 +77,7 @@ func read_bytes(conn net.Conn, bytes int) (data []byte, err error) {
 	// Initiate read in new go routine
 	go func() {
 		buffer := make([]byte, bytes)
-		n, ierr := conn.Read(length_header)
+		n, ierr := conn.Read(buffer)
 		if ierr != nil {
 			error_channel <- ierr
 			return
