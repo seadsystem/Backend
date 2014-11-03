@@ -91,9 +91,9 @@ func read_bytes(conn net.Conn, bytes int) (data []byte, err error) {
 
 	// Receive result of read
 	select {
-	case data := <-data_channel:
+	case data = <-data_channel:
 		// Read resulted in data
-	case err := <-error_channel:
+	case err = <-error_channel:
 		// Read resulted in an error
 	case <-time.After(time.Second * constants.READ_TIME_LIMIT):
 		// Read timed out
