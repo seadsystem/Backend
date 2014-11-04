@@ -26,6 +26,6 @@ func main() {
 			log.Println("Failed to accept request: " + err.Error())
 
 		}
-		handlers.HandleRequest(conn)
+		go handlers.HandleRequest(conn)
 	}
 }
