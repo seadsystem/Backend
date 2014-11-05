@@ -33,11 +33,8 @@ func HandleRequest(conn net.Conn) {
 		// Check that we got a length header
 		if length_header[0] != 'L' || data_length == 0 {
 			log.Println("Invalid length header.")
-
-			// TODO: resync here
-
-			break
-
+			log.Println("Re-syncing...")
+			conn.Write([]byte(constants.HEAD))
 		} else {
 			log.Printf("Length: %d\n", length_header[1])
 
@@ -46,11 +43,17 @@ func HandleRequest(conn net.Conn) {
 
 			if err != nil {
 				read_error(err)
+
+				log.Println("Re-syncing...")
+				conn.Write([]byte(constants.HEAD))
 				break
 			}
 
 			log.Println("Read data:")
 			log.Println(string(data))
+
+			log.Println("Sending ACK.")
+			conn.Write([]byte(constants.ACK))
 		}
 
 	}
