@@ -54,8 +54,12 @@ func HandleRequest(conn net.Conn) {
 
 			log.Println("Sending ACK.")
 			conn.Write([]byte(constants.ACK))
+			
+			log.Println("Sending OKAY.")
+			conn.Write([]byte(constants.OKAY))
 		}
 
+	
 	}
 
 	conn.Write([]byte("Response"))
