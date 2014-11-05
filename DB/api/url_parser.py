@@ -1,37 +1,41 @@
 # Python 3
 import re
+import urllib.parse
 
 def parse(url):
 	'''
 		Match the URL against a set of routing rules
-		TODO update to use GET params
 	'''
-	if re.match('^/\d+/\d+/\d+/\w+$', url):
-		# API request for data within a certain timeframe of a certain type
-		# /device_id/start_time/end_time/type
-		tokens = url.split('/')
+	url_components = urllib.parse.urlparse(url)
+	path = url_components.path
+	params = urllib.parse.parse_qs(url_components.query)
+
+	''' Extract device_id from URL '''
+	if re.match('^/\d+$', path):
+		device_id = path[1:]
+	else:
+		raise Exception("Not Found")
+
+	''' Build query options as per present query parameters '''
+	if 'type' in params.keys() and 'start_time' in params.keys() and \
+		'end_time' in params.keys():
 		query_options = {
-				'device_id': tokens[1],
-				'start_time': tokens[2],
-				'end_time': tokens[3],
-				'type': tokens[4],
+				'device_id': device_id,
+				'start_time': params['start_time'],
+				'end_time': params['end_time'],
+				'type': params['type'],
 				}
-	elif re.match('^/\d+/\d+/\d+$', url):
-		# API request for data within a certain timeframe
-		# /device_id/start_time/end_time
-		tokens = url.split('/')
+	elif 'start_time' in params.keys() and 'end_time' in params.keys():
 		query_options = {
-				'device_id': tokens[1],
-				'start_time': tokens[2],
-				'end_time': tokens[3],
+				'device_id': device_id,
+				'start_time': params['start_time'],
+				'end_time': tokens['end_time'],
 				}
-	elif re.match('^/\d+$', url):
-		# API request for all data for historical data
-		# /device_id
+	elif device_id:
 		query_options = {
-				'device_id': url[1:]
+				'device_id': device_id
 				}
 	else:
-		raise Exception("Not Found: Did not match")
-	
+		raise Exception("Not Found")
+
 	return query_options
