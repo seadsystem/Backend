@@ -12,7 +12,7 @@ import (
 func main() {
 	// For testing
 	log.Println(decoders.DecodeHeader([]byte("THS000001t00000001014911X")))
-	
+
 	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT)
 	if err != nil {
 		log.Println("Failed to open listener on port " + constants.PORT)
@@ -27,7 +27,7 @@ func main() {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Println("Failed to accept request: " + err.Error())
-
+			continue
 		}
 		go handlers.HandleRequest(conn)
 	}
