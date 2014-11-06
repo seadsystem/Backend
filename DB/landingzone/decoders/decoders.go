@@ -131,37 +131,37 @@ func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 		return
 	}
 	ptr += 3
-	time += 60 * 60 * 24 * days
+	time += float64(60 * 60 * 24 * days)
 	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	time += 60 * 60 * hours
+	time += float64(60 * 60 * hours)
 	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	time += 60 * minutes
+	time += float64(60 * minutes)
 	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	time += seconds
+	time += float64(seconds)
 	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
 	if err != nil {
 		return
 	}
 	ptr += 3
-	time += float64(milliseconds) / 1000
+	time += float64(milliseconds) / 1000.0
 	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	time += float64(clock) / 12000
+	time += float64(clock) / 12000.0
 	return
 }
 
