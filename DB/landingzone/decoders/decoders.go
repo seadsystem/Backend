@@ -116,10 +116,10 @@ func doubleToAsciiTime(double_time float64) string {
 
 func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 	// Check time string format
-	if len(asciiTime) != 16 {
+	if len(ascii_time) != 16 {
 		err = InvalidTime
 	}
-	_, err = strconv.Atoi(string(asciiTime))
+	_, err = strconv.Atoi(string(ascii_time))
 	if err != nil {
 		return
 	}
