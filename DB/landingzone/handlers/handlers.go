@@ -55,7 +55,8 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		}
 		log.Printf("Data: %+v\n", data)
 
-		// TODO: Write data to database
+		log.Println("Sending to database...")
+		database_channel <- data
 
 		log.Println("Sending ACK...")
 		writePacket(conn, []byte(constants.ACK))

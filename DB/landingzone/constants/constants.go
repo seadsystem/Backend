@@ -14,4 +14,11 @@ const (
 	READ_TIME_LIMIT = 5 // Measured in seconds
 
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t\\d+X)$"
+
+	// Database
+	DB_SOCKET   = "/var/run/postgresql/.s.PGSQL.5433"
+	DB_PORT     = 5433
+	DB_USER     = "seads"
+	DB_NAME     = "seads"
+	DB_PASSWORD = ""
 )
