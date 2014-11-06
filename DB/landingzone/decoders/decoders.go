@@ -37,15 +37,11 @@ func init() {
 func DecodeHeader(packet []byte) (serial int, err error) {
 	serialStrings := headerRegex.FindSubmatch(packet)
 
-	if serialStrings == nil {
+	if serialStrings == nil || len(serialStrings) != 2 {
 		err = InvalidHeader
 		return
 	}
-	log.Printf("Found %d serials.\n", len(serialStrings)-1)
-	if len(serialStrings) != 2 {
-		err = InvalidHeader
-		return
-	}
+
 	log.Printf("Header serial string: %s\n", string(serialStrings[1]))
 
 	serial, err = strconv.Atoi(string(serialStrings[1]))
