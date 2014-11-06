@@ -23,6 +23,7 @@ func HandleRequest(conn net.Conn) {
 		readError(err)
 		return
 	}
+	log.Printf("Plug serial: %d\n", serial)
 
 	for {
 		log.Println("Reading length header...")
@@ -83,7 +84,10 @@ func sync(conn net.Conn) (serial int, err error) {
 	}
 
 	// TODO Parse header to get serial
-	serial = 0
+	serial, err = decoders.DecodeHeader(data)
+	if err != nil {
+		return
+	}
 
 	log.Println("Sending configuration...")
 
