@@ -95,11 +95,11 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 func doubleToAsciiTime(double_time float64) string {
 	int_time := int(double_time)
 	var days = math.Floor(double_time / (60 * 60 * 24))
-	var hours = math.Floor((int_time % (60 * 60 * 24)) / (60 * 60))
-	var minutes = math.Floor((int_time % (60 * 60)) / (60))
-	var seconds = math.Floor((int_time % (60)) / (1))
-	var milliseconds = math.Floor(((int_time * 1000) % 1000))
-	var clock_time = math.Floor(((int_time * 12000) % 12))
+	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
+	var minutes = (int_time % (60 * 60)) / 60
+	var seconds = (int_time % (60)) / 1
+	var milliseconds = (int_time * 1000) % 1000
+	var clock_time = (int_time * 12000) % 12
 
 	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
 }
