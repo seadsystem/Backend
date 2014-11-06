@@ -5,11 +5,14 @@ import (
 	"net"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
-	//"github.com/seadsystem/Backend/DB/landingzone/decoders"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 	"github.com/seadsystem/Backend/DB/landingzone/handlers"
 )
 
 func main() {
+	// For testing
+	log.Println(decoders.DecodeHeader("THS000001t00000001014911X"))
+	
 	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT)
 	if err != nil {
 		log.Println("Failed to open listener on port " + constants.PORT)
