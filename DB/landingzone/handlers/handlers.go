@@ -71,7 +71,7 @@ func HandleRequest(conn net.Conn) {
 
 func sync(conn net.Conn) (serial int, err error) {
 	log.Println("Sending HEAD...")
-	err = writePacket(conn, constants.HEAD)
+	err = writePacket(conn, []byte(constants.HEAD))
 	if err != nil {
 		return
 	}
@@ -88,7 +88,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	log.Println("Sending configuration...")
 
 	log.Println("Sending OKAY.")
-	err = writePacket(conn, constants.OKAY)
+	err = writePacket(conn, []byte(constants.OKAY))
 	if err != nil {
 		return
 	}
@@ -127,7 +127,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	log.Printf("Length: %d\n", length_header[1])
 
 	// Get the rest of the packet
-	data, err := readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
+	data, err = readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
 
 	if err != nil {
 		return
