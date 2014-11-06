@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"log"
+	"fmt"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
@@ -63,11 +64,11 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 14
 		case datatype == 'P':
 			// Period separator
-			packet.period, err = asciiTimeToDouble(buffer[i : i+14])
+			packet.Period, err = asciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'C':
 			// Count
-			packet.count, err = strconv.Atoi(string(buffer[i : i+2]))
+			packet.Count, err = strconv.Atoi(string(buffer[i : i+2]))
 			i += 2
 		case datatype == 'D':
 			// Data
@@ -92,12 +93,13 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 }
 
 func doubleToAsciiTime(double_time float64) string {
+	int_time := int(double_time)
 	var days = math.Floor(double_time / (60 * 60 * 24))
-	var hours = math.Floor((int(double_time) % (60 * 60 * 24)) / (60 * 60))
-	var minutes = math.Floor((int(double_time) % (60 * 60)) / (60))
-	var seconds = math.Floor((int(double_time) % (60)) / (1))
-	var milliseconds = math.Floor(((int(double_time) * 1000) % 1000))
-	var clock_time = math.Floor(((int(double_time) * 12000) % 12))
+	var hours = math.Floor((int_time % (60 * 60 * 24)) / (60 * 60))
+	var minutes = math.Floor((int_time % (60 * 60)) / (60))
+	var seconds = math.Floor((int_time % (60)) / (1))
+	var milliseconds = math.Floor(((int_time * 1000) % 1000))
+	var clock_time = math.Floor(((int_time * 12000) % 12))
 
 	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
 }
