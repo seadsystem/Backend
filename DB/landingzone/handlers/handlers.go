@@ -20,7 +20,7 @@ func HandleRequest(conn net.Conn) {
 	log.Println("Got a connection.")
 
 	// Do initial sync to get serial number and start receiving data
-	_, err = sync(conn)
+	_, err := sync(conn)
 	if err != nil {
 		readError(err)
 		return
