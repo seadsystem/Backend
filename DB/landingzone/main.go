@@ -5,6 +5,8 @@ import (
 	"net"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
+	"github.com/seadsystem/Backend/DB/landingzone/database"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 	"github.com/seadsystem/Backend/DB/landingzone/handlers"
 )
 
@@ -16,6 +18,10 @@ func main() {
 	}
 	defer listener.Close()
 
+	// Setup database routine
+	database_channel := make(chan decoders.SeadPacket, 10) // Allows buffering up to 10 SeadPackets
+	go database.InsertRaw(database_channel)
+
 	log.Println("Listening for connections...")
 
 	// Handle requests in a go routine
@@ -25,6 +31,6 @@ func main() {
 			log.Println("Failed to accept request: " + err.Error())
 			continue
 		}
-		go handlers.HandleRequest(conn)
+		go handlers.HandleRequest(conn, database_channel)
 	}
 }

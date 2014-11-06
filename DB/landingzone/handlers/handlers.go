@@ -16,7 +16,7 @@ var Timeout = errors.New("Action timed out.")
 var InvalidLength = errors.New("Invalid length header.")
 
 // HandleRequest handles a communication stream with a plug.
-func HandleRequest(conn net.Conn) {
+func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 	log.Println("Got a connection.")
 
 	var err error
