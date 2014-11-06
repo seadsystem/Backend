@@ -28,7 +28,7 @@ func HandleRequest(conn net.Conn) {
 
 	// Main data receiving loop
 	for {
-		data, err := readPacket(conn)
+		packet, err := readPacket(conn)
 
 		if err != nil {
 			readError(err)
@@ -43,7 +43,17 @@ func HandleRequest(conn net.Conn) {
 		}
 
 		log.Println("Read data:")
-		log.Println(string(data))
+		log.Println(string(packet))
+		
+		log.Println("Parsing data...")
+		data, err := decoders.DecodePacket(packet)
+		if err != nil {
+			readError(err)
+			break
+		}
+		log.Printf("Data: %+v\n", data)
+		
+		// TODO: Write data to database
 
 		log.Println("Sending ACK...")
 		writePacket(conn, []byte(constants.ACK))
@@ -51,8 +61,6 @@ func HandleRequest(conn net.Conn) {
 			readError(err)
 			break
 		}
-
-		// TODO: Write data to database
 	}
 
 	log.Println("Closing connection...")
@@ -80,7 +88,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	}
 	log.Printf("Plug serial: %d\n", serial)
 
-	log.Println("Sending configuration...")
+	//log.Println("Sending configuration...")
 	// TODO: Send config
 
 	log.Println("Sending OKAY...")

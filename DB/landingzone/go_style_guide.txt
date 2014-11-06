@@ -1,0 +1,54 @@
+Please read this guide:
+https://golang.org/doc/effective_go.html
+
+We mostly follow it when possible.
+
+All code must conform to the gofmt default style. You can easily run gofmt using the format.sh script. gofmt will find many common syntax errors.
+
+Indentation
+	We use tabs for indentation and gofmt emits them by default. If you insist on having your editor indent with spaces, be sure to run the code through gofmt before checking it in.
+
+Line length:
+	Go has no line length limit. Don't worry about overflowing a punched card. If a line feels too long, wrap it and indent with an extra tab.
+
+Parentheses:
+	Go needs fewer parentheses than C and Java: control structures (if, for, switch) do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so 
+
+Function names:
+	Public functions: PascalCase
+	Private functions: camelCase
+
+Variable names:
+	Globals and properties:
+		Public: PascalCase
+		Private: camelCase
+
+	Parameters and scoped:
+		lowercase_with_underscores
+
+Constants:
+	UPPERCASE_WITH_UNDERSCORES
+
+Comments:
+	All variables and functions which are not obvious should have doc comments. Doc comments work best as complete sentences, which allow a wide variety of automated presentations. The first sentence should be a one-sentence summary that starts with the name being declared (case sensitive).
+
+	Line comments:
+		Commented out code without a space between the // and the code to distinguish it from a real comment.
+
+		Line comments which are actually comments should have a single space between the // and the start of the comment.
+
+		Line comments on the same line as code should have two (2) spaces between the end of the code and the //.
+
+Spacing:
+	gofmt will remove groups of more than one blank line. Group together clusters of statements which do the same thing with a blank line. Example: function call, error handling for that function call, logging the result of the function call.
+
+Whitespace:
+	Trim trailing whitespace.
+
+Logging:
+	Use the log package instead of fmt. Log everything useful for debugging or tracing the code path. If a comment is made redundant by a logging statement, omit the comment.
+
+	If a logging statement indicates that something is about to happen (but has not happened yet), end the text in an ellipsis.
+
+Changes to this guide:
+	All changes to this guide must be reflected in the code. If you don't want to update the code, don't change the guide.
