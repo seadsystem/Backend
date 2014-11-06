@@ -8,7 +8,7 @@ import db
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
 
 	def __init__(self, req, client_addr,server):
-		http.server.SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)      
+		http.server.SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
 
 	def do_GET(self):
 		try:
@@ -16,7 +16,7 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 		except:
 			self.send_error(404)
 			return
-		
+
 		try:
 			r = db.query(parsed)
 		except:

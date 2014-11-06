@@ -104,5 +104,5 @@ def retrieve_historical(device_id):
 	return data
 
 def format_data(data, format):
-    if format == 'array':
-        return str(data)
+	if format == 'array':
+		return str(data)
