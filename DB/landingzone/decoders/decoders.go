@@ -35,6 +35,7 @@ func init() {
 
 func DecodeHeader(packet []byte) (serial int, err error) {
 	serialString := headerRegex.Find(packet)
+	log.Printf("Header serial string: %s\n", string(serialString))
 	if serialString == nil {
 		err = InvalidHeader
 		return
