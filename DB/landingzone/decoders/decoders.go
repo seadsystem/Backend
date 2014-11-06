@@ -5,6 +5,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"log"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
@@ -19,7 +20,7 @@ type SeadPacket struct {
 	Serial    int
 }
 
-var headerRegex *Regexp
+var headerRegex *regexp.Regexp
 var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 
@@ -31,7 +32,7 @@ func init() {
 }
 
 func DecodeHeader(packet []byte) (serial int, err error) {
-	serialString = headerRegex.Find(packet)
+	serialString := headerRegex.Find(packet)
 	if serialString == nil {
 		err = InvalidHeader
 		return
@@ -92,11 +93,11 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 
 func doubleToAsciiTime(double_time float64) string {
 	var days = math.Floor(double_time / (60 * 60 * 24))
-	var hours = math.Floor((double_time % (60 * 60 * 24)) / (60 * 60))
-	var minutes = math.Floor((double_time % (60 * 60)) / (60))
-	var seconds = math.Floor((double_time % (60)) / (1))
-	var milliseconds = math.Floor(((double_time * 1000) % 1000))
-	var clock_time = math.Floor(((double_time * 12000) % 12))
+	var hours = math.Floor((math.Floor(double_time) % (60 * 60 * 24)) / (60 * 60))
+	var minutes = math.Floor((math.Floor(double_time) % (60 * 60)) / (60))
+	var seconds = math.Floor((math.Floor(double_time) % (60)) / (1))
+	var milliseconds = math.Floor(((math.Floor(double_time) * 1000) % 1000))
+	var clock_time = math.Floor(((math.Floor(double_time) * 12000) % 12))
 
 	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
 }
