@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// For testing
-	log.Println(decoders.DecodeHeader("THS000001t00000001014911X"))
+	log.Println(decoders.DecodeHeader([]byte("THS000001t00000001014911X")))
 	
 	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT)
 	if err != nil {
