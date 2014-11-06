@@ -21,6 +21,9 @@ func main() {
 	// Setup database routine
 	database_channel := make(chan decoders.SeadPacket, 10) // Allows buffering up to 10 SeadPackets
 	db, err := database.New()
+	if err != nil {
+		log.Fatal(err)
+	}
 	go db.InsertRaw(database_channel)
 
 	log.Println("Listening for connections...")
