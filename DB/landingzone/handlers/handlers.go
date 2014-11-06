@@ -71,7 +71,7 @@ func HandleRequest(conn net.Conn) {
 
 func sync(conn net.Conn) (serial int, err error) {
 	log.Println("Sending HEAD...")
-	err = writePacket(constants.HEAD)
+	err = writePacket(conn, constants.HEAD)
 	if err != nil {
 		return
 	}
@@ -88,7 +88,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	log.Println("Sending configuration...")
 
 	log.Println("Sending OKAY.")
-	err = writePacket(constants.OKAY)
+	err = writePacket(conn, constants.OKAY)
 	if err != nil {
 		return
 	}
