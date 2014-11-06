@@ -27,43 +27,30 @@ func HandleRequest(conn net.Conn) {
 	log.Printf("Plug serial: %d\n", serial)
 
 	for {
-		log.Println("Reading length header...")
-		length_header, err := readBytes(conn, constants.LENGTH_HEADER_SIZE)
+		// Read packet
+		data, err := readPacket(conn)
+
 		if err != nil {
 			readError(err)
-			break
-		}
 
-		data_length := int(length_header[1])
-
-		// Check that we got a length header
-		if length_header[0] != 'L' || data_length == 0 {
-			log.Println("Invalid length header.")
-			log.Println("Re-syncing...")
-			conn.Write([]byte(constants.HEAD))
-		} else {
-			log.Printf("Length: %d\n", length_header[1])
-
-			// Get the rest of the packet
-			data, err := readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
-
+			serial, err = sync(conn)
 			if err != nil {
 				readError(err)
-
-				log.Println("Re-syncing...")
-				conn.Write([]byte(constants.HEAD))
 				break
 			}
-
-			log.Println("Read data:")
-			log.Println(string(data))
-
-			log.Println("Sending ACK.")
-			conn.Write([]byte(constants.ACK))
-
-			log.Println("Sending OKAY.")
-			conn.Write([]byte(constants.OKAY))
+			continue
 		}
+
+		log.Println("Read data:")
+		log.Println(string(data))
+
+		log.Println("Sending ACK.")
+		conn.Write([]byte(constants.ACK))
+		
+		// TODO: Send configuration packet.
+
+		log.Println("Sending OKAY.")
+		conn.Write([]byte(constants.OKAY))
 
 	}
 
@@ -84,7 +71,7 @@ func sync(conn net.Conn) (serial int, err error) {
 		return
 	}
 
-	// TODO Parse header to get serial
+	// Parse header to get serial
 	serial, err = decoders.DecodeHeader(data)
 	if err != nil {
 		return

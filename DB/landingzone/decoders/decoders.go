@@ -28,7 +28,7 @@ var InvalidPacket = errors.New("Invalid packet.")
 func init() {
 	headerRegex, err := regexp.Compile(constants.HEADER_REGEX)
 	if err != nil {
-		log.Println("Regex compile error:", err)
+		log.Panic("Regex compile error:", err)
 	}
 }
 
