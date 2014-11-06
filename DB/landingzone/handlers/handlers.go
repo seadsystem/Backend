@@ -152,10 +152,10 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 
 // readError checks the error and prints an appropriate friendly error message.
 func readError(err error) {
-	if err != io.EOF {
-		log.Println("Read error:", err)
-	} else {
+	if err == io.EOF {
 		log.Println("Done reading bytes.")
+	} else {
+		log.Println("Read error: ", err)
 	}
 }
 
