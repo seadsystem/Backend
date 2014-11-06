@@ -24,16 +24,18 @@ Variable names:
 		Private: camelCase
 
 	Parameters and scoped:
-		lowercase_with_underscores
+		lowercase_with_underscores  // Non-standard
 
 Constants:
-	UPPERCASE_WITH_UNDERSCORES
+	UPPERCASE_WITH_UNDERSCORES  // Non-standard
 
 Comments:
 	All variables and functions which are not obvious should have doc comments. Doc comments work best as complete sentences, which allow a wide variety of automated presentations. The first sentence should be a one-sentence summary that starts with the name being declared (case sensitive).
+	
+	If the function of a cluster of statements is not immediately obvious, add a comment describing what it does. If why it needs to be done or why it needs to be done a specific way is not obvious, include that too.
 
 	Line comments:
-		Commented out code without a space between the // and the code to distinguish it from a real comment.
+		Commented out code lines without a space between the // and the start of the code to distinguish it from a real comment.
 
 		Line comments which are actually comments should have a single space between the // and the start of the comment.
 
@@ -46,9 +48,21 @@ Whitespace:
 	Trim trailing whitespace.
 
 Logging:
-	Use the log package instead of fmt. Log everything useful for debugging or tracing the code path. If a comment is made redundant by a logging statement, omit the comment.
+	Use the log package instead of fmt. The log package adds timestamps and allows us to easily redirect the logging output.
+	
+	Log everything useful for debugging or tracing the code path. If a comment is made redundant by a logging statement, omit the comment.
 
 	If a logging statement indicates that something is about to happen (but has not happened yet), end the text in an ellipsis.
 
 Changes to this guide:
 	All changes to this guide must be reflected in the code. If you don't want to update the code, don't change the guide.
+
+Imports:
+	Never use imports to connect code files which are not in the same directory.
+
+	Ordering:
+		Standard library
+		3rd party libraries (always use go get)
+		Your packages
+
+	Separate the above mentioned types of imports with a blank line. Always use the import (\n...\n)\n style imports.
