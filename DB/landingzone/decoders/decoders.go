@@ -21,12 +21,13 @@ type SeadPacket struct {
 	Serial    int
 }
 
-var headerRegex *regexp.Regexp = nil
+var headerRegex *regexp.Regexp
 var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 
 func init() {
-	headerRegex, err := regexp.Compile(constants.HEADER_REGEX)
+	var err error
+	headerRegex, err = regexp.Compile(constants.HEADER_REGEX)
 	if err != nil {
 		log.Panic("Regex compile error:", err)
 	}
