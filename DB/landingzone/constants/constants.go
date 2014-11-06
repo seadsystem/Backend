@@ -16,7 +16,7 @@ const (
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t\\d+X)$"
 
 	// Database
-	DB_SOCKET   = "/var/run/postgresql/.s.PGSQL.5433"
+	DB_SOCKET   = "/var/run/postgresql"
 	DB_PORT     = 5433
 	DB_USER     = "seads"
 	DB_NAME     = "seads"
