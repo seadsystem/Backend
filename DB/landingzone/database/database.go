@@ -17,6 +17,9 @@ type DB struct {
 
 func New() (db DB, err error) {
 	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%d", constants.DB_SOCKET, constants.DB_USER, constants.DB_NAME, constants.DB_PASSWORD, constants.DB_PORT))
+	if err != nil {
+		log.Println(err)
+	}
 	db.set(conn)
 	return
 }
@@ -28,6 +31,9 @@ func (db DB) set(conn *sql.DB) {
 func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 	stmt, err := db.conn.Prepare("COPY data_raw (serial, type, data, time) FROM STDIN")
 	// TODO: Add error handling
+	if err != nil {
+		log.Println(err)
+	}
 
 	for {
 		log.Println("Waiting for data...")
@@ -36,5 +42,8 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 		log.Printf("Data: %+v\n", data)
 		_, err = stmt.Exec(data.Serial, data.Type, data.Data, data.Timestamp)
 		// TODO: Add error handling
+		if err != nil {
+			log.Println(err)
+		}
 	}
 }
