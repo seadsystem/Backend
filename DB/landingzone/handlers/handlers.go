@@ -93,7 +93,7 @@ func writePacket(conn net.Conn, data []byte) (err error) {
 	if err != nil {
 		return
 	}
-	if write_length != len(constants.ACK) {
+	if write_length != len(data) {
 		err = io.ErrShortWrite
 		return
 	}
