@@ -19,8 +19,10 @@ var InvalidLength = errors.New("Invalid length header.")
 func HandleRequest(conn net.Conn) {
 	log.Println("Got a connection.")
 
+	var err error
+
 	// Do initial sync to get serial number and start receiving data
-	_, err := sync(conn)
+	_, err = sync(conn)
 	if err != nil {
 		readError(err)
 		return
@@ -44,7 +46,7 @@ func HandleRequest(conn net.Conn) {
 
 		log.Println("Read data:")
 		log.Println(string(packet))
-		
+
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
 		if err != nil {
@@ -52,7 +54,7 @@ func HandleRequest(conn net.Conn) {
 			break
 		}
 		log.Printf("Data: %+v\n", data)
-		
+
 		// TODO: Write data to database
 
 		log.Println("Sending ACK...")

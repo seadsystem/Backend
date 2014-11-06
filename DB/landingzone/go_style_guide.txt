@@ -12,7 +12,7 @@ Line length:
 	Go has no line length limit. Don't worry about overflowing a punched card. If a line feels too long, wrap it and indent with an extra tab.
 
 Parentheses:
-	Go needs fewer parentheses than C and Java: control structures (if, for, switch) do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so 
+	Go needs fewer parentheses than C and Java: control structures (if, for, switch) do not have parentheses in their syntax. Also, the operator precedence hierarchy is shorter and clearer, so
 
 Function names:
 	Public functions: PascalCase
@@ -31,7 +31,7 @@ Constants:
 
 Comments:
 	All variables and functions which are not obvious should have doc comments. Doc comments work best as complete sentences, which allow a wide variety of automated presentations. The first sentence should be a one-sentence summary that starts with the name being declared (case sensitive).
-	
+
 	If the function of a cluster of statements is not immediately obvious, add a comment describing what it does. If why it needs to be done or why it needs to be done a specific way is not obvious, include that too.
 
 	Line comments:
@@ -49,7 +49,7 @@ Whitespace:
 
 Logging:
 	Use the log package instead of fmt. The log package adds timestamps and allows us to easily redirect the logging output.
-	
+
 	Log everything useful for debugging or tracing the code path. If a comment is made redundant by a logging statement, omit the comment.
 
 	If a logging statement indicates that something is about to happen (but has not happened yet), end the text in an ellipsis.
