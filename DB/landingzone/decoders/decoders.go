@@ -114,7 +114,7 @@ func doubleToAsciiTime(double_time float64) string {
 	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
 }
 
-func asciiTimeToDouble(asciiTime []byte) (time float64, err error) {
+func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 	// Check time string format
 	if len(asciiTime) != 16 {
 		err = InvalidTime
@@ -126,24 +126,42 @@ func asciiTimeToDouble(asciiTime []byte) (time float64, err error) {
 
 	// Do the conversion now that we know it should work
 	var ptr int = 0
-	days := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
+	days, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
+	if err != nil {
+		return
+	}
 	ptr += 3
 	time += 60 * 60 * 24 * days
-	hours := int(ascii_time[ptr : ptr+2])
+	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
 	ptr += 2
 	time += 60 * 60 * hours
-	minutes := int(ascii_time[ptr : ptr+2])
+	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
 	ptr += 2
 	time += 60 * minutes
-	seconds := int(ascii_time[ptr : ptr+2])
+	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
 	ptr += 2
 	time += seconds
-	milliseconds := float64(strconv.Atoi(string(ascii_time[ptr : ptr+3])))
+	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
+	if err != nil {
+		return
+	}
 	ptr += 3
-	time += milliseconds / 1000
-	clock := float64(strconv.Atoi(string(ascii_time[ptr : ptr+2])))
+	time += float64(milliseconds) / 1000
+	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
 	ptr += 2
-	time += clock / 12000
+	time += float64(clock) / 12000
 	return
 }
 
