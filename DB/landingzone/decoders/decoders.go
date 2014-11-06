@@ -21,7 +21,7 @@ type SeadPacket struct {
 	Serial    int
 }
 
-var headerRegex *regexp.Regexp
+var headerRegex *regexp.Regexp = nil
 var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 
