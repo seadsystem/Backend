@@ -41,14 +41,14 @@ func DecodeHeader(packet []byte) (serial int, err error) {
 		err = InvalidHeader
 		return
 	}
-	log.Printf("Found %d serials.\n", len(serialStrings))
-	if len(serialStrings) != 1 {
+	log.Printf("Found %d serials.\n", len(serialStrings)-1)
+	if len(serialStrings) != 2 {
 		err = InvalidHeader
 		return
 	}
-	log.Printf("Header serial string: %s\n", string(serialStrings[0]))
+	log.Printf("Header serial string: %s\n", string(serialStrings[1]))
 
-	serial, err = strconv.Atoi(string(serialStrings[0]))
+	serial, err = strconv.Atoi(string(serialStrings[1]))
 	return
 }
 
