@@ -21,6 +21,7 @@ func New() (DB, error) {
 }
 
 func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
+	// Example code: https://github.com/olt/pq/blob/bulk/copy_test.go
 	stmt, err := db.conn.Prepare("COPY data_raw (serial, type, data, time) FROM STDIN")
 	if err != nil {
 		log.Fatal(err)
