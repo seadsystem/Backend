@@ -27,7 +27,6 @@ func HandleRequest(conn net.Conn) {
 	log.Printf("Plug serial: %d\n", serial)
 
 	for {
-		// Read packet
 		data, err := readPacket(conn)
 
 		if err != nil {
@@ -44,17 +43,17 @@ func HandleRequest(conn net.Conn) {
 		log.Println("Read data:")
 		log.Println(string(data))
 
-		log.Println("Sending ACK.")
-		conn.Write([]byte(constants.ACK))
-		
-		// TODO: Send configuration packet.
+		log.Println("Sending ACK...")
+		writePacket(conn, []byte(constants.ACK))
+		if err != nil {
+			readError(err)
+			break
+		}
 
-		log.Println("Sending OKAY.")
-		conn.Write([]byte(constants.OKAY))
-
+		// TODO: Write data to database
 	}
 
-	conn.Write([]byte("Response"))
+	log.Println("Closing connection...")
 	conn.Close()
 }
 
@@ -78,6 +77,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	}
 
 	log.Println("Sending configuration...")
+	// TODO: Send config
 
 	log.Println("Sending OKAY.")
 	err = writePacket(conn, []byte(constants.OKAY))
