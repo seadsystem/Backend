@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT)
+	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT)  // The plugs only support IPv4.
 	if err != nil {
 		log.Println("Failed to open listener on port " + constants.PORT)
 		log.Panic("Error was: " + err.Error())
