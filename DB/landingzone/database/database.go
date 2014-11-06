@@ -15,14 +15,9 @@ type DB struct {
 	conn *sql.DB
 }
 
-func New() (db DB, err error) {
+func New() (DB, error) {
 	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%d", constants.DB_SOCKET, constants.DB_USER, constants.DB_NAME, constants.DB_PASSWORD, constants.DB_PORT))
-	db.set(conn)
-	return
-}
-
-func (db DB) set(conn *sql.DB) {
-	db.conn = conn
+	return &DB{conn}, err
 }
 
 func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
