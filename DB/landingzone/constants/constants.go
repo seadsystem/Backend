@@ -9,5 +9,5 @@ const (
 	ACK                = "\x06\n"
 	OKAY               = "@K\n"
 	READ_TIME_LIMIT    = 5
-	HEADER_REGEX       = "^THS([0-9]+)t[0-9]+X$"
+	HEADER_REGEX       = "(?:THS)([0-9]+)"
 )
