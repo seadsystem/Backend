@@ -26,6 +26,7 @@ var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 var InvalidTime = errors.New("Invalid time.")
 
+// init sets up stuff we need with proper error handling. If it isn't complicated or doesn't need error handling, it can probably just be assigned directly.
 func init() {
 	var err error
 	headerRegex, err = regexp.Compile(constants.HEADER_REGEX)
@@ -34,6 +35,7 @@ func init() {
 	}
 }
 
+// DecodeHeader verifies that the header is in the correct format and extracts the serial number
 func DecodeHeader(packet []byte) (serial int, err error) {
 	serialStrings := headerRegex.FindSubmatch(packet)
 
@@ -48,7 +50,7 @@ func DecodeHeader(packet []byte) (serial int, err error) {
 	return
 }
 
-// Extract data sent from sensor from request
+// DecodePacket extracts the data sent from sensor
 func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 	for i := 0; i < len(buffer); {
 		datatype := buffer[i]
@@ -99,6 +101,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 }
 
 func doubleToAsciiTime(double_time float64) string {
+	// TODO: Check if this logic is correct or if we need to use http://golang.org/pkg/math/#Mod
 	int_time := int(double_time)
 	var days = math.Floor(double_time / (60 * 60 * 24))
 	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
@@ -161,6 +164,7 @@ func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 	return
 }
 
+// every checks if every byte in a slice meets some criteria
 func every(data []byte, check func(byte) bool) bool {
 	for _, element := range data {
 		if !check(element) {

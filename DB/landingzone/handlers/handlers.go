@@ -15,23 +15,25 @@ import (
 var Timeout = errors.New("Action timed out.")
 var InvalidLength = errors.New("Invalid length header.")
 
-// Handle a client's request
+// HandleRequest handles a communication stream with a plug.
 func HandleRequest(conn net.Conn) {
 	log.Println("Got a connection.")
 
+	// Do initial sync to get serial number and start receiving data
 	serial, err := sync(conn)
 	if err != nil {
 		readError(err)
 		return
 	}
-	log.Printf("Plug serial: %d\n", serial)
 
+	// Main data receiving loop
 	for {
 		data, err := readPacket(conn)
 
 		if err != nil {
 			readError(err)
 
+			log.Println("Re-syncing...")
 			serial, err = sync(conn)
 			if err != nil {
 				readError(err)
@@ -57,6 +59,7 @@ func HandleRequest(conn net.Conn) {
 	conn.Close()
 }
 
+// sync re-aligns the packets, resets the plug's configuration and resumes data transfer.
 func sync(conn net.Conn) (serial int, err error) {
 	log.Println("Sending HEAD...")
 	err = writePacket(conn, []byte(constants.HEAD))
@@ -70,16 +73,17 @@ func sync(conn net.Conn) (serial int, err error) {
 		return
 	}
 
-	// Parse header to get serial
+	log.Println("Parsing header for serial...")
 	serial, err = decoders.DecodeHeader(data)
 	if err != nil {
 		return
 	}
+	log.Printf("Plug serial: %d\n", serial)
 
 	log.Println("Sending configuration...")
 	// TODO: Send config
 
-	log.Println("Sending OKAY.")
+	log.Println("Sending OKAY...")
 	err = writePacket(conn, []byte(constants.OKAY))
 	if err != nil {
 		return
@@ -88,6 +92,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	return
 }
 
+// writePacket writes a message to the specified connection with proper error handling.
 func writePacket(conn net.Conn, data []byte) (err error) {
 	write_length, err := conn.Write(data)
 	if err != nil {
@@ -101,6 +106,7 @@ func writePacket(conn net.Conn, data []byte) (err error) {
 	return
 }
 
+// readPacket reads in an entire packet (including length prefix) with proper error handling. The packet's payload (the entire packet minus the length prefix) is returned.
 func readPacket(conn net.Conn) (data []byte, err error) {
 	log.Println("Reading length header...")
 	length_header, err := readBytes(conn, constants.LENGTH_HEADER_SIZE)
@@ -120,7 +126,6 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 
 	// Get the rest of the packet
 	data, err = readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
-
 	if err != nil {
 		return
 	}
@@ -128,7 +133,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	log.Println("Read data:")
 	log.Println(string(data))
 
-	log.Println("Sending ACK.")
+	log.Println("Sending ACK...")
 	err = writePacket(conn, []byte(constants.ACK))
 	if err != nil {
 		return
@@ -146,13 +151,13 @@ func readError(err error) {
 	}
 }
 
-// readBytes reads the specified number of bytes from the connection with an appropriate time limit.
+// readBytes reads the specified number of bytes from the connection with a time limit store in constants.READ_TIME_LIMIT. The timeout kills unneeded connections and helps unstick stuck plug interactions.
 func readBytes(conn net.Conn, bytes int) (data []byte, err error) {
 	// Setup channels
 	data_channel := make(chan []byte, 1)
 	error_channel := make(chan error, 1)
 
-	// Initiate read in new go routine
+	// Initiate read in new go routine to enable timeouts
 	go func() {
 		buffer := make([]byte, bytes)
 		n, ierr := conn.Read(buffer)

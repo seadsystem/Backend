@@ -1,13 +1,17 @@
 package constants
 
 const (
-	HOST               = "0.0.0.0"
-	PORT               = "9000"
-	INPUT_BUFFER_SIZE  = 128
-	LENGTH_HEADER_SIZE = 3
-	HEAD               = "@H\n"
-	ACK                = "\x06\n"
-	OKAY               = "@K\n"
-	READ_TIME_LIMIT    = 5
-	HEADER_REGEX       = "^(?:THS)(\\d+)(?:t\\d+X)$"
+	HOST = "0.0.0.0" // All host names
+	PORT = "9000"
+
+	LENGTH_HEADER_SIZE = 3 // Measured in bytes
+
+	// Packet constants for plug communication
+	HEAD = "@H\n"
+	ACK  = "\x06\n"
+	OKAY = "@K\n"
+
+	READ_TIME_LIMIT = 5 // Measured in seconds
+
+	HEADER_REGEX = "^(?:THS)(\\d+)(?:t\\d+X)$"
 )
