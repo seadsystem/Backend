@@ -1,11 +1,64 @@
 package decoders
 package math
 
-import ()
+import (
+    "math"
+)
 
 // Extract data sent from sensor from request
 func decodePacket(buffer []byte) {
+    // TODO set the types in this struct
+    type SeadPacket struct {
+        type
+        location 
+        timestamp
+        period
+        count
+        data
+        serial
+    }
+    var packet SeadPacket
+    for i := 0; i < len(buffer); {
+        var datatype := buffer[i]
+        i++
 
+        // Switch on the type of data sent in the packet
+        switch {
+        case datatype == 'T':
+            // Type
+            packet.type := buffer[i]
+            i++
+        case datatype == 'l':
+            // Location
+            packet.location := buffer[i]
+            i++
+        case datatype == 't':
+            // Timestamp
+            packet.timestamp := asciiTimeToDouble(buffer[i:i+14])
+            i += 14
+        case datatype == 'P':
+            // Period separator
+            packet.period := asciiTimeToDouble(buffer[i:i+14])
+            i += 14
+        case datatype == 'C':
+            // Count
+            packet.count := buffer[i:i+2]
+            i += 2
+        case datatype == 'D':
+            // Data
+            // if count isn't set, return error
+            // TODO finish parsing data
+        case datatype == 'S':
+            // Serial
+            packet.serial := buffer[i:i+6]
+            i += 6
+        case datatype == 'X':
+            return packet
+        default:
+            // error: unknown field
+        }
+    }
+    // return error
 }
 
 func double_to_ascii_time(double_time float64) (string) {
