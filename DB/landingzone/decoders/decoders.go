@@ -177,7 +177,7 @@ func Every(data []byte, check func(byte) bool) bool {
 // Binary2int converts a byte array containing binary data into an int
 func Binary2int(data []byte) (total int) {
 	for index, element := range data {
-		total += int(element)<<(index * 8)
+		total += int(element)<<uint(index * 8)
 	}
 	return
 }
