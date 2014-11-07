@@ -76,8 +76,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 14
 		case datatype == 'C':
 			// Count
-			//packet.Count, err = strconv.Atoi(string(buffer[i : i+2]))
-			packet.Count = int(buffer[i])
+			packet.Count, err = Binary2int(buffer[i : i+2])
 			i += 2
 		case datatype == 'D':
 			// Data
@@ -165,12 +164,20 @@ func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 	return
 }
 
-// every checks if every byte in a slice meets some criteria
-func every(data []byte, check func(byte) bool) bool {
+// Every checks if every byte in a slice meets some criteria
+func Every(data []byte, check func(byte) bool) bool {
 	for _, element := range data {
 		if !check(element) {
 			return false
 		}
+	}
+	return true
+}
+
+// Binary2int converts a byte array containing binary data into an int
+func Binary2int(data []byte) (total int) {
+	for index, element := range data {
+		total += int(element)<<(index * 8)
 	}
 	return true
 }
