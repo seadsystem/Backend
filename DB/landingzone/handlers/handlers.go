@@ -92,7 +92,7 @@ func sync(conn net.Conn) (serial int, err error) {
 	log.Printf("Plug serial: %d\n", serial)
 
 	log.Println("Sending configuration...")
-	err = writePacket(conn, []byte(CONFIG))
+	err = writePacket(conn, []byte(constants.CONFIG))
 	if err != nil {
 		return
 	}
