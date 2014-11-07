@@ -15,7 +15,7 @@ const (
 	//"@SLITWsEP00000000500000C00001\n"
 	//"@SLITTsEP00000000500000C00001\n"
 
-	READ_TIME_LIMIT = 5 // Measured in seconds
+	READ_TIME_LIMIT = 100 // Measured in seconds
 
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t\\d+X)$"
 
