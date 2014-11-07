@@ -57,6 +57,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 			readError(err)
 			break
 		}
+		log.Printf("Byte: %c\n", end)
 
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
