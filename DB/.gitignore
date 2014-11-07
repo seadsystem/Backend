@@ -1,0 +1,4 @@
+*.sw[po]
+*~
+api/__pycache__
+tags
