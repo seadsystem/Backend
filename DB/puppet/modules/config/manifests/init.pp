@@ -7,7 +7,6 @@ class config {
     ensure => present,
   }
 
-  #  include "user"
   unix_user {['raymond', 'ian']:
     groups  => ['db', 'sudo'],
     require => Group['db'],

@@ -19,10 +19,11 @@ rsync -avc ${SRC}/landingzone/ ${LZ}/
 chown -R landingzone:landingzone $LZ
 rsync -avc ${SRC}/api/ ${API}/
 chown -R seadapi:seadapi ${API}
-for module in constants decoders handlers; do
+for module in constants database decoders handlers; do
     mkdir -p /home/landingzone/go/src/github.com/seadsystem/Backend/DB/landingzone/$module
     rsync -avc ${LZ}/$module/ /home/landingzone/go/src/github.com/seadsystem/Backend/DB/landingzone/$module/
 done
+chown -R landingzone:db /home/landingzone
 su -c "env GOPATH='/home/landingzone/go' go build -o ${LZ}/landingzone ${LZ}/main.go" - landingzone 
 
 # Start each server
