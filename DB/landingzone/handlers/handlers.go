@@ -51,13 +51,13 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		log.Println("Read data:")
 		log.Println(string(packet))
 		
-		log.Println("Reading one more byte...")
-		end, err := readBytes(conn, 1)
+		log.Println("Reading three more byte...")
+		end, err := readBytes(conn, 3)
 		if err != nil {
 			readError(err)
 			break
 		}
-		log.Printf("Byte: %c\n", end[0])
+		log.Printf("Bytes: %s\n", string(end))
 
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
