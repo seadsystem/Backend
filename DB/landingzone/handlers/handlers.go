@@ -143,7 +143,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	}
 
 	log.Printf("Received length header: %s\n", length_header)
-	data_length := decoders.Binary2int(length_header[1:3])
+	data_length := decoders.Binary2uint(length_header[1:3])
 
 	// Check that we got a length header
 	if length_header[0] != 'L' || data_length == 0 {
@@ -176,7 +176,7 @@ func readError(err error) {
 	if err == io.EOF {
 		log.Println("Done reading bytes.")
 	} else {
-		log.Println("Read error: ", err)
+		log.Println("Read error:", err)
 	}
 }
 

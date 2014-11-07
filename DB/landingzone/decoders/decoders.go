@@ -76,7 +76,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 14
 		case datatype == 'C':
 			// Count
-			packet.Count = Binary2int(buffer[i : i+2])
+			packet.Count = Binary2uint(buffer[i : i+2])
 			i += 2
 		case datatype == 'D':
 			// Data
@@ -174,10 +174,10 @@ func Every(data []byte, check func(byte) bool) bool {
 	return true
 }
 
-// Binary2int converts a byte array containing binary data into an int
-func Binary2int(data []byte) (total int) {
+// Binary2uint converts a byte array containing binary data into an int
+func Binary2uint(data []byte) (total uint) {
 	for index, element := range data {
-		total += int(element)<<uint(index * 8)
+		total += uint(element)<<uint(index * 8)
 	}
 	return
 }
