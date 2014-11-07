@@ -76,7 +76,8 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 14
 		case datatype == 'C':
 			// Count
-			packet.Count, err = strconv.Atoi(string(buffer[i : i+2]))
+			//packet.Count, err = strconv.Atoi(string(buffer[i : i+2]))
+			packet.Count, err = strconv.Atoi(string(buffer[i]))
 			i += 2
 		case datatype == 'D':
 			// Data

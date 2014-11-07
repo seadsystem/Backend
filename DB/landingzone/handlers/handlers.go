@@ -36,6 +36,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 			readError(err)
 
 			log.Println("Re-syncing...")
+			// TODO: Send two HEAD packets and ignore result of first one.
 			_, err = sync(conn)
 			if err != nil {
 				readError(err)
