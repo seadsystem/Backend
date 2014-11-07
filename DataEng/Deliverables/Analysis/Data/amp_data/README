@@ -1,0 +1,26 @@
+'Sup guise?
+
+I wrote a little command-line utility to extract the amperage data 
+and corresponding time stamps and put it into a new file. In this 
+directory are the amp data, as well as my command-line utility. It 
+may be the hackiest code I've ever written, but it's super early in 
+the AM and it works. 
+
+I'm not super familiar with functions in bash yet, so I just wrote 
+two files. 
+
+One, "data conversion.sh" cycles through the current 
+directory looking for raw files. If it sees one, it checks to make 
+sure the file hasn't yet been converted (in case we get more data), 
+and if it hasn't, it pulls out all the amperage data and corresponding 
+timestamps and copies them into a new .csv file. 
+
+The other is essentially a technician, who brings his data converter 
+with him to all subdirectories he's called in, converts any data 
+he finds, and puts it all in an appropriately named directory.
+
+If we get more data and you want to use it, just put them both in 
+the top directory and call driver.sh. 
+
+Like I said, it's a hack. In any case, we now have clean amp data 
+to work with.
