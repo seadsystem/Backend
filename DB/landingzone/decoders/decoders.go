@@ -179,5 +179,5 @@ func Binary2int(data []byte) (total int) {
 	for index, element := range data {
 		total += int(element)<<(index * 8)
 	}
-	return true
+	return
 }
