@@ -33,6 +33,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		packet, err := readPacket(conn)
 
 		if err != nil {
+			/*
 			readError(err)
 
 			log.Println("Re-syncing...")
@@ -43,10 +44,19 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 				break
 			}
 			continue
+			*/
+			break
 		}
 
 		log.Println("Read data:")
 		log.Println(string(packet))
+		
+		log.Println("Reading one more byte...")
+		end, err := readBytes(conn, 1)
+		if err != nil {
+			readError(err)
+			break
+		}
 
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
