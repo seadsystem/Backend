@@ -16,7 +16,7 @@ type SeadPacket struct {
 	Location  byte
 	Timestamp float64
 	Period    float64
-	Count     int
+	Count     uint
 	Data      float64
 	Serial    int
 }
@@ -81,7 +81,12 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 		case datatype == 'D':
 			// Data
 			// if count isn't set, return error
-			// TODO finish parsing data
+			if packet.Count == 0 {
+				err = InvalidPacket
+			} else {
+				// TODO unpack data
+				i += 2 * int(packet.Count)
+			}
 		case datatype == 'S':
 			// Serial
 			packet.Serial, err = strconv.Atoi(string(buffer[i : i+6]))
@@ -177,7 +182,7 @@ func Every(data []byte, check func(byte) bool) bool {
 // Binary2uint converts a byte array containing binary data into an int
 func Binary2uint(data []byte) (total uint) {
 	for index, element := range data {
-		total += uint(element)<<uint(index * 8)
+		total += uint(element) << uint(index*8)
 	}
 	return
 }

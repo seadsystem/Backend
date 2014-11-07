@@ -33,33 +33,12 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		packet, err := readPacket(conn)
 
 		if err != nil {
-			/*
-			readError(err)
-
-			log.Println("Re-syncing...")
-			// TODO: Send two HEAD packets and ignore result of first one.
-			_, err = sync(conn)
-			if err != nil {
-				readError(err)
-				break
-			}
-			continue
-			*/
+			// Kill connection to allow plug to reestablish a new connection
 			break
 		}
 
 		log.Println("Read data:")
 		log.Println(string(packet))
-		
-		/*
-		log.Println("Reading three more byte...")
-		end, err := readBytes(conn, 3)
-		if err != nil {
-			readError(err)
-			break
-		}
-		log.Printf("Bytes: %s\n", string(end))
-		*/
 
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
@@ -154,7 +133,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	log.Printf("Length: %d\n", data_length)
 
 	// Get the rest of the packet
-	data, err = readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
+	data, err = readBytes(conn, int(data_length-constants.LENGTH_HEADER_SIZE))
 	if err != nil {
 		return
 	}
