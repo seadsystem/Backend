@@ -143,7 +143,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	}
 
 	log.Printf("Received length header: %s\n", length_header)
-	data_length := int(length_header[1] + length_header[2]<<8)
+	data_length := int(length_header[1]) + int(length_header[2])<<8
 
 	// Check that we got a length header
 	if length_header[0] != 'L' || data_length == 0 {
