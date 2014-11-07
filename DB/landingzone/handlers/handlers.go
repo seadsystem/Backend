@@ -51,6 +51,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		log.Println("Read data:")
 		log.Println(string(packet))
 		
+		/*
 		log.Println("Reading three more byte...")
 		end, err := readBytes(conn, 3)
 		if err != nil {
@@ -58,6 +59,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 			break
 		}
 		log.Printf("Bytes: %s\n", string(end))
+		*/
 
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
@@ -141,7 +143,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	}
 
 	log.Printf("Received length header: %s\n", length_header)
-	data_length := int(length_header[1])
+	data_length := int(length_header[1] + length_header[2])
 
 	// Check that we got a length header
 	if length_header[0] != 'L' || data_length == 0 {
@@ -149,7 +151,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 		return
 	}
 
-	log.Printf("Length: %d\n", length_header[1])
+	log.Printf("Length: %d\n", data_length)
 
 	// Get the rest of the packet
 	data, err = readBytes(conn, data_length-constants.LENGTH_HEADER_SIZE)
