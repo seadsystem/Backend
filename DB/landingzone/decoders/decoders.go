@@ -76,7 +76,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 14
 		case datatype == 'C':
 			// Count
-			packet.Count, err = Binary2int(buffer[i : i+2])
+			packet.Count = Binary2int(buffer[i : i+2])
 			i += 2
 		case datatype == 'D':
 			// Data
