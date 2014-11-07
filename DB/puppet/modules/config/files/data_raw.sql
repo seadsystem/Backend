@@ -1,6 +1,6 @@
 CREATE TABLE data_raw (
-  Serial INTEGER,
-  Type CHAR(1),
-  Data DECIMAL,
-  Timestamp TIMESTAMP
+  Serial INTEGER NOT NULL,
+  Type CHAR(1) NOT NULL,
+  Data DECIMAL NOT NULL,
+  Timestamp TIMESTAMP NOT NULL
 );
