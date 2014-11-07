@@ -91,8 +91,11 @@ func sync(conn net.Conn) (serial int, err error) {
 	}
 	log.Printf("Plug serial: %d\n", serial)
 
-	//log.Println("Sending configuration...")
-	// TODO: Send config
+	log.Println("Sending configuration...")
+	err = writePacket(conn, []byte(CONFIG))
+	if err != nil {
+		return
+	}
 
 	log.Println("Sending OKAY...")
 	err = writePacket(conn, []byte(constants.OKAY))

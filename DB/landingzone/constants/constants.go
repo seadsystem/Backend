@@ -7,9 +7,10 @@ const (
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 
 	// Packet constants for plug communication
-	HEAD = "@H\n"
-	ACK  = "\x06\n"
-	OKAY = "@K\n"
+	HEAD   = "@H\n"
+	ACK    = "\x06\n"
+	OKAY   = "@K\n"
+	CONFIG = "@SLITVsEP00000000500000C00001\n@SLITIsEP00000000500000C00001\n@SLITWsEP00000000500000C00001\n@SLITTsEP00000000500000C00001"
 
 	READ_TIME_LIMIT = 5 // Measured in seconds
 
