@@ -84,8 +84,9 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			if packet.Count == 0 {
 				err = InvalidPacket
 			} else {
-				// TODO unpack data
-				i += 2 * int(packet.Count)
+				count := 2 * int(packet.Count)
+				packet.Count = math.Float64frombits(Binary2uint64(buffer[i : i+count]))
+				i += count
 			}
 		case datatype == 'S':
 			// Serial
