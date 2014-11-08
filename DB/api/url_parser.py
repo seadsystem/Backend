@@ -29,7 +29,7 @@ def parse(url):
 		query_options = {
 				'device_id': device_id,
 				'start_time': params['start_time'],
-				'end_time': tokens['end_time'],
+				'end_time': params['end_time'],
 				}
 	elif device_id:
 		query_options = {
