@@ -17,7 +17,7 @@ type SeadPacket struct {
 	Timestamp float64
 	Period    float64
 	Count     uint
-	Data      float64
+	Data      float32
 	Serial    int
 }
 
@@ -85,7 +85,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 				err = InvalidPacket
 			} else {
 				count := 2 * int(packet.Count)
-				packet.Data = math.Float64frombits(Binary2uint64(buffer[i : i+count]))
+				packet.Data = math.Float32frombits(Binary2uint(buffer[i : i+count]))
 				i += count
 			}
 		case datatype == 'S':
