@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders"
@@ -14,8 +15,6 @@ import (
 type DB struct {
 	conn *sql.DB
 }
-
-var Timeout = errors.New("Action timed out.")
 
 func New() (DB, error) {
 	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%d sslmode=disable", constants.DB_SOCKET, constants.DB_USER, constants.DB_NAME, constants.DB_PASSWORD, constants.DB_PORT))
@@ -30,7 +29,7 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 		log.Println("Got data.")
 
 		// Begin transaction
-		txn, err := db.Begin()
+		txn, err := db.conn.Begin()
 		if err != nil {
 			log.Fatal(err)
 		}
