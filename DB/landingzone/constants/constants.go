@@ -18,7 +18,7 @@ const (
 	READ_TIME_LIMIT = 5 * 60 // Measured in seconds
 	DB_TIME_LIMIT   = 10     // Measured in seconds
 
-	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?X)$"
+	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
 
 	// Database
 	DB_SOCKET   = "/var/run/postgresql"
