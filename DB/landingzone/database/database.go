@@ -48,7 +48,7 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 			interp_time := data.Timestamp
 			period := time.Duration(data.Period * float64(time.Second))
 			for _, element := range data.Data {
-				_, err = stmt.Exec(data.Serial, data_type, float32(element)*scale, interp_time.Format(time.RFC3339))
+				_, err = stmt.Exec(data.Serial, data_type, float32(element)*float32(scale), interp_time.Format(time.RFC3339))
 				interp_time.Add(period)
 				if err != nil {
 					log.Println(err)
@@ -90,4 +90,57 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 
 		log.Println("Transaction closed")
 	}
+}
+
+func (db DB) InsertRawPacket(data decoders.SeadPacket) {
+	log.Println("Beginning transaction...")
+	// Begin transaction
+	txn, err := db.conn.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Prepare statement
+	stmt, err := txn.Prepare(pq.CopyIn("data_raw", "serial", "type", "data", "time"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Processing data...")
+
+	// Process data
+	scale := constants.Scale[data.Type]
+	data_type := string(data.Type)
+	interp_time := data.Timestamp
+	period := time.Duration(data.Period * float64(time.Second))
+	for _, element := range data.Data {
+		_, err = stmt.Exec(data.Serial, data_type, float32(element)*float32(scale), interp_time.Format(time.RFC3339))
+		interp_time.Add(period)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+	}
+
+	log.Println("Closing off transaction...")
+
+	// Flush buffer
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Close prepared statement
+	err = stmt.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Commit transaction
+	err = txn.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Transaction closed")
 }
