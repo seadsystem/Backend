@@ -70,7 +70,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			// Timestamp
 			var double_time float64
 			double_time, err = asciiTimeToDouble(buffer[i : i+14])
-			packet.Timestamp = int64(double_time * math.Pow10(12))
+			packet.Timestamp = int64(double_time * float64(math.Pow10(12)))
 			i += 14
 		case datatype == 'P':
 			// Period separator
