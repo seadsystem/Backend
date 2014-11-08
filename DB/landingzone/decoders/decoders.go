@@ -14,10 +14,10 @@ import (
 type SeadPacket struct {
 	Type      byte
 	Location  byte
-	Timestamp float64
+	Timestamp int64
 	Period    float64
 	Count     uint
-	Data      float64
+	Data      float32
 	Serial    int
 }
 
@@ -68,7 +68,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i++
 		case datatype == 't':
 			// Timestamp
-			packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
+			packet.Timestamp, err = int64(asciiTimeToDouble(buffer[i : i+14]) * math.Pow10(12))
 			i += 14
 		case datatype == 'P':
 			// Period separator
@@ -84,8 +84,9 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			if packet.Count == 0 {
 				err = InvalidPacket
 			} else {
-				// TODO unpack data
-				i += 2 * int(packet.Count)
+				count := 2 * int(packet.Count)
+				packet.Data = math.Float32frombits(uint32(Binary2uint(buffer[i : i+count])))
+				i += count
 			}
 		case datatype == 'S':
 			// Serial
@@ -183,6 +184,14 @@ func Every(data []byte, check func(byte) bool) bool {
 func Binary2uint(data []byte) (total uint) {
 	for index, element := range data {
 		total += uint(element) << uint(index*8)
+	}
+	return
+}
+
+// Binary2uint64 converts a byte array containing binary data into an int
+func Binary2uint64(data []byte) (total uint64) {
+	for index, element := range data {
+		total += uint64(element) << uint64(index*8)
 	}
 	return
 }
