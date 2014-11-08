@@ -18,7 +18,7 @@ type SeadPacket struct {
 	Timestamp time.Time
 	Period    float64
 	Count     uint
-	Data      float32
+	Data      []uint16
 	Serial    int
 }
 
@@ -80,8 +80,8 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 			var double_time float64
 			double_time, err = asciiTimeToDouble(buffer[i : i+14])
 			double_time += offset
-			nano := math.Pow10(6)
-			packet.Timestamp = time.Unix(int64(double_time), int64(double_time*nano)%int64(nano))
+			micro := math.Pow10(6)
+			packet.Timestamp = time.Unix(int64(double_time), int64(double_time*micro)%int64(micro))
 			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'P':
@@ -98,9 +98,14 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 			if packet.Count == 0 {
 				err = InvalidPacket
 			} else {
-				count := 2 * int(packet.Count)
-				packet.Data = math.Float32frombits(uint32(Binary2uint(buffer[i : i+count])))
-				i += count
+				count := int(packet.Count)
+				bytes := count * 2
+				data := buffer[i : i+bytes]
+				packet.Data = make([]uint16, count)
+				for i := 0; i < bytes; i += 2 {
+					packet.Data[i/2] = Binary2uint(data[i : i+2])
+				}
+				i += bytes
 			}
 		case datatype == 'S':
 			// Serial

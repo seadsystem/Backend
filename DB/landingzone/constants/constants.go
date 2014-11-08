@@ -28,3 +28,13 @@ const (
 	DB_NAME     = "seads"
 	DB_PASSWORD = ""
 )
+
+// scale factors
+var Scale map[byte]float32 = map[byte]float32{
+	'W': 0.165,
+	'V': 0.16,
+	'I': 1,
+	'T': 0.1,
+	'A': 1,
+	'L': 1,
+}

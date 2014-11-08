@@ -43,9 +43,17 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 	Data_processing:
 		for {
 			// Process data
-			_, err = stmt.Exec(data.Serial, data.Type, data.Data, data.Timestamp.Format(time.RFC3339))
-			if err != nil {
-				log.Println(err)
+			scale := constants.Scale[data.Type]
+			data_type := string(data.Type)
+			interp_time := data.Timestamp
+			peroid := Duration(data.Peroid * float64(time.Second))
+			for _, element := range data.Data {
+				_, err = stmt.Exec(data.Serial, data_type, float32(element)*scale, interp_time.Format(time.RFC3339))
+				interp_time.Add(peroid)
+				if err != nil {
+					log.Println(err)
+					break
+				}
 			}
 
 			log.Println("Waiting for more data...")
