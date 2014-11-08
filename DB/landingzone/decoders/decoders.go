@@ -186,3 +186,11 @@ func Binary2uint(data []byte) (total uint) {
 	}
 	return
 }
+
+// Binary2uint64 converts a byte array containing binary data into an int
+func Binary2uint64(data []byte) (total uint64) {
+	for index, element := range data {
+		total += uint64(element) << uint64(index*8)
+	}
+	return
+}
