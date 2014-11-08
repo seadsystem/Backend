@@ -38,23 +38,24 @@ func init() {
 
 // DecodeHeader verifies that the header is in the correct format and extracts the serial number
 func DecodeHeader(packet []byte) (serial int, offset float64, err error) {
-	serialStrings := headerRegex.FindSubmatch(packet)
+	headerStrings := headerRegex.FindSubmatch(packet)
 
-	if serialStrings == nil || len(serialStrings) != 3 {
+	if headerStrings == nil || len(headerStrings) != 3 {
 		err = InvalidHeader
 		return
 	}
 
-	log.Printf("Header serial string: %s\n", string(serialStrings[1]))
+	log.Printf("Header serial string: %s\n", string(headerStrings[1]))
 
-	double_time, err = asciiTimeToDouble(buffer[i : i+14])
+	var double_time float64
+	double_time, err = asciiTimeToDouble(headerStrings[2])
 	if err != nil {
 		return
 	}
 
 	offset = float64(time.Now().Unix()) - double_time
 
-	serial, err = strconv.Atoi(string(serialStrings[1]))
+	serial, err = strconv.Atoi(string(headerStrings[1]))
 	return
 }
 
