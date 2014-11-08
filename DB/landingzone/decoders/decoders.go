@@ -85,7 +85,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 				err = InvalidPacket
 			} else {
 				count := 2 * int(packet.Count)
-				packet.Count = math.Float64frombits(Binary2uint64(buffer[i : i+count]))
+				packet.Data = math.Float64frombits(Binary2uint64(buffer[i : i+count]))
 				i += count
 			}
 		case datatype == 'S':
