@@ -68,7 +68,8 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i++
 		case datatype == 't':
 			// Timestamp
-			packet.Timestamp, err = int64(asciiTimeToDouble(buffer[i : i+14]) * math.Pow10(12))
+			double_time, err := asciiTimeToDouble(buffer[i : i+14])
+			packet.Timestamp = int64(double_time * math.Pow10(12))
 			i += 14
 		case datatype == 'P':
 			// Period separator
