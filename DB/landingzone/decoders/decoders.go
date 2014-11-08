@@ -7,6 +7,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 )
@@ -14,7 +15,7 @@ import (
 type SeadPacket struct {
 	Type      byte
 	Location  byte
-	Timestamp float64
+	Timestamp Time
 	Period    float64
 	Count     uint
 	Data      float32
@@ -68,10 +69,12 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i++
 		case datatype == 't':
 			// Timestamp
-			//var double_time float64
-			//double_time, err = asciiTimeToDouble(buffer[i : i+14])
-			//packet.Timestamp = int64(double_time * float64(math.Pow10(12)))
-			packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
+			var double_time float64
+			double_time, err = asciiTimeToDouble(buffer[i : i+14])
+			int_time = int64(double_time * math.Pow10(12))
+			nano = int64(math.Pow10(6))
+			packet.Timestamp = Unix(int_time / nano, int_time % nano)
+			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'P':
 			// Period separator
