@@ -35,6 +35,12 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 		_, err = stmt.Exec(data.Serial, data.Type, data.Data, data.Timestamp)
 		if err != nil {
 			log.Println(err)
+			continue
+		}
+		_, err = stmt.Exec()
+		if err != nil {
+			log.Println(err)
+			continue
 		}
 	}
 }
