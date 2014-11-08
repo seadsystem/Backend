@@ -103,7 +103,7 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 				data := buffer[i : i+bytes]
 				packet.Data = make([]uint16, count)
 				for i := 0; i < bytes; i += 2 {
-					packet.Data[i/2] = Binary2uint(data[i : i+2])
+					packet.Data[i/2] = Binary2uint16(data[i : i+2])
 				}
 				i += bytes
 			}
@@ -207,10 +207,7 @@ func Binary2uint(data []byte) (total uint) {
 	return
 }
 
-// Binary2uint64 converts a byte array containing binary data into an int
-func Binary2uint64(data []byte) (total uint64) {
-	for index, element := range data {
-		total += uint64(element) << uint64(index*8)
-	}
-	return
+// Binary2uint16 converts a 2 byte array containing binary data into an uint16
+func Binary2uint16(data []byte) (total uint16) {
+	return uint16(data[0]) + uint16(data[1]<<8)
 }
