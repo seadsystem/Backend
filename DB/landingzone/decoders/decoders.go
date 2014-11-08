@@ -71,8 +71,8 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			// Timestamp
 			var double_time float64
 			double_time, err = asciiTimeToDouble(buffer[i : i+14])
-			int_time = int64(double_time * math.Pow10(12))
-			nano = int64(math.Pow10(6))
+			int_time := int64(double_time * math.Pow10(12))
+			nano := int64(math.Pow10(6))
 			packet.Timestamp = time.Unix(int_time / nano, int_time % nano)
 			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
 			i += 14
