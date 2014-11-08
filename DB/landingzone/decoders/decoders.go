@@ -14,7 +14,7 @@ import (
 type SeadPacket struct {
 	Type      byte
 	Location  byte
-	Timestamp float64
+	Timestamp int64
 	Period    float64
 	Count     uint
 	Data      float32
@@ -68,7 +68,7 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i++
 		case datatype == 't':
 			// Timestamp
-			packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
+			packet.Timestamp, err = int64(asciiTimeToDouble(buffer[i : i+14]) * math.Pow10(12))
 			i += 14
 		case datatype == 'P':
 			// Period separator
