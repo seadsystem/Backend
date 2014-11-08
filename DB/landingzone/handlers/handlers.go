@@ -37,9 +37,6 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 			break
 		}
 
-		log.Println("Read data:")
-		log.Println(string(packet))
-
 		log.Println("Parsing data...")
 		data, err := decoders.DecodePacket(packet)
 		if err != nil {
