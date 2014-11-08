@@ -125,10 +125,9 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 	return
 }
 
-func doubleToAsciiTime(double_time float64) string {
-	// TODO: Check if this logic is correct or if we need to use http://golang.org/pkg/math/#Mod
+func doubleToasciiTime(double_time float64) string {
 	int_time := int(double_time)
-	var days = math.Floor(double_time / (60 * 60 * 24))
+	var days = int(math.Floor(double_time / (60 * 60 * 24)))
 	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
 	var minutes = (int_time % (60 * 60)) / 60
 	var seconds = (int_time % (60)) / 1
