@@ -22,7 +22,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 	var err error
 
 	// Do initial sync to get serial number and start receiving data
-	serial, err = sync(conn)
+	serial, err := sync(conn)
 	if err != nil {
 		readError(err)
 		return
