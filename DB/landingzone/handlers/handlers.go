@@ -22,7 +22,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 	var err error
 
 	// Do initial sync to get serial number and start receiving data
-	serial, err := sync(conn)
+	serial, offset, err := sync(conn)
 	if err != nil {
 		readError(err)
 		return
@@ -38,7 +38,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		}
 
 		log.Println("Parsing data...")
-		data, err := decoders.DecodePacket(packet)
+		data, err := decoders.DecodePacket(packet, offset)
 		if err != nil {
 			readError(err)
 			break
@@ -62,7 +62,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 }
 
 // sync re-aligns the packets, resets the plug's configuration and resumes data transfer.
-func sync(conn net.Conn) (serial int, err error) {
+func sync(conn net.Conn) (serial int, offset float64, err error) {
 	log.Println("Sending HEAD...")
 	err = writePacket(conn, []byte(constants.HEAD))
 	if err != nil {
@@ -76,11 +76,12 @@ func sync(conn net.Conn) (serial int, err error) {
 	}
 
 	log.Println("Parsing header for serial...")
-	serial, err = decoders.DecodeHeader(data)
+	serial, offset, err = decoders.DecodeHeader(data)
 	if err != nil {
 		return
 	}
 	log.Printf("Plug serial: %d\n", serial)
+	log.Printf("Plug serial: %v\n", offset)
 
 	log.Println("Sending configuration...")
 	err = writePacket(conn, []byte(constants.CONFIG))

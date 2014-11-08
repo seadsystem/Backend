@@ -37,22 +37,29 @@ func init() {
 }
 
 // DecodeHeader verifies that the header is in the correct format and extracts the serial number
-func DecodeHeader(packet []byte) (serial int, err error) {
+func DecodeHeader(packet []byte) (serial int, offset float64, err error) {
 	serialStrings := headerRegex.FindSubmatch(packet)
 
-	if serialStrings == nil || len(serialStrings) != 2 {
+	if serialStrings == nil || len(serialStrings) != 3 {
 		err = InvalidHeader
 		return
 	}
 
 	log.Printf("Header serial string: %s\n", string(serialStrings[1]))
 
+	double_time, err = asciiTimeToDouble(buffer[i : i+14])
+	if err != nil {
+		return
+	}
+
+	offset = float64(time.Now().Unix()) - double_time
+
 	serial, err = strconv.Atoi(string(serialStrings[1]))
 	return
 }
 
 // DecodePacket extracts the data sent from sensor
-func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
+func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) {
 	for i := 0; i < len(buffer); {
 		datatype := buffer[i]
 		i++
@@ -71,9 +78,9 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			// Timestamp
 			var double_time float64
 			double_time, err = asciiTimeToDouble(buffer[i : i+14])
-			int_time := int64(double_time * math.Pow10(12))
-			nano := int64(math.Pow10(6))
-			packet.Timestamp = time.Unix(int_time/nano, int_time%nano)
+			double_time += offset
+			nano := math.Pow10(6)
+			packet.Timestamp = time.Unix(int64(double_time), (int_time*nano)%int64(nano))
 			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'P':

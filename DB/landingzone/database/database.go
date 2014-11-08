@@ -53,9 +53,8 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 			// Receive result of read
 			select {
 			case data = <-database_channel:
-				// Read resulted in data
 				log.Println("Got data.")
-			case <-time.After(time.Second * 30):
+			case <-time.After(time.Second * constants.DB_TIME_LIMIT):
 				log.Println("Transaction timed out.")
 				break Data_processing
 			}
