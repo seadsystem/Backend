@@ -2,8 +2,15 @@
 define unix_user (
   $groups,
   $username = $title,
+  $password = false,
 ) {
-  #  include "user"
+
+  if $password {
+    $user_pw = $password
+  } else {
+    $user_pw = false
+  }
+
   user {$username:
     ensure     => 'present',
     groups     => $groups,
@@ -11,6 +18,7 @@ define unix_user (
     home       => "/home/${username}",
     shell      => '/bin/bash',
     managehome => true,
+    password   => $user_pw,
   }
 
   file {"${username}-bashrc":

@@ -12,7 +12,8 @@ class postgres {
   exec {
     'use-9.4':
       command => "sed -i '/^[^#]/ s/$/ 9.4/' /etc/apt/sources.list.d/pgdg.list",
-      require => Exec['installppa'];
+      require => Exec['installppa'],
+      unless  => "grep '9.4' /etc/apt/sources.list.d/pgdg.list";
     'update-apt':
       command => 'apt-get update',
       require => Exec['use-9.4']
@@ -20,6 +21,10 @@ class postgres {
 
   # Install postgres 9.4
   package {'postgresql-9.4':
+    ensure  => installed,
+    require => Exec['update-apt'],
+  }
+  package {'postgresql-contrib-9.4':
     ensure  => installed,
     require => Exec['update-apt'],
   }
@@ -37,5 +42,12 @@ class postgres {
     ensure    => running,
     enable    => true,
     subscribe => File['postgresql.conf'],
+  }
+
+  file {'/var/run/postgresql':
+    ensure  => present,
+    owner   => 'postgres',
+    group   => 'db',
+    require => Package['postgresql-9.4'],
   }
 }

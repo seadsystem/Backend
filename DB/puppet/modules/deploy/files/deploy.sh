@@ -1,6 +1,5 @@
 #!/bin/sh
-# Deploy the SEAD API and landing zone
-# Prerequisites: puppet modules have been executed
+# Finish deploying the SEAD API and landing zone
 
 # Get source directory, current working directory by default
 SRC="`pwd`"
@@ -24,7 +23,7 @@ for module in constants database decoders handlers; do
     rsync -avc ${LZ}/$module/ /home/landingzone/go/src/github.com/seadsystem/Backend/DB/landingzone/$module/
 done
 chown -R landingzone:db /home/landingzone
-su -c "env GOPATH='/home/landingzone/go' go build -o ${LZ}/landingzone ${LZ}/main.go" - landingzone 
+su -c "env GOPATH='/home/landingzone/go' go build -o ~landingzone/go/bin/landingzone ${LZ}/main.go" - landingzone 
 
 # Start each server
 service seadapi start

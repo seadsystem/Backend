@@ -2,7 +2,7 @@
 class go {
   # Install go package
   package {'golang':
-    ensure => installed,
+    ensure  => installed,
     require => User['landingzone'],
   }
 
