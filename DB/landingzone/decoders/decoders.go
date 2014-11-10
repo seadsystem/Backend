@@ -48,7 +48,7 @@ func DecodeHeader(packet []byte) (serial int, offset float64, err error) {
 	log.Printf("Header serial string: %s\n", string(headerStrings[1]))
 
 	var double_time float64
-	double_time, err = asciiTimeToDouble(headerStrings[2])
+	double_time, err = AsciiTimeToDouble(headerStrings[2])
 	if err != nil {
 		return
 	}
@@ -78,15 +78,15 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 		case datatype == 't':
 			// Timestamp
 			var double_time float64
-			double_time, err = asciiTimeToDouble(buffer[i : i+14])
+			double_time, err = AsciiTimeToDouble(buffer[i : i+14])
 			double_time += offset
 			micro := math.Pow10(6)
 			packet.Timestamp = time.Unix(int64(double_time), int64(double_time*micro)%int64(micro))
-			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
+			//packet.Timestamp, err = AsciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'P':
 			// Period separator
-			packet.Period, err = asciiTimeToDouble(buffer[i : i+14])
+			packet.Period, err = AsciiTimeToDouble(buffer[i : i+14])
 			i += 14
 		case datatype == 'C':
 			// Count
@@ -125,10 +125,9 @@ func DecodePacket(buffer []byte, offset float64) (packet SeadPacket, err error) 
 	return
 }
 
-func doubleToAsciiTime(double_time float64) string {
-	// TODO: Check if this logic is correct or if we need to use http://golang.org/pkg/math/#Mod
+func DoubleToAsciiTime(double_time float64) string {
 	int_time := int(double_time)
-	var days = math.Floor(double_time / (60 * 60 * 24))
+	var days = int(math.Floor(double_time / (60 * 60 * 24)))
 	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
 	var minutes = (int_time % (60 * 60)) / 60
 	var seconds = (int_time % (60)) / 1
@@ -138,7 +137,7 @@ func doubleToAsciiTime(double_time float64) string {
 	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
 }
 
-func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
+func AsciiTimeToDouble(ascii_time []byte) (time float64, err error) {
 	// Check time string format
 	if len(ascii_time) != 16 {
 		err = InvalidTime
