@@ -1,0 +1,36 @@
+
+ID:1
+Category: Television
+Make: Sony
+Model: KDL-32EX400
+Description: 32 inch LCD 
+
+ID:2
+Category: Microwave
+Make: Sharp
+Model: R-4A46
+Description: Sharp "Carousel" Manufactured: August 1994
+
+ID:3
+Category: Lamp
+Make: Generic
+Model: Generic
+Description: Bulb specs--20W/12V JC Type T 
+
+ID:4
+Category: Computer
+Make: Custom
+Model:
+Description: Core 2 Duo Desktop, 300 watt max power supply, nvidia gfx card
+
+ID:5
+Category: Speakers
+Make: Klipsh
+Model: Promedia 2.1
+Description: turned on, not playing music
+
+ID: 6
+Category: Speakers
+Make:
+Model:
+Description: they broke before I could get a reading :(
