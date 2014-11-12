@@ -92,5 +92,8 @@ def format_data(data, format):
 		Process rows of data returned by the db and format
 		them appropriately
 	'''
+	
+	# Convert tuples to lists
+	data = map(list, data)
 	if format == 'array':
 		return str(data)
