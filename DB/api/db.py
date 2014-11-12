@@ -36,39 +36,16 @@ def retrieve_by_type(device_id, start_time, end_time, type):
 	   Return sensor data of a specific type for a device
 	   within a specified timeframe
 	'''
-	data = [
-		['Time', 'KW/H', 'Temp'],
-		['1', 50, 70],
-		['2', 60, 77],
-		['3', 80, 82],
-		['4', 50, 76],
-		['5', 50, 70],
-		['6', 50, 70],
-		['7', 60, 77],
-		['8', 80, 82],
-		['9', 50, 76],
-		['10', 50, 70],
-		['11', 50, 70],
-		['12', 60, 77],
-		['13', 80, 82],
-		['14', 50, 76],
-		['15', 50, 70],
-		['16', 50, 70],
-		['17', 60, 77],
-		['18', 80, 82],
-		['19', 50, 76],
-		['20', 50, 70]
-	]
-	return data
+	query = write_crosstab("WHERE serial = %s AND time BETWEEN %s AND %s AND type = %s")
+	params = (int(device_id), start_time, end_time, type)
+	rows = perform_query(query, params)
+	return rows
 
 def retrieve_within_timeframe(device_id, start_time, end_time):
 	'''
 	   Return sensor data for a device within a specified timeframe
 	'''
-	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " +\
-				"WHERE serial = %s AND time BETWEEN %s AND %s'" +\
-			") AS ct_result(time TIMESTAMP, I DECIMAL, W DECIMAL, V DECIMAL, T DECIMAL);"
+	query = write_crosstab("WHERE serial = %s AND time BETWEEN %s AND %s")
 	params = (int(device_id), start_time, end_time)
 	rows = perform_query(query, params)
 	return rows
@@ -78,13 +55,16 @@ def retrieve_historical(device_id):
 	   Return sensor data for a specific device
 	   TODO: add a page size limit?
 	'''
-	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " +\
-				"WHERE serial = %s'" +\
-			") AS ct_result(time TIMESTAMP, I DECIMAL, W DECIMAL, V DECIMAL, T DECIMAL);"
+	query = write_crosstab("WHERE serial = %s")
 	params = (int(device_id), )
 	rows = perform_query(query, params)
 	return rows
+
+def write_crosstab(where):
+	query = "SELECT * FROM crosstab(" +\
+				"'SELECT time, type, data from data_raw " + where + "'"\
+			") AS ct_result(time TIMESTAMP, I DECIMAL, W DECIMAL, V DECIMAL, T DECIMAL);"
+	return query
 
 def perform_query(query, params):
 	'''
