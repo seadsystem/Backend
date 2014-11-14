@@ -1,0 +1,43 @@
+In bash...
+
+I. Fork the repository
+	1. Go to our backend repo. In the top left, click 'Fork'.
+      Now you have your own fork of the repo.
+
+II. Create a local clone of your fork
+	1. Go to the directory that you want to keep your local working 
+      fork in.
+	2. Issue this command:
+      git clone https://github.com/YOUR-USERNAME/Backend
+		This downloads the repo to a folder named 'Backend' in your 
+      current directory. 
+
+III. Configure Git to sync your fork with the original directory
+	1. cd into the repo.
+	2. Check out the current remote repo by issuing this command:
+		git remote -v
+		This shows you where you're configured to fetch from and push to.
+		To keep synced with the original repo, you need to add it by 
+      issuing this command:
+		git remote add upstream https://github.com/seadsystem/Backend.git
+	3. Check that it worked by issuing git remote -v again.
+
+... summarized from:
+https://help.github.com/articles/fork-a-repo/
+
+
+IV. Add your changes to your local branch
+	1. git add
+		git commit
+		git push
+
+V. Merge your changes into the main repo
+
+To create a pull request (that pulls your code into the repo),
+do this:
+https://help.github.com/articles/using-pull-requests/
+
+
+
+To sync, issue this command:
+git fetch
