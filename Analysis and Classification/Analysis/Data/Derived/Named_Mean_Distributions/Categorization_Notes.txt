@@ -1,0 +1,38 @@
+These devices fall into more than one group, and should not be used 
+used in testing:
+* TVs
+* Speakers
+
+These device types are represented by only tested unit, and should not
+be used in testing IFF we get more data and it continues to exhibit 
+distinct distributions: 
+* Desktop Computer
+
+I think it's feasible to say we can distinguish:
+* Lamps from laptops
+* Lamps from microwaves
+
+The uncategorizable group contains a flatpanel monitor (expected) and 
+a lamp (unexpected). This lamp is an incandescent halogen rated at 20W,
+well half that of the other lamps. What's more, the other lamps 
+produce more distinct spikes as power draw increases. 
+
+Microwaves seem to have a distinct second spike, and start heading 
+upward, whereas lamps have a less distinct second spike at a higher 
+frequency, and start heading down. (i.e., df(t)/dt < 0)
+
+What's more, microwaves have two spikes well above f = 0 that exceed 
+the second standard deviation, while lamps have f(0) > 2*std, and do 
+not exceed the second std elsewhere.
+
+If these features hold, we may be able to distinguish lamps from 
+microwaves. 
+
+At the moment, I think it is reasonable to say that we should shoot 
+for distinguishing between laptops and microwaves or lamps. All of the 
+laptops we've studied...
+* Have two peaks above the 5th std. 
+* Probably have none above the 7th
+... while all the microwaves and lamps have ...
+* One peak above at least the 8th
+* One peak above the 3rd (4th to be safe)

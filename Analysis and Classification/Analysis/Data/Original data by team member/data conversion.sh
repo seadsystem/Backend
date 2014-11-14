@@ -9,7 +9,7 @@ filename_seed=_amps.csv
 #descent_counter=0
 for i in $(ls); do
 	#If we see a raw file...
-	if [[ `echo $i | egrep 'raw.csv'` != "" ]]; then 
+	if [[ `echo $i | egrep 'raw'` != "" ]]; then 
 
 		#Create the new file name.
 		trimmed_original_filename=`echo $i | sed 's/\([^.]\)[.][c][s][v]$/\1/'`
@@ -18,7 +18,7 @@ for i in $(ls); do
 		#Don't convert if it already exists
 		if [ ! -f $filename ]; then
 			echo "Trimming $i..."
-			cat $i | egrep '^70|^66|^74|^62|^78|^58|^50|^14|^54' | sed 's/^[0-9][0-9][,]\([-0-9][0-9]*[\.]*[0-9]*[,][0-9][0-9]*\)[,][0-9][0-9]*/\1/' > $filename
+			cat $i | egrep '^70|^66|^74|^62|^78|^58|^50|^14|^54' | sed 's/^[0-9][0-9][,]\([-0-9][0-9]*[\.]*[0-9]*[,][0-9][0-9]*\)[,][0-9][0-9]*/\1/' >> $filename
 		else
 			echo "Skipping $i..."
 		fi
