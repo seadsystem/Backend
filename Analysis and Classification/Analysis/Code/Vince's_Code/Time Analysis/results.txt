@@ -1,0 +1,103 @@
+
+Analyzing 1
+Skipped time in seconds: 54.046025
+Spent time: 7.795702
+Elapsed time: 61.841727
+Proportion of skipped to total: 0.873941068948
+
+Analyzing 2
+Skipped time in seconds: 71.64827
+Spent time: 1.243995
+Elapsed time: 72.892265
+Proportion of skipped to total: 0.98293378591
+
+Analyzing 3
+Skipped time in seconds: 3.876106
+Spent time: 2.570923
+Elapsed time: 6.447029
+Proportion of skipped to total: 0.601223602376
+
+Analyzing 4
+Skipped time in seconds: 62.336604
+Spent time: 6.63464
+Elapsed time: 68.971244
+Proportion of skipped to total: 0.903805707782
+
+Analyzing 5
+Skipped time in seconds: 51.200036
+Spent time: 5.971176
+Elapsed time: 57.171212
+Proportion of skipped to total: 0.895556246035
+
+Analyzing 6
+Skipped time in seconds: 57.785349
+Spent time: 1.990392
+Elapsed time: 59.775741
+Proportion of skipped to total: 0.96670234502
+
+Analyzing 7
+Skipped time in seconds: 63.311808
+Spent time: 3.897851
+Elapsed time: 67.209659
+Proportion of skipped to total: 0.942004600857
+
+Analyzing 8
+Skipped time in seconds: 0.0
+Spent time: 0.082933
+Elapsed time: 0.082933
+Proportion of skipped to total: 0.0
+
+Analyzing 9
+Skipped time in seconds: 3.371836
+Spent time: 2.239191
+Elapsed time: 5.611027
+Proportion of skipped to total: 0.600930275331
+
+Analyzing 10
+Skipped time in seconds: 4.704059
+Spent time: 3.234387
+Elapsed time: 7.938446
+Proportion of skipped to total: 0.592566731574
+
+Analyzing 11
+Skipped time in seconds: 0.891433
+Spent time: 0.580531
+Elapsed time: 1.471964
+Proportion of skipped to total: 0.605607881714
+
+Analyzing 12
+Skipped time in seconds: 4.051941
+Spent time: 2.902655
+Elapsed time: 6.954596
+Proportion of skipped to total: 0.582627804692
+
+Analyzing 13
+Skipped time in seconds: 41.898945
+Spent time: 0.912263
+Elapsed time: 42.811208
+Proportion of skipped to total: 0.978691024089
+
+Analyzing 14
+Skipped time in seconds: 80.871885
+Spent time: 3.566119
+Elapsed time: 84.438004
+Proportion of skipped to total: 0.957766422333
+
+Analyzing 15
+Skipped time in seconds: 2.357371
+Spent time: 0.414665
+Elapsed time: 2.772036
+Proportion of skipped to total: 0.850411394369
+
+Analyzing 16
+Skipped time in seconds: 0.883171
+Spent time: 0.497598
+Elapsed time: 1.380769
+Proportion of skipped to total: 0.639622558154
+
+Analyzing 17
+Skipped time in seconds: 52.272347
+Spent time: 8.707965
+Elapsed time: 60.980312
+Proportion of skipped to total: 0.857200386249
+
