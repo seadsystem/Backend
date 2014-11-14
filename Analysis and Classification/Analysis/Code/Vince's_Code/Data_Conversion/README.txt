@@ -1,0 +1,1 @@
+This is a pair of scripts that look through directories for raw data csv files. If any are found, the amp data is copied to a new csv file. 

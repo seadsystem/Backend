@@ -1,0 +1,31 @@
+
+
+ID: 1
+Category: Computer
+Make: Apple
+Model: MacBook Pro, Mid 2012
+Description: Laptop
+
+ID:2
+Category: Computer
+Make: ASUS
+Model: 1215-T
+Description: Netbook without battery
+
+ID: 3
+Category: Television
+Make: Samsung
+Model: SyncMaster 712N
+Description: Flatpanel LCD monitor
+
+ID:
+Category:
+Make:
+Model:
+Description:
+
+ID:
+Category:
+Make:
+Model:
+Description:

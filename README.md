@@ -1,2 +1,1 @@
-# Backend Repo
-
+# Unified repository for the backend team. 
