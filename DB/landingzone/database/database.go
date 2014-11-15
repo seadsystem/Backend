@@ -47,6 +47,7 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 			interp_time := data.Timestamp
 			for _, element := range data.Data {
 				log.Println("Data:", element)
+				log.Println("Time:", interp_time)
 				_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
 				interp_time.Add(data.Period)
 				if err != nil {
