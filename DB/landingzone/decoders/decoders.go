@@ -256,6 +256,6 @@ func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) 
 		return
 	}
 	ptr += 2
-	duration += time.Millisecond * time.Duration(clock/12)
+	duration += time.Millisecond * time.Duration(clock) / 12
 	return
 }
