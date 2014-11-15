@@ -60,7 +60,7 @@ func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
 }
 
 // DecodePacket extracts the data sent from sensor
-func DecodePacket(buffer []byte, offset data.Timestamp) (packet SeadPacket, err error) {
+func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error) {
 	for i := 0; i < len(buffer); {
 		datatype := buffer[i]
 		i++
