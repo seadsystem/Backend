@@ -81,7 +81,7 @@ func sync(conn net.Conn) (serial int, offset float64, err error) {
 		return
 	}
 	log.Printf("Plug serial: %d\n", serial)
-	log.Printf("Plug offset: %d\n", offset)
+	log.Printf("Plug offset: %+v\n", offset)
 
 	log.Println("Sending configuration...")
 	err = writePacket(conn, []byte(constants.CONFIG))

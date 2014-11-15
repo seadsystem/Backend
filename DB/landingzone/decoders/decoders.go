@@ -37,7 +37,7 @@ func init() {
 }
 
 // DecodeHeader verifies that the header is in the correct format and extracts the serial number
-func DecodeHeader(packet []byte) (serial int, offset time.Duration, err error) {
+func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
 	headerStrings := headerRegex.FindSubmatch(packet)
 
 	if headerStrings == nil || len(headerStrings) != 3 {
@@ -47,7 +47,7 @@ func DecodeHeader(packet []byte) (serial int, offset time.Duration, err error) {
 
 	log.Printf("Header serial string: %s\n", string(headerStrings[1]))
 
-	var double_time float64
+	var duration time.Duration
 	duration, err = AsciiTimeToDuration(headerStrings[2])
 	if err != nil {
 		return
