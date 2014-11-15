@@ -114,6 +114,7 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 	period := time.Duration(data.Period * float64(time.Second))
 	for _, element := range data.Data {
 		log.Println("Data:", element)
+		log.Println("Time:", interp_time)
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
 		interp_time.Add(period)
 		if err != nil {

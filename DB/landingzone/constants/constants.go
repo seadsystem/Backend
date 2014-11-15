@@ -29,4 +29,3 @@ const (
 	DB_NAME     = "seads"
 	DB_PASSWORD = ""
 )
-

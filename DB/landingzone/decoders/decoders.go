@@ -226,7 +226,7 @@ func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) 
 		return
 	}
 	ptr += 3
-	duration += time.Hour * time.Duration(24 * days)
+	duration += time.Hour * time.Duration(24*days)
 	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
@@ -256,6 +256,6 @@ func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) 
 		return
 	}
 	ptr += 2
-	duration += time.Millisecond * time.Duration(clock / 12)
+	duration += time.Millisecond * time.Duration(clock/12)
 	return
 }
