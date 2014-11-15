@@ -1,5 +1,9 @@
 package constants
 
+import (
+	"math"
+)
+
 const (
 	HOST = "0.0.0.0" // All host names
 	PORT = "9000"
@@ -7,9 +11,9 @@ const (
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 
 	// Packet constants for plug communication
-	HEAD   = "@H\n"
-	ACK    = "\x06\n"
-	OKAY   = "@K\n"
+	HEAD = "@H\n"
+	ACK  = "\x06\n"
+	OKAY = "@K\n"
 	//CONFIG = "@SLITIsEP00000000500000C00001\n" // Config value is no longer used by plug. We must still send it a valid config anyway.
 	// Full config includes these lines too:
 	//"@SLITVsEP00000000500000C00001\n"
@@ -28,6 +32,7 @@ const (
 	DB_USER     = "landingzone"
 	DB_NAME     = "seads"
 	DB_PASSWORD = ""
+	MICRO       = math.Pow10(6)
 )
 
 // scale factors
