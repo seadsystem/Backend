@@ -168,7 +168,6 @@ func readBytes(conn net.Conn, bytes int) (data []byte, err error) {
 	n, err := conn.Read(buffer)
 
 	if err != nil {
-		error_channel <- ierr
 		return
 	}
 
