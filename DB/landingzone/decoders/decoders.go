@@ -2,9 +2,7 @@ package decoders
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"math"
 	"regexp"
 	"strconv"
 	"time"
