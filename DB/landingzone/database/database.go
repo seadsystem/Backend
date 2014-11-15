@@ -21,77 +21,6 @@ func New() (DB, error) {
 	return DB{conn}, err
 }
 
-func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
-	// Infinite loop with no breaks.
-	for {
-		log.Println("Waiting for data...")
-		data := <-database_channel // Wait for first piece of data before starting transaction
-		log.Println("Got data.")
-
-		// Begin transaction
-		txn, err := db.conn.Begin()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Prepare statement
-		stmt, err := txn.Prepare(pq.CopyIn("data_raw", "serial", "type", "data", "time"))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-	Data_processing:
-		for {
-			// Process data
-			data_type := string(data.Type)
-			interp_time := data.Timestamp
-			for _, element := range data.Data {
-				log.Println("Data:", element)
-				log.Println("Time:", interp_time.Format(time.RFC3339))
-				_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
-				interp_time.Add(data.Period)
-				if err != nil {
-					log.Println(err)
-					break
-				}
-			}
-
-			log.Println("Waiting for more data...")
-
-			// Receive result of read
-			select {
-			case data = <-database_channel:
-				log.Println("Got data.")
-			case <-time.After(time.Second * constants.DB_TIME_LIMIT):
-				log.Println("Transaction timed out.")
-				break Data_processing
-			}
-		}
-
-		log.Println("Closing off transaction...")
-
-		// Flush buffer
-		_, err = stmt.Exec()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Close prepared statement
-		err = stmt.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Commit transaction
-		err = txn.Commit()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Println("Transaction closed")
-	}
-}
-
 func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 	log.Println("Beginning transaction...")
 	// Begin transaction
@@ -113,8 +42,8 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 	interp_time := data.Timestamp
 	for _, element := range data.Data {
 		log.Println("Data:", element)
-		log.Println("Time:", interp_time.Format(time.RFC3339))
-		_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
+		log.Println("Time:", interp_time)
+		_, err = stmt.Exec(data.Serial, data_type, element, interp_time)
 		interp_time.Add(data.Period)
 		if err != nil {
 			log.Println(err)
