@@ -45,11 +45,10 @@ func (db DB) InsertRaw(database_channel <-chan decoders.SeadPacket) {
 			// Process data
 			data_type := string(data.Type)
 			interp_time := data.Timestamp
-			period := time.Duration(data.Period * float64(time.Second))
 			for _, element := range data.Data {
 				log.Println("Data:", element)
 				_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
-				interp_time.Add(period)
+				interp_time.Add(data.Period)
 				if err != nil {
 					log.Println(err)
 					break
@@ -111,12 +110,11 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 	// Process data
 	data_type := string(data.Type)
 	interp_time := data.Timestamp
-	period := time.Duration(data.Period * float64(time.Second))
 	for _, element := range data.Data {
 		log.Println("Data:", element)
 		log.Println("Time:", interp_time)
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time.Format(time.RFC3339))
-		interp_time.Add(period)
+		interp_time.Add(data.Period)
 		if err != nil {
 			log.Println(err)
 			break

@@ -16,7 +16,7 @@ type SeadPacket struct {
 	Type      byte
 	Location  byte
 	Timestamp time.Time
-	Period    float64
+	Period    time.Duration
 	Count     uint
 	Data      []uint16
 	Serial    int
@@ -83,7 +83,7 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 			i += 14
 		case datatype == 'P':
 			// Period separator
-			packet.Period, err = AsciiTimeToDouble(buffer[i : i+14])
+			packet.Period, err = AsciiTimeToDuration(buffer[i : i+14])
 			i += 14
 		case datatype == 'C':
 			// Count
