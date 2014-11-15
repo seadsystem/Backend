@@ -101,7 +101,7 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 
 // writePacket writes a message to the specified connection with proper error handling.
 func writePacket(conn net.Conn, data []byte) (err error) {
-	conn.SetWriteTimeout(time.Now().Add(time.Second * constants.WRITE_TIME_LIMIT))
+	conn.SetWriteDeadline(time.Now().Add(time.Second * constants.WRITE_TIME_LIMIT))
 	write_length, err := conn.Write(data)
 	if err != nil {
 		return
@@ -162,7 +162,7 @@ func readError(err error) {
 
 // readBytes reads the specified number of bytes from the connection with a time limit store in constants.READ_TIME_LIMIT. The timeout kills unneeded connections and helps unstick stuck plug interactions.
 func readBytes(conn net.Conn, bytes int) (data []byte, err error) {
-	conn.SetReadTimeout(time.Now().Add(time.Second * constants.READ_TIME_LIMIT))
+	conn.SetReadDeadline(time.Now().Add(time.Second * constants.READ_TIME_LIMIT))
 
 	buffer := make([]byte, bytes)
 	n, err := conn.Read(buffer)
