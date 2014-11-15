@@ -62,7 +62,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 }
 
 // sync re-aligns the packets, resets the plug's configuration and resumes data transfer.
-func sync(conn net.Conn) (serial int, offset float64, err error) {
+func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 	log.Println("Sending HEAD...")
 	err = writePacket(conn, []byte(constants.HEAD))
 	if err != nil {
