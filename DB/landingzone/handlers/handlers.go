@@ -16,7 +16,7 @@ var Timeout = errors.New("Action timed out.")
 var InvalidLength = errors.New("Invalid length header.")
 
 // HandleRequest handles a communication stream with a plug.
-func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
+func HandleRequest(conn net.Conn, db database.DB) {
 	log.Println("Got a connection.")
 
 	var err error
@@ -47,7 +47,7 @@ func HandleRequest(conn net.Conn, database_channel chan<- decoders.SeadPacket) {
 		log.Printf("Data: %+v\n", data)
 
 		log.Println("Sending to database...")
-		database_channel <- data
+		go db.InsertRawPacket(data)
 
 		log.Println("Sending ACK...")
 		writePacket(conn, []byte(constants.ACK))

@@ -122,69 +122,6 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 	return
 }
 
-func DoubleToAsciiTime(double_time float64) string {
-	int_time := int(double_time)
-	var days = int(math.Floor(double_time / (60 * 60 * 24)))
-	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
-	var minutes = (int_time % (60 * 60)) / 60
-	var seconds = (int_time % (60)) / 1
-	var milliseconds = (int_time * 1000) % 1000
-	var clock_time = (int_time * 12000) % 12
-
-	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
-}
-
-func AsciiTimeToDouble(ascii_time []byte) (time float64, err error) {
-	// Check time string format
-	if len(ascii_time) != 16 {
-		err = InvalidTime
-	}
-	_, err = strconv.Atoi(string(ascii_time))
-	if err != nil {
-		return
-	}
-
-	// Do the conversion now that we know it should work
-	var ptr int = 0
-	days, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
-	ptr += 3
-	time += float64(60 * 60 * 24 * days)
-	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(60 * 60 * hours)
-	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(60 * minutes)
-	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(seconds)
-	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
-	ptr += 3
-	time += float64(milliseconds) / 1000.0
-	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(clock) / 12000.0
-	return
-}
-
 // Every checks if every byte in a slice meets some criteria
 func Every(data []byte, check func(byte) bool) bool {
 	for _, element := range data {
