@@ -44,7 +44,7 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 		log.Println("Data:", element)
 		log.Println("Time:", interp_time)
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time)
-		interp_time.Add(data.Period)
+		interp_time = interp_time.Add(data.Period)
 		if err != nil {
 			log.Println(err)
 			break
