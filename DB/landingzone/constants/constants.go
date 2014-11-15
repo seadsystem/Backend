@@ -7,14 +7,9 @@ const (
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 
 	// Packet constants for plug communication
-	HEAD = "@H\n"
-	ACK  = "\x06\n"
-	OKAY = "@K\n"
-	//CONFIG = "@SLITIsEP00000000500000C00001\n" // Config value is no longer used by plug. We must still send it a valid config anyway.
-	// Full config includes these lines too:
-	//"@SLITVsEP00000000500000C00001\n"
-	//"@SLITWsEP00000000500000C00001\n"
-	//"@SLITTsEP00000000500000C00001\n"
+	HEAD   = "@H\n"
+	ACK    = "\x06\n"
+	OKAY   = "@K\n"
 	CONFIG = "@SLITIsEP00000000500000C00001\n@SLITVsEP00000000500000C00001\n@SLITWsEP00000000500000C00001\n@SLITTsEP00000000500000C00001\n"
 
 	READ_TIME_LIMIT  = 10 // Measured in seconds

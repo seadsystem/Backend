@@ -16,7 +16,7 @@ type SeadPacket struct {
 	Timestamp time.Time
 	Period    time.Duration
 	Count     uint
-	Data      []uint16
+	Data      []int16
 	Serial    int
 }
 
@@ -96,9 +96,9 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 				count := int(packet.Count)
 				bytes := count * 2
 				data := buffer[i : i+bytes]
-				packet.Data = make([]uint16, count)
+				packet.Data = make([]int16, count)
 				for i := 0; i < bytes; i += 2 {
-					packet.Data[i/2] = uint16(Binary2uint(data[i : i+2]))
+					packet.Data[i/2] = int16(Binary2uint(data[i : i+2]))
 				}
 				i += bytes
 			}
@@ -118,16 +118,6 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 	}
 	err = InvalidPacket
 	return
-}
-
-// Every checks if every byte in a slice meets some criteria
-func Every(data []byte, check func(byte) bool) bool {
-	for _, element := range data {
-		if !check(element) {
-			return false
-		}
-	}
-	return true
 }
 
 // Binary2uint converts a byte array containing binary data into an int
