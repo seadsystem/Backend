@@ -226,36 +226,36 @@ func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) 
 		return
 	}
 	ptr += 3
-	duration += time.Day * days
+	duration += time.Hour * time.Duration(24 * days)
 	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	duration += time.Hour * hours
+	duration += time.Hour * time.Duration(hours)
 	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	duration += time.Minute * minutes
+	duration += time.Minute * time.Duration(minutes)
 	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	duration += time.Second * seconds
+	duration += time.Second * time.Duration(seconds)
 	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
 	if err != nil {
 		return
 	}
 	ptr += 3
-	duration += time.Millisecond * milliseconds
+	duration += time.Millisecond * time.Duration(milliseconds)
 	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	if err != nil {
 		return
 	}
 	ptr += 2
-	duration += time.Millisecond * clock / 12
+	duration += time.Millisecond * time.Duration(clock / 12)
 	return
 }
