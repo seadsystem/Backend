@@ -9,6 +9,7 @@ import (
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders"
+	"github.com/seadsystem/Backend/DB/landingzone/database"
 )
 
 // Errors
