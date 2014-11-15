@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
-	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 )
 
 // Errors
