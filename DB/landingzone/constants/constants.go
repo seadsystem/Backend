@@ -1,9 +1,5 @@
 package constants
 
-import (
-	"math"
-)
-
 const (
 	HOST = "0.0.0.0" // All host names
 	PORT = "9000"
@@ -32,7 +28,6 @@ const (
 	DB_USER     = "landingzone"
 	DB_NAME     = "seads"
 	DB_PASSWORD = ""
-	MICRO       = math.Pow10(6)
 )
 
 // scale factors
