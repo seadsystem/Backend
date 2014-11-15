@@ -140,7 +140,7 @@ func Binary2uint(data []byte) (total uint) {
 
 // Binary2uint16 converts a 2 byte array containing binary data into an uint16
 func Binary2uint16(data []byte) (total uint16) {
-	return uint16(data[0]) + uint16(data[1]<<8)
+	return uint16(data[0]) + uint16(data[1])<<uint16(8)
 }
 
 func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) {

@@ -60,6 +60,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 
 	log.Println("Closing connection...")
 	conn.Close()
+	log.Println("Connection closed.")
 }
 
 // sync re-aligns the packets, resets the plug's configuration and resumes data transfer.
