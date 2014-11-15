@@ -98,7 +98,7 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 				data := buffer[i : i+bytes]
 				packet.Data = make([]uint16, count)
 				for i := 0; i < bytes; i += 2 {
-					packet.Data[i/2] = Binary2uint(data[i : i+2])
+					packet.Data[i/2] = uint16(Binary2uint(data[i : i+2]))
 				}
 				i += bytes
 			}
