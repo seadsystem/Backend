@@ -17,8 +17,8 @@ const (
 	//"@SLITTsEP00000000500000C00001\n"
 	CONFIG = "@SLITIsEP00000000500000C00001\n@SLITVsEP00000000500000C00001\n@SLITWsEP00000000500000C00001\n@SLITTsEP00000000500000C00001\n"
 
-	READ_TIME_LIMIT = 5 * 60 // Measured in seconds
-	DB_TIME_LIMIT   = 10     // Measured in seconds
+	READ_TIME_LIMIT  = 10 // Measured in seconds
+	WRITE_TIME_LIMIT = 5  // Measured in seconds
 
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
 

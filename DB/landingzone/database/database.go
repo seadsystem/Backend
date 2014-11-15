@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	//"time"
 
 	"github.com/lib/pq"
 

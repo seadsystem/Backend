@@ -101,6 +101,7 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 
 // writePacket writes a message to the specified connection with proper error handling.
 func writePacket(conn net.Conn, data []byte) (err error) {
+	conn.SetWriteTimeout(time.Now().Add(time.Second * constants.WRITE_TIME_LIMIT))
 	write_length, err := conn.Write(data)
 	if err != nil {
 		return
@@ -161,35 +162,21 @@ func readError(err error) {
 
 // readBytes reads the specified number of bytes from the connection with a time limit store in constants.READ_TIME_LIMIT. The timeout kills unneeded connections and helps unstick stuck plug interactions.
 func readBytes(conn net.Conn, bytes int) (data []byte, err error) {
-	// Setup channels
-	data_channel := make(chan []byte, 1)
-	error_channel := make(chan error, 1)
+	conn.SetReadTimeout(time.Now().Add(time.Second * constants.READ_TIME_LIMIT))
 
-	// Initiate read in new go routine to enable timeouts
-	go func() {
-		buffer := make([]byte, bytes)
-		n, ierr := conn.Read(buffer)
-		if ierr != nil {
-			error_channel <- ierr
-			return
-		}
-		if bytes != n {
-			error_channel <- io.ErrShortWrite
-			return
-		}
-		data_channel <- buffer
-	}()
+	buffer := make([]byte, bytes)
+	n, err := conn.Read(buffer)
 
-	// Receive result of read
-	select {
-	case data = <-data_channel:
-		// Read resulted in data
-	case err = <-error_channel:
-		// Read resulted in an error
-	case <-time.After(time.Second * constants.READ_TIME_LIMIT):
-		// Read timed out
-		err = Timeout
+	if err != nil {
+		error_channel <- ierr
+		return
 	}
+
+	if bytes != n {
+		err = io.ErrShortWrite
+		return
+	}
+	data = buffer
 
 	return
 }
