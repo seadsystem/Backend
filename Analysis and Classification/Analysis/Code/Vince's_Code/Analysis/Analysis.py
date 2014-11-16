@@ -78,7 +78,7 @@ def import_and_trim():
 					Currents.append(line[1])
 					Times.append(line[2])
 	else:                                                                   
-		print "Analysis: file does not exist: ", filename                    
+		print "Analysis: cannot open file: ", filename                    
 		sys.exit(-4)  
 
 	#Convert time since Unix epoch to intervals in microseconds             
@@ -196,7 +196,9 @@ def write_output():
 		input = raw_input("Error: Output file already exists! Overwrite? (y/n)\n")
 		while input != 'y' and input != 'n':
 			input = raw_input("Please enter either \'y\' or \'n\'.\n")
-	if input == 'y':
+		if input == 'n':
+			print "Output not written."
+	else:
 		out = open(filename, 'w')
 		for element in Spectrum:
 			out.write(str(element) + "\n")
