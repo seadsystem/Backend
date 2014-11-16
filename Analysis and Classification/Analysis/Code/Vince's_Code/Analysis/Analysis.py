@@ -177,14 +177,17 @@ def display(spectrum):
 	if 'v' in Options:
 		tokens = sys.argv[-1].split('.')
 		filename = tokens[0] + ".png"
+		input = ''
 		if os.path.isfile(filename):
 			input = raw_input("Error: Plot file already exists! Overwrite? (y/n)\n")
 			while input != 'y' and input != 'n':
 				input = raw_input("Please enter either \'y\' or \'n\'.\n")
-		if input == 'y':
-			pyp.savefig(filename) 
+			if input == 'y':
+				pyp.savefig(filename) 
+			else:
+				print "Plot not written."
 		else:
-			print "Plot not written."
+			pyp.savefig(filename) 
 
 def write_output():
 	tokens = sys.argv[-1].split('.')
