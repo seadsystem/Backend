@@ -67,7 +67,7 @@ def write_crosstab(where):
 	'''
 	query = "SELECT * FROM crosstab(" +\
 				"'SELECT time, type, data from data_raw " + where + \
-			"') AS ct_result(time TIMESTAMP, I DECIMAL, W DECIMAL, V DECIMAL, T DECIMAL);"
+			"') AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
 
 def perform_query(query, params):
@@ -96,11 +96,4 @@ def format_data(data):
 		Process rows of data returned by the db and format
 		them appropriately
 	'''
-	results = []
-	for row in data:
-		fields = []
-		for field in row:
-			fields.append(str(field))
-		results.append(str(list(fields)))
-
-	return "[" + ", ".join(results) + "]"
+	return map(lambda x: str(list(map(str, x))) + '\n', data)
