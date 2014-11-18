@@ -6,7 +6,7 @@ class deploy {
 CREATE TABLE data_raw (
   serial INTEGER NOT NULL,
   type CHAR(1) NOT NULL,
-  data DECIMAL NOT NULL,
+  data SMALLINT NOT NULL,
   time TIMESTAMP NOT NULL
 );
   '
@@ -47,6 +47,11 @@ CREATE TABLE data_raw (
 
   exec {'enable-tablefunc':
     command => 'sudo -u postgres psql -d seads -c "CREATE EXTENSION tablefunc;"',
+    require => Exec['seads-db'],
+  }
+
+  exec {'enable-plpython':
+    command => 'sudo -u postgres psql -d seads -c "CREATE LANGUAGE plpythonu;"',
     require => Exec['seads-db'],
   }
 
