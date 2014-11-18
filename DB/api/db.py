@@ -18,26 +18,29 @@ def query(parsed_url):
 			parsed_url['end_time'],
 			parsed_url['type'],
 		)
+		header = ['time', parsed_url['type']]
 	elif 'start_time' in parsed_url.keys():
 		results = retrieve_within_timeframe(
 			parsed_url['device_id'],
 			parsed_url['start_time'],
 			parsed_url['end_time']
 		)
+		header = ['time', 'I', 'W', 'V', 'T']
 	elif 'device_id' in parsed_url.keys():
 		results = retrieve_historical(parsed_url['device_id'])
+		header = ['time', 'I', 'W', 'V', 'T']
 	else:
 		raise Exception("Recieved malform URL data")
 
-	return format_data(results)
+	return format_data(header, results)
 
-def retrieve_by_type(device_id, start_time, end_time, type):
+def retrieve_by_type(device_id, start_time, end_time, data_type):
 	'''
 	   Return sensor data of a specific type for a device
 	   within a specified timeframe
 	'''
-	query = write_crosstab("WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s) AND type = \'%s\'")
-	params = (device_id, start_time, end_time, type)
+	query = "SELECT time, data FROM data_raw WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s) AND type = %s;"
+	params = (device_id, start_time, end_time, data_type)
 	rows = perform_query(query, params)
 	return rows
 
@@ -91,9 +94,10 @@ def perform_query(query, params):
 		if con:
 			con.close()
 
-def format_data(data):
+def format_data(header, data):
 	'''
 		Process rows of data returned by the db and format
 		them appropriately
 	'''
+	data.insert(0, header)
 	return map(lambda x: str(list(map(str, x))) + '\n', data)
