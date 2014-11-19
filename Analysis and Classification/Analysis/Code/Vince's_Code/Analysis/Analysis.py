@@ -207,6 +207,13 @@ def write_output():
 			input = raw_input("Please enter either \'y\' or \'n\'.\n")
 		if input == 'n':
 			print "Output not written."
+			return
+		else:
+			out = open(filename, 'w')
+
+			for element in Spectrum:
+				out.write(str(element) + ",")
+			out.close()
 	else:
 		out = open(filename, 'w')
 
