@@ -200,8 +200,9 @@ def write_output():
 			print "Output not written."
 	else:
 		out = open(filename, 'w')
+
 		for element in Spectrum:
-			out.write(str(element) + "\n")
+			out.write(str(element) + ",")
 		out.close()
 
 def print_help():
@@ -239,9 +240,9 @@ Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
-mean = np.mean(Spectrum)
-standard_deviation = np.std(Spectrum)
-variation_coefficient = standard_deviation / mean
+#mean = np.mean(Spectrum)
+#standard_deviation = np.std(Spectrum)
+#variation_coefficient = standard_deviation / mean
 
 if 'h' in Options:
 	print_help()
@@ -252,4 +253,4 @@ if 'w' in Options:
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
 
-print variation_coefficient
+#print variation_coefficient
