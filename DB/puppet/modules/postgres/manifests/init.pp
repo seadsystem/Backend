@@ -19,12 +19,16 @@ class postgres {
       require => Exec['use-9.4']
   }
 
-  # Install postgres 9.4
+  # Install postgres 9.4 and extensions
   package {'postgresql-9.4':
     ensure  => installed,
     require => Exec['update-apt'],
   }
   package {'postgresql-contrib-9.4':
+    ensure  => installed,
+    require => Exec['update-apt'],
+  }
+  package {'postgresql-plpython-9.4':
     ensure  => installed,
     require => Exec['update-apt'],
   }

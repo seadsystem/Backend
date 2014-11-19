@@ -23,7 +23,7 @@ class config {
     require  => Group['db'],
   }
   unix_user {'seadapi':
-    groups  => 'db',
+    groups  => ['db', 'postgres'],
     require => Group['db'],
   }
 

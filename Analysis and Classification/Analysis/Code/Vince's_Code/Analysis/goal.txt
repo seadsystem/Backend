@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ========================================================================
 Completed tasks
 ========================================================================
@@ -40,3 +41,9 @@ To do:
 2. Add an option '-c' for classification. 
 
 3. Make a routine that finds number
+=======
+1. Enable the code to use 'I' instead of device ID
+   do this by adding to the regex?
+
+2. Editing this file to test github addition tracking info. 
+>>>>>>> upstream/master

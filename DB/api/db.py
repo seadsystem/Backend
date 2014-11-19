@@ -18,26 +18,29 @@ def query(parsed_url):
 			parsed_url['end_time'],
 			parsed_url['type'],
 		)
+		header = ['time', parsed_url['type']]
 	elif 'start_time' in parsed_url.keys():
 		results = retrieve_within_timeframe(
 			parsed_url['device_id'],
 			parsed_url['start_time'],
 			parsed_url['end_time']
 		)
+		header = ['time', 'I', 'W', 'V', 'T']
 	elif 'device_id' in parsed_url.keys():
 		results = retrieve_historical(parsed_url['device_id'])
+		header = ['time', 'I', 'W', 'V', 'T']
 	else:
 		raise Exception("Recieved malform URL data")
 
-	return format_data(results, 'array')
+	return format_data(header, results)
 
-def retrieve_by_type(device_id, start_time, end_time, type):
+def retrieve_by_type(device_id, start_time, end_time, data_type):
 	'''
 	   Return sensor data of a specific type for a device
 	   within a specified timeframe
 	'''
-	query = write_crosstab("WHERE serial = %s AND time BETWEEN %s AND %s AND type = %s")
-	params = (int(device_id), start_time, end_time, type)
+	query = "SELECT time, data FROM data_raw WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s) AND type = %s;"
+	params = (device_id, start_time, end_time, data_type)
 	rows = perform_query(query, params)
 	return rows
 
@@ -45,8 +48,8 @@ def retrieve_within_timeframe(device_id, start_time, end_time):
 	'''
 	   Return sensor data for a device within a specified timeframe
 	'''
-	query = write_crosstab("WHERE serial = %s AND time BETWEEN %s AND %s")
-	params = (int(device_id), start_time, end_time)
+	query = write_crosstab("WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)")
+	params = (device_id, start_time, end_time)
 	rows = perform_query(query, params)
 	return rows
 
@@ -56,14 +59,19 @@ def retrieve_historical(device_id):
 	   TODO: add a page size limit?
 	'''
 	query = write_crosstab("WHERE serial = %s")
-	params = (int(device_id), )
+	params = (device_id, )
 	rows = perform_query(query, params)
 	return rows
 
 def write_crosstab(where):
+	'''
+	   Write a PostgreSQL crosstab() query to create a pivot table
+	   and rearrage the data into a more useful form
+	'''
 	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " + where + "'"\
-			") AS ct_result(time TIMESTAMP, I DECIMAL, W DECIMAL, V DECIMAL, T DECIMAL);"
+				"'SELECT time, type, data from data_raw " + where + "'," +\
+				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
+			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
 
 def perform_query(query, params):
@@ -87,13 +95,10 @@ def perform_query(query, params):
 		if con:
 			con.close()
 
-def format_data(data, format):
+def format_data(header, data):
 	'''
 		Process rows of data returned by the db and format
 		them appropriately
 	'''
-	
-	# Convert tuples to lists
-	data = map(list, data)
-	if format == 'array':
-		return str(data)
+	data.insert(0, header)
+	return map(lambda x: str(list(map(str, x))) + '\n', data)
