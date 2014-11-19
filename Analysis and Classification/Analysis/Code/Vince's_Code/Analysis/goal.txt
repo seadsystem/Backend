@@ -1,4 +1,42 @@
-1. Enable the code to use 'I' instead of device ID
-   do this by adding to the regex?
+========================================================================
+Completed tasks
+========================================================================
 
-2. Editing this file to test github addition tracking info. 
+* Modified Analysis.py to read old-format plug csvs.
+* 
+
+
+========================================================================
+To do
+========================================================================
+
+* Get the script to read Ian's files
+  1. Read the first line. If the first element is any of
+     WTIV
+
+* Construct the demo. 
+* When called with only one argument and that argument is an option, 
+  the program thinks the argument is a file. 
+* Weird output happens when the program is called in an efficient way for many files. Truncated odd output below:
+[Analysis] $ python Analysis.py -c all_in_one_folder/plots/Microwaves/*.csv 
+Ignoring invalid option: '/'
+Ignoring invalid option: '1'
+Ignoring invalid option: '2'
+Ignoring invalid option: '7'
+Ignoring invalid option: 'K'
+Ignoring invalid option: 'M'
+Ignoring invalid option: 'Q'
+Ignoring invalid option: 'W'
+
+
+Goal for demo tomorrow:
+* For the devices from the apparently-distinct categories, when passed a file from any of the devices, print to stdout the category name. 
+
+To do:
+1. Visually inspect the plots and decide on distinguishing features. 
+   Features:
+   * 
+
+2. Add an option '-c' for classification. 
+
+3. Make a routine that finds number
