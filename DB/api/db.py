@@ -69,8 +69,9 @@ def write_crosstab(where):
 	   and rearrage the data into a more useful form
 	'''
 	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " + where + \
-			"') AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
+				"'SELECT time, type, data from data_raw " + where + "'," +\
+			    " 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
+            "AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
 
 def perform_query(query, params):
