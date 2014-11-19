@@ -65,19 +65,12 @@ def init():
 def import_and_trim():
 #	Times = []
 	Currents = []
-<<<<<<< HEAD
 	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
-=======
-	Times = []
-	
-	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54, 'I']
->>>>>>> upstream/master
 
 	#Try to open source file for reading                                    
 	filename = sys.argv[len(sys.argv) - 1]                                  
 	if os.path.isfile(filename):                                               
 		with open(filename) as f:
-<<<<<<< HEAD
 			#Check the first element of the first line.
 			#if it's "sensor_id", it's the old format
 			#if it's "1", it's the new format
@@ -99,18 +92,6 @@ def import_and_trim():
 						Currents.append(line[1])
 	else:
 		print "Analysis: cannot open file:", filename
-=======
-			#discard first line
-			f.readline()
-			for line in f:
-				line = re.split(',|\t', line.strip())
-				if int(line[0]) in amp_ids:
-					Currents.append(line[1])
-					Times.append(line[2])
-	else:                                                                   
-		print "Analysis: cannot open file: ", filename                    
-		sys.exit(-4)  
->>>>>>> upstream/master
 
 	#Convert time since Unix epoch to intervals in microseconds             
 	#Convert currents to milliamps                                          
@@ -191,21 +172,12 @@ def produce_mean_normalized_power_spectrum(blocklist):
 
 def display(spectrum):
 	template = np.ones(len(spectrum))
-<<<<<<< HEAD
-=======
-	mean = np.mean(spectrum)
-	standard_deviation = np.std(spectrum)
->>>>>>> upstream/master
 
 	#Get the plot ready and label the axes
 	pyp.plot(spectrum)
 	max_range = int(math.ceil(np.amax(spectrum) / standard_deviation))
 	for i in xrange(0, max_range):
-<<<<<<< HEAD
 		pyp.plot(template * (mean + i * standard_deviation))
-=======
-	   pyp.plot(template * (mean + i * standard_deviation))
->>>>>>> upstream/master
 	pyp.xlabel('Units?')
 	pyp.ylabel('Amps Squared')    
 	pyp.title('Mean Normalized Power Spectrum')
@@ -308,19 +280,12 @@ Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
-<<<<<<< HEAD
 #mean and std are used by both display() and classify()
 #only calculate once.
 mean = np.mean(Spectrum)
 standard_deviation = np.std(Spectrum)
 
 #This should be done first
-=======
-#mean = np.mean(Spectrum)
-#standard_deviation = np.std(Spectrum)
-#variation_coefficient = standard_deviation / mean
-
->>>>>>> upstream/master
 if 'h' in Options:
 	print_help()
 if 'c' in Options:
@@ -331,5 +296,3 @@ if 'w' in Options:
 	write_output()
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
-
-#print variation_coefficient
