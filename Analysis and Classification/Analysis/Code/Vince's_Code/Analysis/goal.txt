@@ -1,0 +1,4 @@
+1. Enable the code to use 'I' instead of device ID
+   do this by adding to the regex?
+
+2. Editing this file to test github addition tracking info. 

@@ -25,7 +25,6 @@ III. Configure Git to sync your fork with the original directory
 ... summarized from:
 https://help.github.com/articles/fork-a-repo/
 
-
 IV. Add your changes to your local branch
 	1. git add
 		git commit
@@ -37,7 +36,11 @@ To create a pull request (that pulls your code into the repo),
 do this:
 https://help.github.com/articles/using-pull-requests/
 
-
-
 To sync, issue this command:
 git fetch
+
+Extra notes:
+* Set username and email by:
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
