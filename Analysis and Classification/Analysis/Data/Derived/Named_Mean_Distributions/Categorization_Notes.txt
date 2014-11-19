@@ -36,3 +36,7 @@ laptops we've studied...
 ... while all the microwaves and lamps have ...
 * One peak above at least the 8th
 * One peak above the 3rd (4th to be safe)
+
+Differences between Lamps and Microwaves:
+* Peak_value_microwave ~= 40 * peak_value_lamp
+

@@ -63,7 +63,7 @@ def import_and_trim():
 	Currents = []
 	Times = []
 	
-	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
+	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54, 'I']
 
 	flag = 0	
 	#Try to open source file for reading                                    
@@ -73,7 +73,7 @@ def import_and_trim():
 			#discard first line
 			f.readline()
 			for line in f:
-				line = line.strip().split(',')
+				line = re.split(',|\t', line.strip())
 				if int(line[0]) in amp_ids:
 					Currents.append(line[1])
 					Times.append(line[2])
@@ -161,14 +161,14 @@ def produce_mean_normalized_power_spectrum(blocklist):
 
 def display(spectrum):
 	template = np.ones(len(spectrum))
-	mean_value = np.mean(spectrum)
-	std_dist = np.std(spectrum)
+	mean = np.mean(spectrum)
+	standard_deviation = np.std(spectrum)
 
 	#Get the plot ready and label the axes
 	pyp.plot(spectrum)
-	max_range = int(math.ceil(np.amax(spectrum) / std_dist))
+	max_range = int(math.ceil(np.amax(spectrum) / standard_deviation))
 	for i in xrange(0, max_range):
-	   pyp.plot(template * (mean_value + i * std_dist))
+	   pyp.plot(template * (mean + i * standard_deviation))
 	pyp.xlabel('Units?')
 	pyp.ylabel('Amps Squared')    
 	pyp.title('Mean Normalized Power Spectrum')
@@ -238,6 +238,11 @@ Options = init()
 Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
+
+mean = np.mean(Spectrum)
+standard_deviation = np.std(Spectrum)
+variation_coefficient = standard_deviation / mean
+
 if 'h' in Options:
 	print_help()
 if 'p' in Options:
@@ -246,3 +251,5 @@ if 'w' in Options:
 	write_output()
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
+
+print variation_coefficient
