@@ -201,25 +201,21 @@ def display(spectrum):
 def write_output():
 	tokens = sys.argv[-1].split('.')
 	filename = tokens[0] + ".txt"
+
+	#If a file with the same name already exists,
+	#check before overwriting and skip if necessary
 	if os.path.isfile(filename):
-		input = raw_input("Error: Output file already exists! Overwrite? (y/n)\n")
+		input = raw_input("Error: Output file already exists! Overwrite? (y/n) : ")
 		while input != 'y' and input != 'n':
 			input = raw_input("Please enter either \'y\' or \'n\'.\n")
 		if input == 'n':
-			print "Output not written."
+			print "Writing skipped."
 			return
-		else:
-			out = open(filename, 'w')
-
-			for element in Spectrum:
-				out.write(str(element) + ",")
-			out.close()
-	else:
-		out = open(filename, 'w')
-
-		for element in Spectrum:
-			out.write(str(element) + ",")
-		out.close()
+	#Write
+	out = open(filename, 'w')
+	for element in Spectrum:
+		out.write(str(element) + ",")
+	out.close()
 
 def print_help():
 	print "\nAnalysis.py."
