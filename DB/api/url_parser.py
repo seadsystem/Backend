@@ -19,21 +19,25 @@ def parse(url):
 	''' Build query options as per present query parameters '''
 	if 'type' in params.keys() and 'start_time' in params.keys() and \
 		'end_time' in params.keys():
+		start_time = params['start_time'][0]
+		end_time = params['end_time'][0]
 		query_options = {
-				'device_id': device_id,
-				'start_time': params['start_time'],
-				'end_time': params['end_time'],
-				'type': params['type'],
+				'device_id': int(device_id),
+				'start_time': int(start_time),
+				'end_time': int(end_time),
+				'type': params['type'][0],
 				}
 	elif 'start_time' in params.keys() and 'end_time' in params.keys():
+		start_time = params['start_time'][0]
+		end_time = params['end_time'][0]
 		query_options = {
-				'device_id': device_id,
-				'start_time': params['start_time'],
-				'end_time': params['end_time'],
+				'device_id': int(device_id),
+				'start_time': int(start_time),
+				'end_time': int(end_time),
 				}
 	elif device_id:
 		query_options = {
-				'device_id': device_id
+				'device_id': int(device_id)
 				}
 	else:
 		raise Exception("Not Found")

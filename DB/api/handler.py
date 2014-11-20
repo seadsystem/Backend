@@ -26,7 +26,10 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header("Content-type", "application/json;charset=utf-8")
 
-		self.send_header("Content-length", len(r))
+#		self.send_header("Content-length", len(r))
 		self.end_headers()
-		self.wfile.write(r.encode("utf-8"))
+		self.wfile.write('[\n'.encode("utf-8"))
+		for line in r:
+			self.wfile.write(line.encode("utf-8"))
+		self.wfile.write(']\n'.encode("utf-8"))
 		self.wfile.flush()

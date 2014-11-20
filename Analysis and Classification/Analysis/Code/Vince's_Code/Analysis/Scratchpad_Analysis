@@ -1,0 +1,289 @@
+========================================================================
+Sorting the features I want to add
+========================================================================
+
+To do today:
+0. Make Analysis.py work with raw.csv files
+
+1. Organize all of this into functions.
+   Test as you go along. I'm learning how Python does functions with 
+   this. 
+
+2. Decide on max timestep length to use. See what's best for fft.
+   Don't include incomplete chunks.
+
+4. Remove options:
+	-f: This should always be used. Perhaps allow user to set 
+            timestep size
+
+5. Add options: 
+	-p: print list containing spectrum to stdout / return list
+	-w: write output to file
+	-v: write plot to file
+	-V: display plot
+
+6. Document (man page with examples) and push onto GH
+
+
+To do not today:
+* Make Analysis.py produce a vector of stds (unnecessary accord to Kev). 
+* Add option: 
+   -P: return spectrum and deviation vector
+* 
+   a. Find out if it's possible to produce a power spectrum
+   b. Find out if it's reasonable to produce a normalized frequency
+      spectrum
+
+DONE:
+
+3. Make sure options work in arbitrary order, and in groups
+
+
+========================================================================
+Sketch of the code using functions
+========================================================================
+
+
+
+========================================================================
+Goals
+========================================================================
+
+Working on 3:
+	Unmet goals:
+	* If a user passes in an option twice, print something like
+	  "Option "-f" already set. Ignoring duplicate."
+	Met goals:
+	* If a user passes in a non-option as an option, print something
+	  like "Ignoring invalid option: '-z'
+
+
+
+========================================================================
+========================================================================
+Below this point is archaic stuff from working on 3 left just in case
+========================================================================
+========================================================================
+Writing it out
+========================================================================
+
+valid_opts = 'df'
+
+alleged_options = list(set(''.join(dargv[1:len(dargv) - 1])))
+options = [x for x in optstring if re.search(x, valid_opts)]
+options
+non_options = [x for x in alleged_options if x not in options]
+
+for i in non_options:
+print "Ignoring invalid option: \'%s\'" % (i)
+
+#get a string of sorted non-duplicate characters
+#Join options, remove duplicates and invalids, convert to string.
+possible_options = set(''.join(dargv[1:len(dargv) - 1]))
+optstring = [x for x in optstring if re.search(x, valids)]
+optstring = ''.join(optstring)
+
+
+all in one line:
+
+opd = {}
+
+import re
+valids = 'df'
+dargv = []
+dargv.append('Analysis.py')
+dargv.append('-d')
+dargv.append('-f')
+dargv.append('-vV')
+dargv.append('-Chloe raw.csv')
+
+options = [x for x in ''.join(sys.argv[1:len(sys.argv) - 1]) if re.search(x, valids) != None]
+
+
+options = [x for x in optstring if re.search(x, valids) != None]
+optstring = ''.join(optstring)
+
+
+#does this remove dupes?
+alleged_options = ''.join(dargv[1:len(dargv) - 1])
+options = [x for x in possible_options if re.search(x, valids) != None]
+non_options = 
+
+
+
+========================================================================
+Sketching of algorithm
+========================================================================
+
+Idea 1:
+valid_opts = 'fd'
+
+#get a sorted list of non-duplicate characters
+optstring = ''.join(sorted(set(''.join(dargv[1:len(dargv) - 1]))))
+optstring = [x for x in optstring if re.search(x, valids) != None]
+
+
+Which is better:
+if re.search('d', optstring).group():
+	debug = 1
+...
+
+Or
+valid_opts = 'fd'
+flag_list... does Python have hashes?
+for i in xrange(0, len(valid_opts)):
+	flag_list[i] = re.search(valid_opts[i], optstring).group()
+		
+
+Or I could just check like this
+if re.search(..):
+	do stuff
+
+unless I can
+if
+
+because it's sorted, we'll do
+iter 1:
+2
+
+iter 2:
+1
+2
+
+iter 3:
+1
+1
+2
+
+Maybe this can be optimized by doing a switch?
+Maybe this can be optimized by not using a loop!
+It's sorted, so we know the order things will be in. 
+We just need to ignore invalids. 
+To do: 
+* get rid of non-alphanumeric chars
+* get rid of elements not matching chars in valid_opts
+Or, rather, just
+* get rid of elements not matching chars in valid_opts
+
+Can't use a bitmask for multiple reasons
+
+Checking out: list comprehensions
+
+
+
+Idea 2:
+valid_opts = 'fd'
+
+optstring = ''
+For i in xrange(1, len(sys.argv) - 1):
+	#get the alphanumeric part
+	#if it's not in the optstring already
+		print "ignoring invalid option"
+	#add it to the optstring
+
+For i in xrange(0, len(optstring)):
+	option = re.search(optstring[i], valid_opts).group()
+	if option == a && option_a_flag == 0:
+		option_a_flag = 1
+		continue
+	if option == b && option_b_flag == 0:
+		option_b_flag = 1
+		continue
+	...
+
+Good:
+	Tells the user about invalids
+	runs in O(n)
+Bad: 
+	This evaluates every conditional n^2 times.
+	Doesn't ignore duplicates
+
+
+========================================================================
+Sketching for python terminal
+========================================================================
+
+
+dargv = []
+dargv.append('Analysis.py')
+dargv.append('-d')
+dargv.append('-f')
+dargv.append('-vV')
+dargv.append('-Chloe raw.csv')
+
+optstring = sorted(set(''.join(dargv[1:len(dargv) - 1])))
+
+
+valid_opts = 'abcde'
+
+optstring = sorted(set(dargv[1:len(dargv) - 1]))
+
+optstring
+
+========================================================================
+Sketching of regex functionality
+This ignores invalids and does nothing for dupes.
+Input is a string
+========================================================================
+
+import re
+
+optstring = "dfvf"
+valid_opts = "-f -d"
+
+for i in xrange(0, len(optstring)):
+	candidate = re.search(optstring[i], valid_opts)
+	if candidate == None:
+		print "Ignoring invalid option: %s" % (optstring[i])
+		print "continuing. index: %d" % (i)
+		continue
+	print "afterif. Index %d" % (i)
+	option = candidate.group()
+	print "A valid option: %s" % (option)
+
+
+
+========================================================================
+problem
+========================================================================
+
+valids = "abcde"
+
+optstring = sorted(set(''.join(dargv[1:len(dargv) - 1])))
+optstring = [x for x in optstring if re.search(x, valids) != None]
+
+new = ""
+for x in optstring
+	for y in valids
+		if x is not y
+			continue
+		else if x is y
+			new += x
+
+
+optstring = [x for x in optstring if re.search(x, valids) != None]
+                                     
+
+
+
+
+========================================================================
+Sketching of regex functionality
+This ignores invalids and does nothing for dupes.
+Input is a string
+========================================================================
+
+import re
+
+optstring = "dfvf"
+valid_opts = "-f -d"
+
+for i in xrange(0, len(optstring)):
+	candidate = re.search(optstring[i], valid_opts)
+	if candidate == None:
+		print "Ignoring invalid option: %s" % (optstring[i])
+		print "continuing. index: %d" % (i)
+		continue
+	print "afterif. Index %d" % (i)
+	option = candidate.group()
+	print "A valid option: %s" % (option)
