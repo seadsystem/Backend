@@ -15,14 +15,15 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 		try:
 			parsed = url_parser.parse(self.path)
 		except:
-			self.send_error(404)
+			if self.path == '/':
+				self.send_response(200)
+				self.send_header("Content-type", "text/plain")
+				self.end_headers()
+				self.wfile.write((self.server() + USAGE).encode("utf-8"))
+				self.wfile.flush()
+			else:
+				self.send_error(404)
 			return
-
-		if parsed["device_id"] is None:
-			self.send_response(200)
-			self.send_header("Content-type", "text/plain")
-			self.end_headers()
-			self.wfile.write((self.server() + USAGE).encode("utf-8"))
 
 		try:
 			r = db.query(parsed)
