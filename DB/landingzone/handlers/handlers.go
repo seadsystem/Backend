@@ -26,6 +26,9 @@ func HandleRequest(conn net.Conn, db database.DB) {
 	serial, offset, err := sync(conn)
 	if err != nil {
 		readError(err)
+		log.Println("Closing connection...")
+		conn.Close()
+		log.Println("Connection closed.")
 		return
 	}
 
