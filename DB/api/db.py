@@ -57,7 +57,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 		data = '''
 SELECT * FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		% ceil(count(*) OVER () / 500.0)::int) AS rn
+		% ceil(count(*) OVER () / %s)::int) AS rn
 	FROM   data_raw
 	) sub
 WHERE sub.rn = 0'''
