@@ -17,7 +17,7 @@ def query(parsed_url):
 		raise Exception("Relieved malformed URL data")
 
 	header = ['time', 'I', 'W', 'V', 'T']
-	start_time = end_time = data_type = None
+	start_time = end_time = data_type = subset = None
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -25,6 +25,8 @@ def query(parsed_url):
 		start_time = parsed_url['start_time']
 	if 'end_time' in parsed_url.keys():
 		end_time = parsed_url['end_time']
+	if 'end_time' in parsed_url.keys():
+		subset = parsed_url['subset']
 
 	if start_time or end_time or data_type:
 		results = retrieve_within_filters(
@@ -32,6 +34,7 @@ def query(parsed_url):
 			start_time,
 			end_time,
 			data_type,
+			subset,
 		)
 	else:
 		results = retrieve_historical(parsed_url['device_id'])
