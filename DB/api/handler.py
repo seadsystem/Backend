@@ -1,9 +1,8 @@
-# Python 3
-
 import http.server
 
 import url_parser
 import db
+
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
 
@@ -26,7 +25,6 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header("Content-type", "application/json;charset=utf-8")
 
-#		self.send_header("Content-length", len(r))
 		self.end_headers()
 		self.wfile.write('[\n'.encode("utf-8"))
 		for line in r:
