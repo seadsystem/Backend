@@ -46,6 +46,6 @@ def parse(url):
 		raise Exception("Not Found")
 
 	if 'subset' in params.keys():
-		query_options['subset'] = int(params['end_time'][0])
+		query_options['subset'] = int(params['subset'][0])
 
 	return query_options
