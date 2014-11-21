@@ -15,6 +15,7 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 		try:
 			parsed = url_parser.parse(self.path)
 		except:
+			print(self.path)
 			if self.path == '/':
 				self.send_response(200)
 				self.send_header("Content-type", "text/plain")
