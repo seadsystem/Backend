@@ -29,13 +29,13 @@ import re
 def init():
 	#Check for proper number of arguments, die if necessary
 	#max args = 2 + number of valid options
-	max_args = 9
+	max_args = 10
 	if len(sys.argv) < 2:
-		print "Usage: <program name> [-fhpvVw] [input file]"
+		print "Usage: Analysis.py [-cfhpvVw] source_file"
 		print "Call with -h for help"
 		sys.exit(-1)
 	if len(sys.argv) > max_args:
-		print "Usage: <program name> [option] [input file]"
+		print "Usage: Analysis.py [-cfhpvVw] source_file"
 		print "Call with -h for help"
 		sys.exit(-2)
 
@@ -48,7 +48,10 @@ def init():
 	#characters. Make a list of those that are valid, and a list of 
 	#those that aren't. Let the user know if they endered an invalid 
 	#option.
-	valid_options = 'dfhpvVw'
+
+	#When adding options, be sure to add a description to the -h section
+	#below
+	valid_options = 'cdfhpvVw'
 	alleged_options = list(set(''.join(sys.argv[1:-1])))
 	options = [x for x in alleged_options if re.search(x, valid_options)]
 	non_options = [x for x in alleged_options if x not in options and x != '-']
@@ -60,32 +63,41 @@ def init():
 
 #consider making times and currents an associative array
 def import_and_trim():
+#	Times = []
 	Currents = []
-	Times = []
-	
-	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54, 'I']
+	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
 
-	flag = 0	
 	#Try to open source file for reading                                    
 	filename = sys.argv[len(sys.argv) - 1]                                  
-	if os.path.isfile(filename):                                                 
+	if os.path.isfile(filename):                                               
 		with open(filename) as f:
-			#discard first line
-			f.readline()
-			for line in f:
-				line = re.split(',|\t', line.strip())
-				if int(line[0]) in amp_ids:
-					Currents.append(line[1])
-					Times.append(line[2])
-	else:                                                                   
-		print "Analysis: cannot open file: ", filename                    
-		sys.exit(-4)  
+			#Check the first element of the first line.
+			#if it's "sensor_id", it's the old format
+			#if it's "1", it's the new format
+
+			line = f.readline().split(',')
+
+			#New format
+			if line[0] == '1':
+				if line[1] == 'I':
+					Currents.append(line[3])
+				for line in f:
+					line = line.split(',')
+					if line[1] == 'I':
+						Currents.append(line[2])
+			else:
+				for line in f:
+					line = re.split(',|\t', line)
+					if int(line[0]) in amp_ids:
+						Currents.append(line[1])
+	else:
+		print "Analysis: cannot open file:", filename
 
 	#Convert time since Unix epoch to intervals in microseconds             
 	#Convert currents to milliamps                                          
-	Times = [ int(x) - int(Times[0]) for x in Times ]                       
+#	Times = [ int(x) - int(Times[0]) for x in Times ]                       
 	Currents = [ 27*float(x)/1000 for x in Currents ] 
-	
+
 	return Currents, Times
 
 def produce_blocklist():
@@ -93,26 +105,26 @@ def produce_blocklist():
 
 	data_length = len(Currents) #or Times, just to de-specify
 	i = 0
-	if 'f' in Options:
-		while i < data_length:
-			block = []
-
-			j = i
-			while j < data_length: 
-				if j + 1 < data_length and Times[j + 1] - Times[j] < 418:
-					block.append(Currents[j])
-				else: 
-					break
-				j += 1
-
-			blocklist.append(block)
-			i = j + 1
-	else:
-		while i < data_length:
-			if i + 200 > len(Currents):                                       
-				break   
-			blocklist.append(Currents[i:i+blockwidth])                        
-			i += blockwidth 
+#	if 'f' in Options:
+#		while i < data_length:
+#			block = []
+#
+#			j = i
+#			while j < data_length: 
+#				if j + 1 < data_length and Times[j + 1] - Times[j] < 418:
+#					block.append(Currents[j])
+#				else: 
+#					break
+#				j += 1
+#
+#			blocklist.append(block)
+#			i = j + 1
+#	else:
+	while i < data_length:
+		if i + 200 > len(Currents):                                       
+			break   
+		blocklist.append(Currents[i:i+blockwidth])                        
+		i += blockwidth 
 
 	return blocklist
 
@@ -139,7 +151,6 @@ def produce_mean_normalized_power_spectrum(blocklist):
 	#in amps squared
 
 	#Produce power spectrum, sum                                 
-	scale_factor = float(1)/len(blocklist) 
 	power_spectrum = np.square(np.absolute(np.fft.rfft(blocklist[0])))
 	sum_power_spectrum = power_spectrum
 	for i in xrange(1, len(blocklist)):
@@ -155,20 +166,18 @@ def produce_mean_normalized_power_spectrum(blocklist):
 	normalized_power_spectrum = sum_power_spectrum * (1/total_sq_amps)
 
 	#Finish taking mean
-	mean_normalized_spectrum = scale_factor * normalized_power_spectrum
+	mean_normalized_spectrum = normalized_power_spectrum / len(blocklist)
 
 	return mean_normalized_spectrum
 
 def display(spectrum):
 	template = np.ones(len(spectrum))
-	mean = np.mean(spectrum)
-	standard_deviation = np.std(spectrum)
 
 	#Get the plot ready and label the axes
 	pyp.plot(spectrum)
 	max_range = int(math.ceil(np.amax(spectrum) / standard_deviation))
 	for i in xrange(0, max_range):
-	   pyp.plot(template * (mean + i * standard_deviation))
+		pyp.plot(template * (mean + i * standard_deviation))
 	pyp.xlabel('Units?')
 	pyp.ylabel('Amps Squared')    
 	pyp.title('Mean Normalized Power Spectrum')
@@ -192,18 +201,21 @@ def display(spectrum):
 def write_output():
 	tokens = sys.argv[-1].split('.')
 	filename = tokens[0] + ".txt"
+
+	#If a file with the same name already exists,
+	#check before overwriting and skip if necessary
 	if os.path.isfile(filename):
-		input = raw_input("Error: Output file already exists! Overwrite? (y/n)\n")
+		input = raw_input("Error: Output file already exists! Overwrite? (y/n) : ")
 		while input != 'y' and input != 'n':
 			input = raw_input("Please enter either \'y\' or \'n\'.\n")
 		if input == 'n':
-			print "Output not written."
-	else:
-		out = open(filename, 'w')
-
-		for element in Spectrum:
-			out.write(str(element) + ",")
-		out.close()
+			print "Writing skipped."
+			return
+	#Write
+	out = open(filename, 'w')
+	for element in Spectrum:
+		out.write(str(element) + ",")
+	out.close()
 
 def print_help():
 	print "\nAnalysis.py."
@@ -216,6 +228,7 @@ def print_help():
 	print "1. Numpy array printed to stdout."
 	print "2. Spectrum written to text file."
 	print "\nOptions may be arranged in any order, and in any number of groups"
+	print ""
 	print "-f:\t Fragmented data. This handles gaps in the data."
 	print "-h:\t Help. Display this message."
 	print "-p:\t Print. Print numpy array containing spectrum to terminal."
@@ -230,6 +243,36 @@ def print_help():
 	print "2: View plot of spectrum"
 	print "   python Analysis.py -V 1_raw.csv"
 
+def classify(spectrum):
+	variation_coefficient = standard_deviation / mean
+
+	#count regions
+	count = 0
+	flag = 0
+	threshold = mean + standard_deviation
+	for i in xrange(0, len(spectrum)):
+		if flag == 0 and spectrum[i] > threshold:
+			flag = 1
+			count += 1
+			continue
+		elif flag == 1 and spectrum[i] < threshold:
+			flag = 0
+
+	output_string = sys.argv[-1]
+	if len(output_string) < 24:
+		output_string = output_string + "\t"
+
+	if variation_coefficient < 3.511:
+		print "%s\t was recorded from a laptop computer." % (output_string)
+		return
+	elif np.amax(spectrum) < 0.01 or count > 1:
+		print "%s\t was recorded from a microwave." % (output_string)
+		return
+	else:
+		print "%s\t was recorded from a lamp." % (output_string)
+
+
+
 #Execution begins here
 blockwidth = 200
 Currents = []
@@ -240,17 +283,19 @@ Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
-#mean = np.mean(Spectrum)
-#standard_deviation = np.std(Spectrum)
-#variation_coefficient = standard_deviation / mean
+#mean and std are used by both display() and classify()
+#only calculate once.
+mean = np.mean(Spectrum)
+standard_deviation = np.std(Spectrum)
 
+#This should be done first
 if 'h' in Options:
 	print_help()
+if 'c' in Options:
+	classify(Spectrum)
 if 'p' in Options:
 	print Spectrum
 if 'w' in Options:
 	write_output()
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
-
-#print variation_coefficient

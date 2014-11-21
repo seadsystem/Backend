@@ -1,0 +1,42 @@
+
+
+ID: 1
+Category: Computer
+Make: Apple
+Model: MacBook Pro, Early 2011
+Description: 13-inch Laptop
+
+ID: 2
+Category: Lamp
+Make: Generic
+Model: Generic
+Description: Bulb specs--72 Watts, 1490 Lumens, 120 Volts
+
+
+ID: 3
+Category: Lamp
+Make: Generic
+Model: Generic
+Description: Bulb spec--75 Watts, 120 volts, Soft White
+
+
+ID: 4
+Category: Computer
+Make: Toshiba
+Model: Satellite P505D
+Description: 19-inch Laptop
+
+
+ID: 5
+Category: Lamp
+Make: Generic
+Model: Generic
+Description: Bulb spec--75 Watts, 120 volts, Soft White
+
+ID: 6
+Category: Lamp
+Make: Generic
+Model: Generic
+Description: Bulb spec--75 Watts, 120 volts, Soft White
+
+

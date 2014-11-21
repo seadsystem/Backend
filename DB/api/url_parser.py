@@ -1,11 +1,14 @@
-# Python 3
 import re
 import urllib.parse
 
+
 def parse(url):
-	'''
-		Match the URL against a set of routing rules
-	'''
+	"""
+	Match the URL against a set of routing rules
+
+	:param url: The path from the request
+	:return: Array of URL parameters
+	"""
 	url_components = urllib.parse.urlparse(url)
 	path = url_components.path
 	params = urllib.parse.parse_qs(url_components.query)
@@ -41,5 +44,8 @@ def parse(url):
 				}
 	else:
 		raise Exception("Not Found")
+
+	if 'subset' in params.keys():
+		query_options['subset'] = int(params['subset'][0])
 
 	return query_options

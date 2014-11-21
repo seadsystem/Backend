@@ -1,9 +1,10 @@
-# Python 3
-
 import http.server
 
 import url_parser
 import db
+
+USAGE = "/(device id)?[start_time=(start time as UTC unix timestamp), end_time=(end time as UTC unix timestamp), type=(Sensor type code)].join('&')"
+
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
 
@@ -13,23 +14,38 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 	def do_GET(self):
 		try:
 			parsed = url_parser.parse(self.path)
-		except:
-			self.send_error(404)
+		except Exception as inst:
+			if self.path == '/':
+				self.send_response(200)
+				self.send_header("Content-type", "text/plain")
+				self.end_headers()
+				self.wfile.write(("Usage: " + self.address_string() + USAGE).encode("utf-8"))
+				self.wfile.flush()
+			else:
+				print(type(inst))
+				print(inst.args)
+				print(inst)
+
+				self.send_error(404)
 			return
 
 		try:
 			r = db.query(parsed)
-		except:
+
+			self.send_response(200)
+			self.send_header("Content-type", "application/json;charset=utf-8")
+
+			self.end_headers()
+			self.wfile.write('[\n'.encode("utf-8"))
+			for line in r:
+				self.wfile.write(line.encode("utf-8"))
+			self.wfile.write(']\n'.encode("utf-8"))
+		except Exception as inst:
 			self.send_error(500)
+			print(type(inst))
+			print(inst.args)
+			print(inst)
+
 			return
 
-		self.send_response(200)
-		self.send_header("Content-type", "application/json;charset=utf-8")
-
-#		self.send_header("Content-length", len(r))
-		self.end_headers()
-		self.wfile.write('[\n'.encode("utf-8"))
-		for line in r:
-			self.wfile.write(line.encode("utf-8"))
-		self.wfile.write(']\n'.encode("utf-8"))
 		self.wfile.flush()

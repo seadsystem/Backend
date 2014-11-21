@@ -1,85 +1,135 @@
-# Python 3
 import psycopg2
 import psycopg2.extras
 
 # Database user credentials
-DATABASE = ""
-USER	 = ""
+DATABASE = "seads"
+USER	 = "seadapi"
+
 
 def query(parsed_url):
-	'''
-		Handle parsed URL data and query the database
-		as appropriate
-	'''
+	"""
+	Handle parsed URL data and query the database as appropriate
+
+	:param parsed_url: Array of url parameters
+	:return: Generator of result strings
+	"""
+	if 'device_id' not in parsed_url.keys():
+		raise Exception("Relieved malformed URL data")
+
+	header = ['time', 'I', 'W', 'V', 'T']
+	start_time = end_time = data_type = subset = None
 	if 'type' in parsed_url.keys():
-		results = retrieve_by_type(
-			parsed_url['device_id'],
-			parsed_url['start_time'],
-			parsed_url['end_time'],
-			parsed_url['type'],
-		)
+		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
-	elif 'start_time' in parsed_url.keys():
-		results = retrieve_within_timeframe(
+	if 'start_time' in parsed_url.keys():
+		start_time = parsed_url['start_time']
+	if 'end_time' in parsed_url.keys():
+		end_time = parsed_url['end_time']
+	if 'subset' in parsed_url.keys():
+		subset = parsed_url['subset']
+
+	if start_time or end_time or data_type:
+		results = retrieve_within_filters(
 			parsed_url['device_id'],
-			parsed_url['start_time'],
-			parsed_url['end_time']
+			start_time,
+			end_time,
+			data_type,
+			subset,
 		)
-		header = ['time', 'I', 'W', 'V', 'T']
-	elif 'device_id' in parsed_url.keys():
-		results = retrieve_historical(parsed_url['device_id'])
-		header = ['time', 'I', 'W', 'V', 'T']
 	else:
-		raise Exception("Recieved malform URL data")
+		results = retrieve_historical(parsed_url['device_id'])
 
 	return format_data(header, results)
 
-def retrieve_by_type(device_id, start_time, end_time, data_type):
-	'''
-	   Return sensor data of a specific type for a device
-	   within a specified timeframe
-	'''
-	query = "SELECT time, data FROM data_raw WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s) AND type = %s;"
-	params = (device_id, start_time, end_time, data_type)
-	rows = perform_query(query, params)
+
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
+	"""
+	Return sensor data for a device within a specified timeframe
+
+	:param device_id: The serial number of the device in question
+	:param start_time: The start of the time range for which to query for data
+	:param end_time: The end of the time range for which to query for data
+	:param data_type: The type of data to query for
+	:param subset: The size of the subset
+	:return: Generator of database row tuples
+	"""
+	params = [device_id]
+	where = None
+
+	if subset:
+		data = '''
+(SELECT * FROM (
+	SELECT *, ((row_number() OVER (ORDER BY "time"))
+		% ceil(count(*) OVER () / %s)::int) AS rn
+	FROM   data_raw
+	) sub
+WHERE sub.rn = 0)'''
+		params.insert(0, subset)
+
+	else:
+		data = 'data_raw'
+
+	if start_time and end_time:
+		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
+		params.append(start_time)
+		params.append(end_time)
+	elif start_time:
+		where = "WHERE serial = %s AND time >= to_timestamp(%s)"
+		params.append(start_time)
+	elif end_time:
+		where = "WHERE serial = %s AND time <= to_timestamp(%s)"
+		params.append(end_time)
+	if data_type:
+		if where:
+			where += " AND type = %s"
+		else:
+			where = "WHERE serial = %s AND type = %s"
+		params.append(data_type)
+		query = "SELECT time, data FROM " + data + " as raw " + where
+	else:
+		query = write_crosstab(where, data)
+
+	rows = perform_query(query, tuple(params))
 	return rows
 
-def retrieve_within_timeframe(device_id, start_time, end_time):
-	'''
-	   Return sensor data for a device within a specified timeframe
-	'''
-	query = write_crosstab("WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)")
-	params = (device_id, start_time, end_time)
-	rows = perform_query(query, params)
-	return rows
 
 def retrieve_historical(device_id):
-	'''
-	   Return sensor data for a specific device
-	   TODO: add a page size limit?
-	'''
+	"""
+	Return sensor data for a specific device
+	TODO: add a page size limit?
+
+	:param device_id: The serial number of the device in question
+	:return: Generator of database row tuples
+	"""
 	query = write_crosstab("WHERE serial = %s")
 	params = (device_id, )
 	rows = perform_query(query, params)
 	return rows
 
-def write_crosstab(where):
-	'''
-	   Write a PostgreSQL crosstab() query to create a pivot table
-	   and rearrage the data into a more useful form
-	'''
+
+def write_crosstab(where, data='data_raw'):
+	"""
+	Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
+
+	:param where: WHERE clause for SQL query
+	:param data: Table or subquery from which to get the data
+	:return: Complete SQL query
+	"""
 	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " + where + "'," +\
+				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
 				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
 			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
 
+
 def perform_query(query, params):
-	'''
-		Initiate a connection to the database and return a cursor
-		to return db rows a dictionaries
-		Returns cursor
-	'''
+	"""
+	Initiate a connection to the database and return a cursor to return db rows a dictionaries
+
+	:param query: SQL query string
+	:param params: List of SQL query parameters
+	:return: Result cursor
+	"""
 	con = None
 	try:
 		con = psycopg2.connect("dbname='" + DATABASE +
@@ -95,10 +145,14 @@ def perform_query(query, params):
 		if con:
 			con.close()
 
+
 def format_data(header, data):
-	'''
-		Process rows of data returned by the db and format
-		them appropriately
-	'''
+	"""
+	Process rows of data returned by the db and format them appropriately
+
+	:param header: The first row of the result
+	:param data: Result cursor
+	:return: Generator of result strings
+	"""
 	data.insert(0, header)
 	return map(lambda x: str(list(map(str, x))) + '\n', data)
