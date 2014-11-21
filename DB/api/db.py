@@ -25,7 +25,7 @@ def query(parsed_url):
 		start_time = parsed_url['start_time']
 	if 'end_time' in parsed_url.keys():
 		end_time = parsed_url['end_time']
-	if 'end_time' in parsed_url.keys():
+	if 'subset' in parsed_url.keys():
 		subset = parsed_url['subset']
 
 	if start_time or end_time or data_type:
