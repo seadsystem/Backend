@@ -2,3 +2,5 @@
 *~
 api/__pycache__
 tags
+.idea
+.DS_Store
