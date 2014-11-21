@@ -55,12 +55,12 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 
 	if subset:
 		data = '''
-SELECT * FROM (
+(SELECT * FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
 		% ceil(count(*) OVER () / %s)::int) AS rn
 	FROM   data_raw
 	) sub
-WHERE sub.rn = 0'''
+WHERE sub.rn = 0)'''
 		params.insert(0, subset)
 
 	else:
@@ -82,7 +82,7 @@ WHERE sub.rn = 0'''
 		else:
 			where = "WHERE serial = %s AND type = %s"
 		params.append(data_type)
-		query = "SELECT time, data FROM (" + data + ") as raw " + where
+		query = "SELECT time, data FROM " + data + " as raw " + where
 	else:
 		query = write_crosstab(where, data)
 
@@ -113,7 +113,7 @@ def write_crosstab(where, data='data_raw'):
 	:return: Complete SQL query
 	"""
 	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from (" + data + ") as raw " + where + "'," +\
+				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
 				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
 			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
