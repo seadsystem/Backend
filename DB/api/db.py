@@ -1,6 +1,5 @@
 import psycopg2
 import psycopg2.extras
-import functools
 
 # Database user credentials
 DATABASE = "seads"
@@ -40,7 +39,7 @@ def query(parsed_url):
 	return format_data(header, results)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -48,10 +47,25 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type):
 	:param start_time: The start of the time range for which to query for data
 	:param end_time: The end of the time range for which to query for data
 	:param data_type: The type of data to query for
+	:param subset: The size of the subset
 	:return: Generator of database row tuples
 	"""
 	params = [device_id]
 	where = None
+
+	if subset:
+		data = '''
+SELECT * FROM (
+	SELECT *, ((row_number() OVER (ORDER BY "time"))
+		% ceil(count(*) OVER () / 500.0)::int) AS rn
+	FROM   data_raw
+	) sub
+WHERE sub.rn = 0'''
+		params.insert(0, subset)
+
+	else:
+		data = 'data_raw'
+
 	if start_time and end_time:
 		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
 		params.append(start_time)
@@ -68,9 +82,9 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type):
 		else:
 			where = "WHERE serial = %s AND type = %s"
 		params.append(data_type)
-		query = "SELECT time, data FROM data_raw " + where
+		query = "SELECT time, data FROM (" + data + ") as raw " + where
 	else:
-		query = write_crosstab(where)
+		query = write_crosstab(where, data)
 
 	rows = perform_query(query, tuple(params))
 	return rows
@@ -90,15 +104,16 @@ def retrieve_historical(device_id):
 	return rows
 
 
-def write_crosstab(where):
+def write_crosstab(where, data='data_raw'):
 	"""
 	Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
 
 	:param where: WHERE clause for SQL query
+	:param data: Table or subquery from which to get the data
 	:return: Complete SQL query
 	"""
 	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from data_raw " + where + "'," +\
+				"'SELECT time, type, data from (" + data + ") as raw " + where + "'," +\
 				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
 			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
 	return query
