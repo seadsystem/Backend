@@ -2,7 +2,7 @@
 Created By: Quintin Leong
 Created Date: November 5th, 2014
 File Name: Classes.py
-File Description: Class representations to interact with database
+File Description: Class representations to interact with database.
 '''
 
 
