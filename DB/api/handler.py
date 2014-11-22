@@ -3,7 +3,7 @@ import http.server
 import url_parser
 import db
 
-USAGE = "/(device id)?[start_time=(start time as UTC unix timestamp), end_time=(end time as UTC unix timestamp), type=(Sensor type code)].join('&')"
+USAGE = "Usage: 128.114.59.76:8080/(device id)?[start_time=(start time as UTC unix timestamp), end_time=(end time as UTC unix timestamp), type=(Sensor type code)].join('&')"
 
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
@@ -19,7 +19,7 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 				self.send_response(200)
 				self.send_header("Content-type", "text/plain")
 				self.end_headers()
-				self.wfile.write(("Usage: " + self.address_string() + USAGE).encode("utf-8"))
+				self.wfile.write(USAGE.encode("utf-8"))
 				self.wfile.flush()
 			else:
 				print(type(inst))
