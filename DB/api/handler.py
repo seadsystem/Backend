@@ -19,6 +19,7 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 				self.send_response(200)
 				self.send_header("Content-type", "text/plain")
 				self.end_headers()
+				self.wfile.write(self.request.address_string().encode("utf-8"))
 				self.wfile.write(USAGE.encode("utf-8"))
 				self.wfile.flush()
 			else:
