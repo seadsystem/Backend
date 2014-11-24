@@ -56,6 +56,8 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 	"""
 	params = [device_id]
 	where = None
+	if subset:
+		params.insert(0, float(subset) + 1.0)
 
 	if start_time and end_time:
 		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
@@ -75,13 +77,11 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 		params.append(data_type)
 		query = "SELECT time, data FROM " + TABLE + " as raw " + where
 		if subset:
-			params.insert(0, float(subset))
 			query = write_subsample(query, False)
 
 	else:
 		query = write_crosstab(where, TABLE)
 		if subset:
-			params.insert(0, float(subset))
 			query = write_subsample(query, True)
 
 	query += ";"
