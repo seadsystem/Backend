@@ -27,7 +27,7 @@ def query(parsed_url):
 	if 'end_time' in parsed_url.keys():
 		end_time = parsed_url['end_time']
 	if 'subset' in parsed_url.keys():
-		subset = float(parsed_url['subset'])
+		subset = parsed_url['subset']
 
 	if start_time or end_time or data_type or subset:
 		results = retrieve_within_filters(
@@ -75,13 +75,13 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 		params.append(data_type)
 		query = "SELECT time, data FROM " + TABLE + " as raw " + where
 		if subset:
-			params.insert(0, subset)
+			#params.insert(0, float(subset))
 			query = write_subsample(query, False)
 
 	else:
 		query = write_crosstab(where, TABLE)
 		if subset:
-			params.insert(0, subset)
+			#params.insert(0, float(subset))
 			query = write_subsample(query, True)
 
 	rows = perform_query(query, tuple(params))
@@ -168,7 +168,7 @@ def write_subsample(query, crosstab=False):
 		new_query += "time, data"
 	new_query += '''FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		% ceil(count(*) OVER () / %s)::int) AS rn
+		% ceil(count(*) OVER () / 500.0)::int) AS rn
 	FROM ('''
 	new_query += query
 	new_query += '''
