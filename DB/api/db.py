@@ -4,6 +4,7 @@ import psycopg2.extras
 # Database user credentials
 DATABASE = "seads"
 USER	 = "seadapi"
+TABLE    = "data_raw"
 
 
 def query(parsed_url):
@@ -28,7 +29,7 @@ def query(parsed_url):
 	if 'subset' in parsed_url.keys():
 		subset = parsed_url['subset']
 
-	if start_time or end_time or data_type:
+	if start_time or end_time or data_type or subset:
 		results = retrieve_within_filters(
 			parsed_url['device_id'],
 			start_time,
@@ -67,7 +68,7 @@ WHERE sub.rn = 0)'''
 		params.insert(0, subset)
 
 	else:
-		data = 'data_raw'
+		data = TABLE
 
 	if start_time and end_time:
 		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
@@ -107,7 +108,7 @@ def retrieve_historical(device_id):
 	return rows
 
 
-def write_crosstab(where, data='data_raw'):
+def write_crosstab(where, data = TABLE):
 	"""
 	Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
 
