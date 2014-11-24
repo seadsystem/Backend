@@ -9,6 +9,7 @@ PORT = 8080
 
 Handler = handler.ApiHandler
 
+socketserver.ThreadingTCPServer.allow_reuse_address = True
 httpd = socketserver.TCPServer(("", PORT), Handler)
 
 print("serving at port", PORT)
