@@ -27,7 +27,7 @@ def query(parsed_url):
 	if 'end_time' in parsed_url.keys():
 		end_time = parsed_url['end_time']
 	if 'subset' in parsed_url.keys():
-		subset = parsed_url['subset']
+		subset = float(parsed_url['subset'])
 
 	if start_time or end_time or data_type or subset:
 		results = retrieve_within_filters(
@@ -156,7 +156,7 @@ def format_data(header, data):
 def write_subsample(query, crosstab=False):
 	"""
 	Adds subsampling to a query. This should be the absolute last step in query building. This function call should be immediately proceeded with params.insert(0, subset).
-	
+
 	:param query: The exiting query to subsample
 	:param crosstab: Whether or not the query is a crosstab
 	:return: Query with subsampling enabled.
@@ -168,7 +168,7 @@ def write_subsample(query, crosstab=False):
 		new_query += "time, data"
 	new_query += '''FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		% ceil(count(*) OVER () / %s::float)::int) AS rn
+		% ceil(count(*) OVER () / %s)::int) AS rn
 	FROM ('''
 	new_query += query
 	new_query += '''
