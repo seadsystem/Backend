@@ -84,6 +84,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 			#params.insert(0, float(subset))
 			query = write_subsample(query, True)
 
+	query += ";"
 	rows = perform_query(query, tuple(params))
 	return rows
 
@@ -113,7 +114,7 @@ def write_crosstab(where, data = TABLE):
 	query = "SELECT * FROM crosstab(" +\
 				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
 				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
-			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT);"
+			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT)"
 	return query
 
 
@@ -173,5 +174,5 @@ def write_subsample(query, crosstab=False):
 	new_query += query
 	new_query += ''') AS subquery
 	) sub
-WHERE sub.rn = 0;'''
+WHERE sub.rn = 0'''
 	return new_query
