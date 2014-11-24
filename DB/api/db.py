@@ -57,19 +57,6 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 	params = [device_id]
 	where = None
 
-	if subset:
-		data = '''
-(SELECT * FROM (
-	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		% ceil(count(*) OVER () / %s)::int) AS rn
-	FROM   data_raw
-	) sub
-WHERE sub.rn = 0)'''
-		params.insert(0, subset)
-
-	else:
-		data = TABLE
-
 	if start_time and end_time:
 		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
 		params.append(start_time)
@@ -86,9 +73,16 @@ WHERE sub.rn = 0)'''
 		else:
 			where = "WHERE serial = %s AND type = %s"
 		params.append(data_type)
-		query = "SELECT time, data FROM " + data + " as raw " + where
+		query = "SELECT time, data FROM " + TABLE + " as raw " + where
+		if subset:
+			params.insert(0, subset)
+			query = write_subsample(query, False)
+
 	else:
-		query = write_crosstab(where, data)
+		query = write_crosstab(where, TABLE)
+		if subset:
+			params.insert(0, subset)
+			query = write_subsample(query, True)
 
 	rows = perform_query(query, tuple(params))
 	return rows
@@ -157,3 +151,27 @@ def format_data(header, data):
 	"""
 	data.insert(0, header)
 	return map(lambda x: str(list(map(str, x))) + '\n', data)
+
+
+def write_subsample(query, crosstab=False):
+	"""
+	Adds subsampling to a query. This should be the absolute last step in query building. This function call should be immediately proceeded with params.insert(0, subset).
+	
+	:param query: The exiting query to subsample
+	:param crosstab: Whether or not the query is a crosstab
+	:return: Query with subsampling enabled.
+	"""
+	new_query = "SELECT "
+	if crosstab:
+		new_query += "time, I, W, V, T"
+	else:
+		new_query += "time, data"
+	new_query += '''FROM (
+	SELECT *, ((row_number() OVER (ORDER BY "time"))
+		% ceil(count(*) OVER () / %s::float)::int) AS rn
+	FROM ('''
+	new_query += query
+	new_query += '''
+	) sub
+WHERE sub.rn = 0;'''
+	return new_query
