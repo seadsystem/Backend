@@ -166,12 +166,12 @@ def write_subsample(query, crosstab=False):
 		new_query += "time, I, W, V, T"
 	else:
 		new_query += "time, data"
-	new_query += '''FROM (
+	new_query += ''' FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		% ceil(count(*) OVER () / 500.0)::int) AS rn
+		%% ceil(count(*) OVER () / 500.0)::int) AS rn
 	FROM ('''
 	new_query += query
-	new_query += '''
+	new_query += ''') AS subquery
 	) sub
 WHERE sub.rn = 0;'''
 	return new_query
