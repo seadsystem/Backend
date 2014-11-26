@@ -151,7 +151,7 @@ def format_data(header, data):
 	:return: Generator of result strings
 	"""
 	data.insert(0, header)
-	return map(lambda x: str(list(map(str, x))) + '\n', data)
+	return map(lambda x: str(list(map(str, x))) + ',\n', data)
 
 
 def write_subsample(query, crosstab=False):

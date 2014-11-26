@@ -23,7 +23,7 @@ def parse(url):
 	if re.match('^/\d+$', path):
 		query_options['device_id'] = int(path[1:])
 	else:
-		raise Exception("Not Found")
+		raise Exception("Serial Not Found")
 
 	''' Iterate over possible parameters and set query options accordingly '''
 	for param in ['start_time', 'end_time', 'subset']:
