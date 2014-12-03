@@ -263,6 +263,9 @@ def count_inputs(target):
 		if (temp < minimum):
 			print "needs", minimum-temp, "more inputs"
 			makeclf = False
+	if (np.unique(target_list).size < 2):
+		makeclf = False
+		print "At least 2 device types needed."
 	return makeclf
 
 def record(spectrum):
@@ -283,8 +286,13 @@ def record(spectrum):
 	target = np.append(target, [device], axis=0)
 
 	makeclf = count_inputs(target)
-	clf = neighbors.NearestCentroid() if makeclf else None
-	if (clf):
+	clf = None
+	if (makeclf == True):
+		print "make clf"
+		clf = neighbors.NearestCentroid()
+#	clf = neighbors.NearestCentroid() if (makeclf == True) else None
+	if (clf != None):
+		print "make fit"
 	       	clf.fit(data, target)
 
 	combined = {'data':data, 'target':target, 'clf':clf}
@@ -311,6 +319,7 @@ def classify(spectrum):
 	if (clf):
 		print "recorded from", clf.predict(spectrum)
 	else:
+		print "More input needed to create a classifier:"
 		count_inputs(target)
 
 #Execution begins here
