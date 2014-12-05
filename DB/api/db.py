@@ -3,7 +3,7 @@ import psycopg2.extras
 
 # Database user credentials
 DATABASE = "seads"
-USER	 = "seadapi"
+USER     = "seadapi"
 TABLE    = "data_raw"
 
 
@@ -18,7 +18,7 @@ def query(parsed_url):
 		raise Exception("Relieved malformed URL data")
 
 	header = ['time', 'I', 'W', 'V', 'T']
-	start_time = end_time = data_type = subset = None
+	start_time = end_time = data_type = subset = limit = None
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -28,6 +28,8 @@ def query(parsed_url):
 		end_time = parsed_url['end_time']
 	if 'subset' in parsed_url.keys():
 		subset = parsed_url['subset']
+	if 'limit' in parsed_url.keys():
+		limit = parsed_url['limit']
 
 	if start_time or end_time or data_type or subset:
 		results = retrieve_within_filters(
@@ -36,6 +38,7 @@ def query(parsed_url):
 			end_time,
 			data_type,
 			subset,
+			limit,
 		)
 	else:
 		results = retrieve_historical(parsed_url['device_id'])
@@ -43,7 +46,7 @@ def query(parsed_url):
 	return format_data(header, results)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -52,6 +55,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 	:param end_time: The end of the time range for which to query for data
 	:param data_type: The type of data to query for
 	:param subset: The size of the subset
+	:param limit: Truncate result to this many rows
 	:return: Generator of database row tuples
 	"""
 	params = [device_id]
@@ -84,7 +88,11 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset):
 		if subset:
 			query = write_subsample(query, True)
 
-	query += ";"
+	if limit:
+		query += " LIMIT %s"
+		params.append(limit)
+
+	query += " ORDER BY time DESC;"
 	rows = perform_query(query, tuple(params))
 	return rows
 

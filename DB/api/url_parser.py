@@ -13,11 +13,12 @@ def parse(url):
 	path = url_components.path
 	params = urllib.parse.parse_qs(url_components.query)
 	query_options = {
-			'device_id': None,
-			'start_time': None,
-			'end_time': None,
-			'subset': None,
-			}
+		'device_id': None,
+		'start_time': None,
+		'end_time': None,
+		'subset': None,
+		"limit": None,
+		}
 
 	''' Extract device_id from URL '''
 	if re.match('^/\d+$', path):
