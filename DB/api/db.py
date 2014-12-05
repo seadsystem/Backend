@@ -88,11 +88,13 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		if subset:
 			query = write_subsample(query, True)
 
+	query += " ORDER BY time DESC"
+
 	if limit:
 		query += " LIMIT %s"
 		params.append(limit)
 
-	query += " ORDER BY time DESC;"
+	query += ";"
 	rows = perform_query(query, tuple(params))
 	return rows
 
