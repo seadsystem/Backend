@@ -27,7 +27,7 @@ def parse(url):
 		raise Exception("Serial Not Found")
 
 	''' Iterate over possible parameters and set query options accordingly '''
-	for param in ['start_time', 'end_time', 'subset']:
+	for param in ['start_time', 'end_time', 'subset', 'limit']:
 		if param in params.keys():
 			query_options[param] = int(params[param][0])
 	if 'type' in params.keys():

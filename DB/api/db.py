@@ -31,7 +31,7 @@ def query(parsed_url):
 	if 'limit' in parsed_url.keys():
 		limit = parsed_url['limit']
 
-	if start_time or end_time or data_type or subset:
+	if start_time or end_time or data_type or subset or limit:
 		results = retrieve_within_filters(
 			parsed_url['device_id'],
 			start_time,
