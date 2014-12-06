@@ -35,17 +35,14 @@ def query(parsed_url):
 	if 'json' in parsed_url.keys():
 		json = parsed_url['json']
 
-	if start_time or end_time or data_type or subset or limit:
-		results = retrieve_within_filters(
-			parsed_url['device_id'],
-			start_time,
-			end_time,
-			data_type,
-			subset,
-			limit,
-		)
-	else:
-		results = retrieve_historical(parsed_url['device_id'])
+	results = retrieve_within_filters(
+		parsed_url['device_id'],
+		start_time,
+		end_time,
+		data_type,
+		subset,
+		limit,
+	)
 
 	return format_data(header, results, json)
 
@@ -65,7 +62,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 	# Initialize parameter list and WHERE clause
 	params = [device_id]
-	where = ""
+	where = "WHERE serial = %s"
 
 	# Add subset size parameter if set
 	if subset:
@@ -73,20 +70,20 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 	# Generate WHERE clause
 	if start_time and end_time:
-		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
+		where += " AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
 		params.append(start_time)
 		params.append(end_time)
 	elif start_time:
-		where = "WHERE serial = %s AND time >= to_timestamp(%s)"
+		where += " AND time >= to_timestamp(%s)"
 		params.append(start_time)
 	elif end_time:
-		where = "WHERE serial = %s AND time <= to_timestamp(%s)"
+		where += " AND time <= to_timestamp(%s)"
 		params.append(end_time)
 	if data_type:
 		if where:
 			where += " AND type = %s"
 		else:
-			where = "WHERE serial = %s AND type = %s"
+			where += " AND type = %s"
 		params.append(data_type)
 		query = "SELECT time, data FROM " + TABLE + " as raw " + where
 		if subset:
@@ -107,20 +104,6 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 	query += ";"
 	rows = perform_query(query, tuple(params))
-	return rows
-
-
-def retrieve_historical(device_id):
-	"""
-	Return ALL sensor data for a specific device
-	TODO: add a page size limit?
-
-	:param device_id: The serial number of the device in question
-	:return: Generator of database row tuples
-	"""
-	query = write_crosstab("WHERE serial = %s")
-	params = (device_id, )
-	rows = perform_query(query, params)
 	return rows
 
 
