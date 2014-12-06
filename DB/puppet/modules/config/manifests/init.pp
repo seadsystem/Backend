@@ -19,11 +19,12 @@ class config {
   # Create application users
   unix_user {'landingzone':
     groups   => ['db', 'postgres'],
-    password => $config::landingzone_pw,
+    #password => $config::landingzone_pw,
     require  => Group['db'],
   }
   unix_user {'seadapi':
     groups  => ['db', 'postgres'],
+    #password => $config::seadapi_pw,
     require => Group['db'],
   }
 

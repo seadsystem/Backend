@@ -250,30 +250,32 @@ def print_help():
 	print "2: View plot of spectrum"
 	print "   python Analysis.py -V 1_raw.csv"
 
-def count_inputs(target):
+def count_inputs(target):#makes sure that device count >=2; inputs per device >=minimum
 	minimum = 5
-	makeclf = True
-	target_list = target.tolist()
-	if (len(target_list) < 2):
+	makeclf = True # if True make classifier
+	target_list = target.tolist() #target is the array containing device types
+	if (np.unique(target_list).size < 2): #if device count <2
+		makeclf = False
 		print "At least 2 device types needed."
-		return False
 	for element in set(target):
 		temp = target_list.count(element)
 		print element, "has", temp, "inputs"
 		if (temp < minimum):
 			print "needs", minimum-temp, "more inputs"
 			makeclf = False
-	if (np.unique(target_list).size < 2):
-		makeclf = False
-		print "At least 2 device types needed."
-	return makeclf
+	return makeclf # if True make classifier
 
 def record(spectrum):
 	for i in range(0, spectrum.size):
 		spectrum[i] /= mean
 	device = sys.argv[len(sys.argv)-2]
+	#scikit nearest neighbors requires two sets of inputs
+	#a set of signatures that correspond to a set of classifications
+	#variables named data and target here
 	data = np.array([[]])
 	target = np.array([])
+	#pickle stores a dictionary of data, target, and the classifier
+	#if pickle file exists, open it
 	if os.path.isfile(picklename):                                               
 		f = open("clf.p", "r+")
 		combined = pickle.load(f)
@@ -285,8 +287,8 @@ def record(spectrum):
 		data = np.append(data, [spectrum], axis=1)
 	target = np.append(target, [device], axis=0)
 
-	makeclf = count_inputs(target)
-	clf = None
+	makeclf = count_inputs(target) #checks if enough data to make target now
+	clf = None #classifier
 	if (makeclf == True):
 		print "make clf"
 		clf = neighbors.NearestCentroid()
@@ -294,33 +296,33 @@ def record(spectrum):
 	if (clf != None):
 		print "make fit"
 	       	clf.fit(data, target)
-
+	#dictionary so just one object would be pickled
 	combined = {'data':data, 'target':target, 'clf':clf}
 	f = open("clf.p", "w+")
-	pickle.dump(combined, f)
+	pickle.dump(combined, f) #stores pickle
 	f.close()
 
 
 def classify(spectrum):
 	variation_coefficient = standard_deviation
-	for i in range(0, spectrum.size):
-		spectrum[i] /= mean
-	clf = None
-	if os.path.isfile(picklename):                                               
+	#for i in range(0, spectrum.size):
+	#	spectrum[i] /= mean
+	#already normalized, no need to divide by mean again..
+	clf = None #classifier
+	if os.path.isfile(picklename): #reads in classifier, if it exists                                               
 		f = open("clf.p", "r+")
 		combined = pickle.load(f)
-		data = combined['data']
-		target = combined['target']
 		clf = combined['clf']
 		f.close()
 	else:
 		print "there is no classifier!"
 
 	if (clf):
-		print "recorded from", clf.predict(spectrum)
+		print "recorded from", clf.predict(spectrum)[0]
+		# .predict returns a one-dimensional array, so take index 0
 	else:
 		print "More input needed to create a classifier:"
-		count_inputs(target)
+		count_inputs(target) #prints out what is needed to make a classifier
 
 #Execution begins here
 classification_data = np.array([])
@@ -329,7 +331,9 @@ blockwidth = 200
 Currents = []
 Times = []
 filename_arg_index = len(sys.argv) - 1
-
+if (os.path.isfile(sys.argv[filename_arg_index]) == False):
+	    print_help()
+	    exit(0)
 Options = init()
 Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
@@ -345,7 +349,10 @@ picklename = "clf.p"
 if 'h' in Options:
 	print_help()
 if 'c' in Options:
-	classify(Spectrum)
+	if len(sys.argv) < 3:
+		print_help()
+	else:
+		classify(Spectrum)
 if 'p' in Options:
 	print Spectrum
 if 'w' in Options:
@@ -353,5 +360,7 @@ if 'w' in Options:
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
 if 'r' in Options:
-	filename_arg_index -= 1
-	record(Spectrum)
+	if len(sys.argv) < 4:
+		print_help()
+	else:
+		record(Spectrum)
