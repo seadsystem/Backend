@@ -65,7 +65,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 	# Initialize parameter list and WHERE clause
 	params = [device_id]
-	where = None
+	where = ""
 
 	# Add subset size parameter if set
 	if subset:
@@ -106,7 +106,8 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		params.append(limit)
 
 	query += ";"
-	rows = perform_query(query, tuple(params))
+	#rows = perform_query(query, tuple(params))
+	rows = []
 	return rows
 
 
@@ -120,7 +121,8 @@ def retrieve_historical(device_id):
 	"""
 	query = write_crosstab("WHERE serial = %s")
 	params = (device_id, )
-	rows = perform_query(query, params)
+	#rows = perform_query(query, params)
+	rows = []
 	return rows
 
 
