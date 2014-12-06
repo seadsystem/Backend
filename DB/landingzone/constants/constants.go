@@ -21,7 +21,7 @@ const (
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
 
 	// Database
-	DB_SOCKET   = "/var/run/postgresql"
+	DB_SOCKET   = "/var/run/postgresql" // Use localhost or appropriate hostname for IP connection
 	DB_PORT     = 5432
 	DB_USER     = "landingzone"
 	DB_NAME     = "seads"
