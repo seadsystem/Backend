@@ -146,6 +146,8 @@ func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) 
 	if len(ascii_time) != 16 {
 		err = InvalidTime
 	}
+
+	// Check that all characters are integers.
 	_, err = strconv.Atoi(string(ascii_time))
 	if err != nil {
 		return
