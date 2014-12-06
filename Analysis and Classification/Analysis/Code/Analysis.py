@@ -331,7 +331,9 @@ blockwidth = 200
 Currents = []
 Times = []
 filename_arg_index = len(sys.argv) - 1
-
+if (os.path.isfile(sys.argv[filename_arg_index]) == False):
+	    print_help()
+	    exit(0)
 Options = init()
 Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
@@ -347,7 +349,10 @@ picklename = "clf.p"
 if 'h' in Options:
 	print_help()
 if 'c' in Options:
-	classify(Spectrum)
+	if len(sys.argv) < 3:
+		print_help()
+	else:
+		classify(Spectrum)
 if 'p' in Options:
 	print Spectrum
 if 'w' in Options:
@@ -355,5 +360,7 @@ if 'w' in Options:
 if 'v' in Options or 'V' in Options:
 	display(Spectrum)
 if 'r' in Options:
-	filename_arg_index -= 1
-	record(Spectrum)
+	if len(sys.argv) < 4:
+		print_help()
+	else:
+		record(Spectrum)
