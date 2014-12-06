@@ -1,3 +1,6 @@
+/*
+ * Package contains functions to decode raw packets.
+ */
 package decoders
 
 import (
@@ -137,7 +140,7 @@ func Binary2uint(data []byte) (total uint) {
 	return
 }
 
-// AsciiTimeToDuration converts plug time string to an integral Go duration
+// AsciiTimeToDuration converts plug time string to an integral duration type
 func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) {
 	// Check time string format
 	if len(ascii_time) != 16 {
