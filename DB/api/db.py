@@ -152,6 +152,8 @@ def perform_query(query, params):
 		con = psycopg2.connect("dbname='" + DATABASE +
 				"' user='" + USER + "'")
 		cursor = con.cursor()
+		print("Query:", query)
+		print("Parameters:", params)
 		cursor.execute(query, params)
 		return cursor.fetchall()
 
