@@ -39,7 +39,7 @@ Comments:
 
 		Line comments which are actually comments should have a single space between the // and the start of the comment.
 
-		Line comments on the same line as code should have two (2) spaces between the end of the code and the //.
+		Line comments on the same line as code should have a single space between the end of the code and the //.
 
 Spacing:
 	gofmt will remove groups of more than one blank line. Group together clusters of statements which do the same thing with a blank line. Example: function call, error handling for that function call, logging the result of the function call.
