@@ -27,12 +27,13 @@ def parse(url):
 		raise Exception("Serial Not Found")
 
 	''' Iterate over possible parameters and set query options accordingly '''
-	for param in ['start_time', 'end_time', 'subset', 'limit']:
+	for param in ['start_time', 'end_time', 'subset', 'limit']:  # Cast integer parameters
 		if param in params.keys():
 			query_options[param] = int(params[param][0])
-	if 'type' in params.keys():
+	if 'type' in params.keys():  # Set character parameter
 		query_options['type'] = params['type'][0]
 
+	# Serial number required
 	if not query_options['device_id']:
 		raise Exception("Not Found")
 

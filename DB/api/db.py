@@ -58,11 +58,16 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param limit: Truncate result to this many rows
 	:return: Generator of database row tuples
 	"""
+
+	# Initialize parameter list and WHERE clause
 	params = [device_id]
 	where = None
+
+	# Add subset size parameter if set
 	if subset:
 		params.insert(0, float(subset) + 1.0)
 
+	# Generate WHERE clause
 	if start_time and end_time:
 		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
 		params.append(start_time)
@@ -84,10 +89,12 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			query = write_subsample(query, False)
 
 	else:
+		# If no data type is set we return all data types
 		query = write_crosstab(where, TABLE)
 		if subset:
 			query = write_subsample(query, True)
 
+	# Required for LIMIT, analysis code assumes sorted data
 	query += " ORDER BY time DESC"
 
 	if limit:
@@ -101,7 +108,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 def retrieve_historical(device_id):
 	"""
-	Return sensor data for a specific device
+	Return ALL sensor data for a specific device
 	TODO: add a page size limit?
 
 	:param device_id: The serial number of the device in question
@@ -152,7 +159,7 @@ def perform_query(query, params):
 			con.close()
 
 
-def format_data(header, data):
+def format_data(header, data, json=False):
 	"""
 	Process rows of data returned by the db and format them appropriately
 
@@ -161,7 +168,13 @@ def format_data(header, data):
 	:return: Generator of result strings
 	"""
 	data.insert(0, header)
-	return map(lambda x: str(list(map(str, x))) + ',\n', data)
+	formatted = map(lambda x: str(list(map(str, x))) + ',\n', data)
+	formatted.insert(0, "[\n")
+	formatted.append("]\n")
+	if json:
+		formatted.insert(0, "{ data:\n")
+		formatted.append("}\n")
+	return formatted
 
 
 def write_subsample(query, crosstab=False):
@@ -174,9 +187,9 @@ def write_subsample(query, crosstab=False):
 	"""
 	new_query = "SELECT "
 	if crosstab:
-		new_query += "time, I, W, V, T"
+		new_query += "time, I, W, V, T"  # SELECT all data type columns
 	else:
-		new_query += "time, data"
+		new_query += "time, data"  # Single data type query
 	new_query += ''' FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
 		%% ceil(count(*) OVER () / %s)::int) AS rn

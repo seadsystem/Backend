@@ -33,13 +33,11 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 			r = db.query(parsed)
 
 			self.send_response(200)
-			self.send_header("Content-type", "application/json;charset=utf-8")
+			self.send_header("Content-type", "application/json;charset=utf-8")  # Not actually using JSON format. Causes errors in Chrome when it tries to validate
 
 			self.end_headers()
-			self.wfile.write('[\n'.encode("utf-8"))
 			for line in r:
 				self.wfile.write(line.encode("utf-8"))
-			self.wfile.write(']\n'.encode("utf-8"))
 		except Exception as inst:
 			self.send_error(500)
 			print(type(inst))
