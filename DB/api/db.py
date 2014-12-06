@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import itertools
 
 # Database user credentials
 DATABASE = "seads"
@@ -168,12 +169,9 @@ def format_data(header, data, json=False):
 	:return: Generator of result strings
 	"""
 	data.insert(0, header)
-	formatted = map(lambda x: str(list(map(str, x))) + ',\n', data)
-	formatted.insert(0, "[\n")
-	formatted.append("]\n")
+	formatted = itertools.chain(["[\n"], map(lambda x: str(list(map(str, x))) + ',\n', data), ["]\n"])
 	if json:
-		formatted.insert(0, "{ data:\n")
-		formatted.append("}\n")
+		formatted = itertools.chain(["{ data:\n"], formatted, ["}\n"])
 	return formatted
 
 
