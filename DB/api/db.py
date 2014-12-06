@@ -174,7 +174,7 @@ def format_data(header, data, json=False):
 	data.insert(0, header)
 	formatted = itertools.chain(["[\n"], map(lambda x: str(list(map(str, x))) + ',\n', data), ["]\n"])
 	if json:
-		formatted = itertools.chain(["{ data:\n"], formatted, ["}\n"])
+		formatted = itertools.chain(["{\ndata: "], formatted, ["}\n"])
 	return formatted
 
 
