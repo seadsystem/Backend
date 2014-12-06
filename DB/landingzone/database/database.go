@@ -1,3 +1,6 @@
+/*
+ * Package handles connecting and writing to the database.
+ */
 package database
 
 import (
@@ -22,13 +25,13 @@ func New() (DB, error) {
 
 func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 	log.Println("Beginning transaction...")
-	// Begin transaction
+	// Begin transaction. Required for bulk insert
 	txn, err := db.conn.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Prepare statement
+	// Prepare bulk insert statement
 	stmt, err := txn.Prepare(pq.CopyIn("data_raw", "serial", "type", "data", "time"))
 	if err != nil {
 		log.Fatal(err)
@@ -38,12 +41,12 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 
 	// Process data
 	data_type := string(data.Type)
-	interp_time := data.Timestamp
+	interp_time := data.Timestamp // Set timestamp for first data point to time in packet
 	for _, element := range data.Data {
 		log.Println("Data:", element)
 		log.Println("Time:", interp_time)
-		_, err = stmt.Exec(data.Serial, data_type, element, interp_time)
-		interp_time = interp_time.Add(data.Period)
+		_, err = stmt.Exec(data.Serial, data_type, element, interp_time) // Insert data. This is buffered.
+		interp_time = interp_time.Add(data.Period) // Add data point time spacing for next data point
 		if err != nil {
 			log.Println(err)
 			break

@@ -1,3 +1,6 @@
+/*
+ * Package contains constants and config for the program. Easier than a true config file.
+ */
 package constants
 
 const (
@@ -10,7 +13,7 @@ const (
 	HEAD   = "@H\n"
 	ACK    = "\x06\n"
 	OKAY   = "@K\n"
-	CONFIG = "@SLITIsEP00000000500000C00001\n@SLITVsEP00000000500000C00001\n@SLITWsEP00000000500000C00001\n@SLITTsEP00000000500000C00001\n"
+	CONFIG = "@SLITIsEP00000000500000C00001\n@SLITVsEP00000000500000C00001\n@SLITWsEP00000000500000C00001\n@SLITTsEP00000000500000C00001\n" // Sample config pulled from the old database for plug serial #00001
 
 	READ_TIME_LIMIT  = 10 // Measured in seconds
 	WRITE_TIME_LIMIT = 5  // Measured in seconds
@@ -22,5 +25,5 @@ const (
 	DB_PORT     = 5432
 	DB_USER     = "landingzone"
 	DB_NAME     = "seads"
-	DB_PASSWORD = ""
+	DB_PASSWORD = "" // Password unneeded for Postgres peer authentication.
 )
