@@ -20,6 +20,7 @@ def query(parsed_url):
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = None
+	json = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -31,6 +32,8 @@ def query(parsed_url):
 		subset = parsed_url['subset']
 	if 'limit' in parsed_url.keys():
 		limit = parsed_url['limit']
+	if 'json' in parsed_url.keys():
+		json = parsed_url['json']
 
 	if start_time or end_time or data_type or subset or limit:
 		results = retrieve_within_filters(
@@ -44,7 +47,7 @@ def query(parsed_url):
 	else:
 		results = retrieve_historical(parsed_url['device_id'])
 
-	return format_data(header, results)
+	return format_data(header, results, json)
 
 
 def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit):

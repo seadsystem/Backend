@@ -18,6 +18,7 @@ def parse(url):
 		'end_time': None,
 		'subset': None,
 		"limit": None,
+		"json": None,
 		}
 
 	''' Extract device_id from URL '''
@@ -32,6 +33,8 @@ def parse(url):
 			query_options[param] = int(params[param][0])
 	if 'type' in params.keys():  # Set character parameter
 		query_options['type'] = params['type'][0]
+	if 'json' in params.keys():  # Set boolean parameter
+		query_options['json'] = True
 
 	# Serial number required
 	if not query_options['device_id']:
