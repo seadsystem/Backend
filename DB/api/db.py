@@ -106,8 +106,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		params.append(limit)
 
 	query += ";"
-	#rows = perform_query(query, tuple(params))
-	rows = []
+	rows = perform_query(query, tuple(params))
 	return rows
 
 
@@ -121,8 +120,7 @@ def retrieve_historical(device_id):
 	"""
 	query = write_crosstab("WHERE serial = %s")
 	params = (device_id, )
-	#rows = perform_query(query, params)
-	rows = []
+	rows = perform_query(query, params)
 	return rows
 
 
