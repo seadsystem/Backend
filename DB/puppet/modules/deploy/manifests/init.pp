@@ -11,9 +11,6 @@ CREATE TABLE data_raw (
 );
   '
 
-  # Configure this line as the source directory to deploy from
-  $project_src = '/vagrant/'
-
   exec {'seads-db':
     command => "sudo -u postgres psql -c 'CREATE DATABASE seads;'",
     unless  => 'sudo -u postgres psql -l seads',
@@ -48,15 +45,11 @@ CREATE TABLE data_raw (
   exec {'enable-tablefunc':
     command => 'sudo -u postgres psql -d seads -c "CREATE EXTENSION tablefunc;"',
     require => Exec['seads-db'],
-  }
-
-  exec {'enable-plpython':
-    command => 'sudo -u postgres psql -d seads -c "CREATE LANGUAGE plpythonu;"',
-    require => Exec['seads-db'],
+    unless  => 'sudo -u postgres psql -d seads -c "\\dx tablefunc;"'
   }
 
   exec {'deploy.sh':
-    command => "/etc/puppet/modules/deploy/files/deploy.sh ${project_src}",
+    command => "/etc/puppet/modules/deploy/files/deploy.sh",
     require => Exec['create-table'],
   }
 }
