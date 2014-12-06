@@ -1,4 +1,5 @@
 import http.server
+import sys, os
 
 import url_parser
 import db
@@ -25,6 +26,9 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 				print(type(inst))
 				print(inst.args)
 				print(inst)
+				exc_type, exc_obj, exc_tb = sys.exc_info()
+				fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+				print(exc_type, fname, exc_tb.tb_lineno)
 
 				self.send_error(404)
 			return
@@ -43,6 +47,9 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 			print(type(inst))
 			print(inst.args)
 			print(inst)
+			exc_type, exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			print(exc_type, fname, exc_tb.tb_lineno)
 
 			return
 
