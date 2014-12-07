@@ -177,8 +177,6 @@ def format_data(header, data, json=False):
 	if json:
 		yield "}\n"
 
-	return ""
-
 
 def write_subsample(query, crosstab=False):
 	"""
