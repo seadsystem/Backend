@@ -147,6 +147,15 @@ def perform_query(query, params):
 			con.close()
 
 
+def format_data_row(row):
+	"""
+	Formats result row into result row string
+	:param row: Result row
+	:return: Result row string
+	"""
+	return '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
+
+
 def format_data(header, data, json=False):
 	"""
 	Process rows of data returned by the db and format them appropriately
@@ -158,22 +167,10 @@ def format_data(header, data, json=False):
 	"""
 	if json:
 		yield '{\n"data": '
-
-	yield "[\n"
-
-	data.insert(0, header)
-
-	first = True
+	yield "[\n" + format_data_row(header)  # No comma before header
 	for row in data:
-		row_string = '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
-		if first:
-			first = False
-			yield row_string
-		else:
-			yield ',\n' + row_string
-
+		yield ',\n' + format_data_row(row)
 	yield "\n]\n"
-
 	if json:
 		yield "}\n"
 
