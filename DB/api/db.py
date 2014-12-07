@@ -157,8 +157,7 @@ def format_data(header, data, json=False):
 	:param json: Whether or not to use the pseudo JSON format.
 	:return: Generator of result strings
 	"""
-	data.insert(0, header)
-	formatted = itertools.chain(["[\n"], map(lambda x: str(list(map(str, x))) + ',\n', data), ["]\n"])
+	formatted = itertools.chain(["[\n"], [str(list(map(str, header)))], map(lambda x: ',\n' + str(list(map(str, x))), data), ["]\n"])
 	if json:
 		formatted = itertools.chain(["{\n'data': "], formatted, ["}\n"])
 	return formatted

@@ -37,18 +37,18 @@ CREATE TABLE classifications (
   exec {'create-table':
     command => "sudo -u postgres psql -d seads -c '${table_schema}'",
     unless  => "sudo -u postgres psql -d seads -c '\\d data_raw;'",
-    require => File['data_raw.sql'],
+    require => Exec['seads-db'],
   }
 
   exec {'enable-tablefunc':
-    command => 'sudo -u postgres psql -d seads -c "CREATE EXTENSION tablefunc;"',
+    command => 'sudo -u postgres psql -d seads -c "CREATE EXTENSION IF NOT EXISTS tablefunc;"',
     require => Exec['seads-db'],
-    unless  => 'sudo -u postgres psql -d seads -c "\\dx tablefunc;"'
   }
 
   exec {'deploy.sh':
-    command => "/etc/puppet/modules/deploy/files/deploy.sh",
-    require => Exec['create-table'],
+    command   => '/etc/puppet/modules/deploy/files/deploy.sh',
+    #cwd       => '/vagrant',
+    require   => Exec['create-table'],
   }
 }
 
