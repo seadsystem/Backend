@@ -1,6 +1,5 @@
 import psycopg2
 import psycopg2.extras
-import itertools
 
 # Database user credentials
 DATABASE = "seads"
@@ -157,11 +156,26 @@ def format_data(header, data, json=False):
 	:param json: Whether or not to use the pseudo JSON format.
 	:return: Generator of result strings
 	"""
-	data.insert(0, header)
-	formatted = itertools.chain(["[\n"], map(lambda x: str(list(map(str, x))) + ',\n', data), ["]\n"])
 	if json:
-		formatted = itertools.chain(["{\n'data': "], formatted, ["}\n"])
-	return formatted
+		yield '{\n"data": '
+
+	yield "[\n"
+
+	data.insert(0, header)
+
+	first = False
+	for row in data:
+		row_string = '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
+		if first:
+			first = True
+			yield row_string
+		else:
+			yield ',\n' + row_string
+
+	yield "\n]\n"
+
+	if json:
+		yield "}\n"
 
 
 def write_subsample(query, crosstab=False):
