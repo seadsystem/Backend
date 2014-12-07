@@ -3,7 +3,7 @@ import http.server
 import url_parser
 import db
 
-USAGE = "Usage: http://db.sead.systems:8080/(device id)?[[start_time=(start time as UTC unix timestamp)], [end_time=(end time as UTC unix timestamp)], [type=(Sensor type code)], [subset=(subsample result down to this many rows)], [limit=(truncate result to this many rows)], [json=(set to something to get the result in pseudo JSON format)]].join('&')"
+USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)], [end_time=(end time as UTC unix timestamp)], [type=(Sensor type code)], [subset=(subsample result down to this many rows)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]"
 
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):

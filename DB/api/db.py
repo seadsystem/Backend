@@ -153,7 +153,7 @@ def format_data(header, data, json=False):
 
 	:param header: The first row of the result
 	:param data: Result cursor
-	:param json: Whether or not to use the pseudo JSON format.
+	:param json: Whether or not to use JSON format.
 	:return: Generator of result strings
 	"""
 	if json:
