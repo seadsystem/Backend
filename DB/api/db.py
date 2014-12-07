@@ -163,11 +163,11 @@ def format_data(header, data, json=False):
 
 	data.insert(0, header)
 
-	first = False
+	first = True
 	for row in data:
 		row_string = '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
 		if first:
-			first = True
+			first = False
 			yield row_string
 		else:
 			yield ',\n' + row_string
