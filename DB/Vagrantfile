@@ -58,10 +58,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
      puppet.module_path = "puppet/modules"
      puppet.manifest_file  = "site.pp"
   end
-
-  # Set up server directories and compile landingzone
-  config.vm.provision 'shell' do |shell|
-    shell.path = 'deploy.sh'
-    shell.args = '/vagrant'
-  end
 end
