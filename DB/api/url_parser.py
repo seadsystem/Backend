@@ -19,6 +19,7 @@ def parse(url):
 		'subset': None,
 		"limit": None,
 		"json": None,
+		"reverse": None,
 		}
 
 	''' Extract device_id from URL '''
@@ -35,6 +36,8 @@ def parse(url):
 		query_options['type'] = params['type'][0]
 	if 'json' in params.keys():  # Set boolean parameter
 		query_options['json'] = True
+	if 'reverse' in params.keys():  # Set boolean parameter
+		query_options['reverse'] = True
 
 	# Serial number required
 	if not query_options['device_id']:

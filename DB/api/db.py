@@ -19,7 +19,7 @@ def query(parsed_url):
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = None
-	json = False
+	json = reverse = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -33,6 +33,8 @@ def query(parsed_url):
 		limit = parsed_url['limit']
 	if 'json' in parsed_url.keys():
 		json = parsed_url['json']
+	if 'reverse' in parsed_url.keys():
+		reverse = parsed_url['reverse']
 
 	results = retrieve_within_filters(
 		parsed_url['device_id'],
@@ -41,12 +43,13 @@ def query(parsed_url):
 		data_type,
 		subset,
 		limit,
+	    reverse,
 	)
 
 	return format_data(header, results, json)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -56,6 +59,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param data_type: The type of data to query for
 	:param subset: The size of the subset
 	:param limit: Truncate result to this many rows
+	:param reverse: Return results in reverse order
 	:return: Generator of database row tuples
 	"""
 
@@ -95,7 +99,12 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			query = write_subsample(query, True)
 
 	# Required for LIMIT, analysis code assumes sorted data
-	query += " ORDER BY time DESC"
+	query += " ORDER BY time"
+
+	if reverse:
+		query += " ASC"
+	else:
+		query += " DESC"
 
 	if limit:
 		query += " LIMIT %s"
