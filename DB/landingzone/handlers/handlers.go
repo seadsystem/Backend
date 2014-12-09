@@ -101,7 +101,7 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 
 // writePacket writes a message to the specified connection with proper error handling.
 func writePacket(conn net.Conn, data []byte) (err error) {
-	
+
 	// Set write timeout. If the write times out, the connection is most likely dead.
 	conn.SetWriteDeadline(time.Now().Add(time.Second * constants.WRITE_TIME_LIMIT))
 	write_length, err := conn.Write(data)

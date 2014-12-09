@@ -46,7 +46,7 @@ func (db DB) InsertRawPacket(data decoders.SeadPacket) {
 		log.Println("Data:", element)
 		log.Println("Time:", interp_time)
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time) // Insert data. This is buffered.
-		interp_time = interp_time.Add(data.Period) // Add data point time spacing for next data point
+		interp_time = interp_time.Add(data.Period)                       // Add data point time spacing for next data point
 		if err != nil {
 			log.Println(err)
 			break

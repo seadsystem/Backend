@@ -43,7 +43,7 @@ def query(parsed_url):
 		data_type,
 		subset,
 		limit,
-	    reverse,
+		reverse,
 	)
 
 	return format_data(header, results, json)

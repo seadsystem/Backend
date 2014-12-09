@@ -126,7 +126,7 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 			return
 		}
 	}
-	
+
 	// Breaking out of loop constitutes an error.
 	err = InvalidPacket
 	return
