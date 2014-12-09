@@ -17,11 +17,8 @@
 #For numerical analysis                                                 
 import numpy as np                                                            
 import math
-
-#For automatic feature extraction and classification
 from sklearn import neighbors
 import pickle
-
 #For visualization                                                      
 import matplotlib.pyplot as pyp                                         
                                                                         
@@ -69,12 +66,14 @@ def init():
 
 	return options
 
+#consider making times and currents an associative array
 def import_and_trim():
+#	Times = []
 	Currents = []
 	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
 
 	#Try to open source file for reading                                    
-	filename = sys.argv[len(sys.argv) - 1]                                  
+	filename = sys.argv[filename_arg_index]
 	if os.path.isfile(filename):                                               
 		with open(filename) as f:
 			#Check the first element of the first line.
@@ -84,12 +83,7 @@ def import_and_trim():
 			line = f.readline().split(',')
 
 			#New format
-			if len(line) == 2:
-				#discard first one
-				for line in f:
-					line = line.split(',')
-					Currents.append(line[1])
-			elif line[0] == '1':
+			if line[0] == '1':
 				if line[1] == 'I':
 					Currents.append(line[3])
 				for line in f:
@@ -103,17 +97,34 @@ def import_and_trim():
 						Currents.append(line[1])
 	else:
 		print "Analysis: cannot open file:", filename
-      
-	#Convert currents to milliamps                                                                 
+
+	#Convert time since Unix epoch to intervals in microseconds             
+	#Convert currents to milliamps                                          
+#	Times = [ int(x) - int(Times[0]) for x in Times ]                       
 	Currents = [ 27*float(x)/1000 for x in Currents ] 
 
-	return Currents
+	return Currents, Times
 
 def produce_blocklist():
 	blocklist = []
 
-	data_length = len(Currents) 
+	data_length = len(Currents) #or Times, just to de-specify
 	i = 0
+#	if 'f' in Options:
+#		while i < data_length:
+#			block = []
+#
+#			j = i
+#			while j < data_length: 
+#				if j + 1 < data_length and Times[j + 1] - Times[j] < 418:
+#					block.append(Currents[j])
+#				else: 
+#					break
+#				j += 1
+#
+#			blocklist.append(block)
+#			i = j + 1
+#	else:
 	while i < data_length:
 		if i + 200 > len(Currents):                                       
 			break   
@@ -121,6 +132,7 @@ def produce_blocklist():
 		i += blockwidth 
 
 	return blocklist
+
 
 def produce_mean_normalized_power_spectrum(blocklist):
 	#question: mean then normalize, or normalized then mean?
@@ -315,10 +327,11 @@ classification_data = np.array([])
 classification_target = np.array([])
 blockwidth = 200
 Currents = []
+Times = []
 filename_arg_index = len(sys.argv) - 1
 
 Options = init()
-Currents = import_and_trim()
+Currents, Times = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
@@ -326,7 +339,6 @@ Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 #only calculate once.
 mean = np.mean(Spectrum)
 standard_deviation = np.std(Spectrum)
-
 picklename = "clf.p"
 
 #This should be done first

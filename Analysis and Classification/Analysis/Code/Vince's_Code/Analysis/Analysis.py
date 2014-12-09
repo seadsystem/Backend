@@ -61,9 +61,7 @@ def init():
 
 	return options
 
-#consider making times and currents an associative array
 def import_and_trim():
-#	Times = []
 	Currents = []
 	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
 
@@ -78,7 +76,12 @@ def import_and_trim():
 			line = f.readline().split(',')
 
 			#New format
-			if line[0] == '1':
+			if len(line) == 2:
+				#discard first one
+				for line in f:
+					line = line.split(',')
+					Currents.append(line[1])
+			elif line[0] == '1':
 				if line[1] == 'I':
 					Currents.append(line[3])
 				for line in f:
@@ -92,34 +95,17 @@ def import_and_trim():
 						Currents.append(line[1])
 	else:
 		print "Analysis: cannot open file:", filename
-
-	#Convert time since Unix epoch to intervals in microseconds             
-	#Convert currents to milliamps                                          
-#	Times = [ int(x) - int(Times[0]) for x in Times ]                       
+      
+	#Convert currents to milliamps                                                                 
 	Currents = [ 27*float(x)/1000 for x in Currents ] 
 
-	return Currents, Times
+	return Currents
 
 def produce_blocklist():
 	blocklist = []
 
 	data_length = len(Currents) #or Times, just to de-specify
 	i = 0
-#	if 'f' in Options:
-#		while i < data_length:
-#			block = []
-#
-#			j = i
-#			while j < data_length: 
-#				if j + 1 < data_length and Times[j + 1] - Times[j] < 418:
-#					block.append(Currents[j])
-#				else: 
-#					break
-#				j += 1
-#
-#			blocklist.append(block)
-#			i = j + 1
-#	else:
 	while i < data_length:
 		if i + 200 > len(Currents):                                       
 			break   
@@ -127,7 +113,6 @@ def produce_blocklist():
 		i += blockwidth 
 
 	return blocklist
-
 
 def produce_mean_normalized_power_spectrum(blocklist):
 	#question: mean then normalize, or normalized then mean?
@@ -178,7 +163,6 @@ def display(spectrum):
 	max_range = int(math.ceil(np.amax(spectrum) / standard_deviation))
 	for i in xrange(0, max_range):
 		pyp.plot(template * (mean + i * standard_deviation))
-	pyp.xlabel('Units?')
 	pyp.ylabel('Amps Squared')    
 	pyp.title('Mean Normalized Power Spectrum')
 	if 'V' in Options:
@@ -229,6 +213,8 @@ def print_help():
 	print "2. Spectrum written to text file."
 	print "\nOptions may be arranged in any order, and in any number of groups"
 	print ""
+	print "-c:\t Classify. Match input data to a known group."
+	print "      This only works for microwaves, lamps, and laptop computers"
 	print "-f:\t Fragmented data. This handles gaps in the data."
 	print "-h:\t Help. Display this message."
 	print "-p:\t Print. Print numpy array containing spectrum to terminal."
@@ -279,7 +265,7 @@ Currents = []
 Times = []
 
 Options = init()
-Currents, Times = import_and_trim()
+Currents = import_and_trim()
 Blocklist = produce_blocklist()
 Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
