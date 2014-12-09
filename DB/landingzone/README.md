@@ -29,8 +29,8 @@ $ cd DB/
 If desired, configure the UNIX application user’s password in puppet/modules/config. First add the user credentials to manifests/credentials.pp, then uncomment the password definitions in config/manifests/init.pp.
 ```sh
 $ cd puppet/config
-$ vi manifests/credentials.pp
-$ vi manifests/init.pp
+$ nano manifests/credentials.pp
+$ nano manifests/init.pp
 $ cd ../..
 ```
 
