@@ -19,6 +19,7 @@ def query(parsed_url):
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = None
+	json = reverse = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -30,23 +31,25 @@ def query(parsed_url):
 		subset = parsed_url['subset']
 	if 'limit' in parsed_url.keys():
 		limit = parsed_url['limit']
+	if 'json' in parsed_url.keys():
+		json = parsed_url['json']
+	if 'reverse' in parsed_url.keys():
+		reverse = parsed_url['reverse']
 
-	if start_time or end_time or data_type or subset or limit:
-		results = retrieve_within_filters(
-			parsed_url['device_id'],
-			start_time,
-			end_time,
-			data_type,
-			subset,
-			limit,
-		)
-	else:
-		results = retrieve_historical(parsed_url['device_id'])
+	results = retrieve_within_filters(
+		parsed_url['device_id'],
+		start_time,
+		end_time,
+		data_type,
+		subset,
+		limit,
+		reverse,
+	)
 
-	return format_data(header, results)
+	return format_data(header, results, json)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -56,39 +59,52 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param data_type: The type of data to query for
 	:param subset: The size of the subset
 	:param limit: Truncate result to this many rows
+	:param reverse: Return results in reverse order
 	:return: Generator of database row tuples
 	"""
+
+	# Initialize parameter list and WHERE clause
 	params = [device_id]
-	where = None
+	where = "WHERE serial = %s"
+
+	# Add subset size parameter if set
 	if subset:
 		params.insert(0, float(subset) + 1.0)
 
+	# Generate WHERE clause
 	if start_time and end_time:
-		where = "WHERE serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
+		where += " AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
 		params.append(start_time)
 		params.append(end_time)
 	elif start_time:
-		where = "WHERE serial = %s AND time >= to_timestamp(%s)"
+		where += " AND time >= to_timestamp(%s)"
 		params.append(start_time)
 	elif end_time:
-		where = "WHERE serial = %s AND time <= to_timestamp(%s)"
+		where += " AND time <= to_timestamp(%s)"
 		params.append(end_time)
 	if data_type:
 		if where:
 			where += " AND type = %s"
 		else:
-			where = "WHERE serial = %s AND type = %s"
+			where += " AND type = %s"
 		params.append(data_type)
 		query = "SELECT time, data FROM " + TABLE + " as raw " + where
 		if subset:
 			query = write_subsample(query, False)
 
 	else:
+		# If no data type is set we return all data types
 		query = write_crosstab(where, TABLE)
 		if subset:
 			query = write_subsample(query, True)
 
-	query += " ORDER BY time DESC"
+	# Required for LIMIT, analysis code assumes sorted data
+	query += " ORDER BY time"
+
+	if reverse:
+		query += " ASC"
+	else:
+		query += " DESC"
 
 	if limit:
 		query += " LIMIT %s"
@@ -96,20 +112,6 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 	query += ";"
 	rows = perform_query(query, tuple(params))
-	return rows
-
-
-def retrieve_historical(device_id):
-	"""
-	Return sensor data for a specific device
-	TODO: add a page size limit?
-
-	:param device_id: The serial number of the device in question
-	:return: Generator of database row tuples
-	"""
-	query = write_crosstab("WHERE serial = %s")
-	params = (device_id, )
-	rows = perform_query(query, params)
 	return rows
 
 
@@ -141,6 +143,8 @@ def perform_query(query, params):
 		con = psycopg2.connect("dbname='" + DATABASE +
 				"' user='" + USER + "'")
 		cursor = con.cursor()
+		print("Query:", query)
+		print("Parameters:", params)
 		cursor.execute(query, params)
 		return cursor.fetchall()
 
@@ -152,16 +156,32 @@ def perform_query(query, params):
 			con.close()
 
 
-def format_data(header, data):
+def format_data_row(row):
+	"""
+	Formats result row into result row string
+	:param row: Result row
+	:return: Result row string
+	"""
+	return '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
+
+
+def format_data(header, data, json=False):
 	"""
 	Process rows of data returned by the db and format them appropriately
 
 	:param header: The first row of the result
 	:param data: Result cursor
+	:param json: Whether or not to use JSON format.
 	:return: Generator of result strings
 	"""
-	data.insert(0, header)
-	return map(lambda x: str(list(map(str, x))) + ',\n', data)
+	if json:
+		yield '{\n"data": '
+	yield "[\n" + format_data_row(header)  # No comma before header
+	for row in data:
+		yield ',\n' + format_data_row(row)
+	yield "\n]\n"
+	if json:
+		yield "}\n"
 
 
 def write_subsample(query, crosstab=False):
@@ -174,9 +194,9 @@ def write_subsample(query, crosstab=False):
 	"""
 	new_query = "SELECT "
 	if crosstab:
-		new_query += "time, I, W, V, T"
+		new_query += "time, I, W, V, T"  # SELECT all data type columns
 	else:
-		new_query += "time, data"
+		new_query += "time, data"  # Single data type query
 	new_query += ''' FROM (
 	SELECT *, ((row_number() OVER (ORDER BY "time"))
 		%% ceil(count(*) OVER () / %s)::int) AS rn

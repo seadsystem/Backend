@@ -3,7 +3,7 @@ import http.server
 import url_parser
 import db
 
-USAGE = "Usage: http://db.sead.systems:8080/(device id)?[start_time=(start time as UTC unix timestamp), end_time=(end time as UTC unix timestamp), type=(Sensor type code), subset=(subsample result down to this many rows), limit=(truncate result to this many rows)].join('&')"
+USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)], [end_time=(end time as UTC unix timestamp)], [type=(Sensor type code)], [subset=(subsample result down to this many rows)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]"
 
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
@@ -33,13 +33,11 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 			r = db.query(parsed)
 
 			self.send_response(200)
-			self.send_header("Content-type", "application/json;charset=utf-8")
+			self.send_header("Content-type", "application/json;charset=utf-8")  # Not actually using JSON format. Causes errors in Chrome when it tries to validate
 
 			self.end_headers()
-			self.wfile.write('[\n'.encode("utf-8"))
 			for line in r:
 				self.wfile.write(line.encode("utf-8"))
-			self.wfile.write(']\n'.encode("utf-8"))
 		except Exception as inst:
 			self.send_error(500)
 			print(type(inst))

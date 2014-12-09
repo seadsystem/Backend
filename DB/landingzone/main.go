@@ -1,3 +1,6 @@
+/*
+ * Package sets up connection listener and database and delegates new connections as they come in.
+ */
 package main
 
 import (
@@ -10,6 +13,7 @@ import (
 )
 
 func main() {
+	// Set up connection
 	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT) // The plugs only support IPv4.
 	if err != nil {
 		log.Println("Failed to open listener on port " + constants.PORT)
@@ -17,7 +21,7 @@ func main() {
 	}
 	defer listener.Close()
 
-	// Setup database routine
+	// Setup database
 	db, err := database.New()
 	if err != nil {
 		log.Fatal(err)
@@ -25,13 +29,13 @@ func main() {
 
 	log.Println("Listening for connections...")
 
-	// Handle requests in a go routine
+	// Wait for requests forever
 	for {
-		conn, err := listener.Accept()
+		conn, err := listener.Accept() // Blocking
 		if err != nil {
 			log.Println("Failed to accept request: " + err.Error())
 			continue
 		}
-		go handlers.HandleRequest(conn, db)
+		go handlers.HandleRequest(conn, db) // Handle request in a new go routine
 	}
 }

@@ -1,3 +1,6 @@
+/*
+ * Package contains functions to handle connections and network communication.
+ */
 package handlers
 
 import (
@@ -37,7 +40,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 		packet, err := readPacket(conn)
 
 		if err != nil {
-			// Kill connection to allow plug to reestablish a new connection
+			// Kill connection to allow plug to reestablish a new connection. It is important to do this every so often to resync the time.
 			break
 		}
 
@@ -45,20 +48,13 @@ func HandleRequest(conn net.Conn, db database.DB) {
 		data, err := decoders.DecodePacket(packet, offset)
 		if err != nil {
 			readError(err)
-			break
+			break // Kill the connection. This will fix most problems including alignment issues.
 		}
 		data.Serial = serial
 		log.Printf("Data: %+v\n", data)
 
 		log.Println("Sending to database...")
-		go db.InsertRawPacket(data)
-
-		log.Println("Sending ACK...")
-		writePacket(conn, []byte(constants.ACK))
-		if err != nil {
-			readError(err)
-			break
-		}
+		go db.InsertRawPacket(data) // Inset data into database in a new go routine. Non-blocking.
 	}
 
 	log.Println("Closing connection...")
@@ -69,7 +65,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 // sync re-aligns the packets, resets the plug's configuration and resumes data transfer.
 func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 	log.Println("Sending HEAD...")
-	err = writePacket(conn, []byte(constants.HEAD))
+	err = writePacket(conn, []byte(constants.HEAD)) // Send header request
 	if err != nil {
 		return
 	}
@@ -89,13 +85,13 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 	log.Printf("Plug offset: %+v\n", offset)
 
 	log.Println("Sending configuration...")
-	err = writePacket(conn, []byte(constants.CONFIG))
+	err = writePacket(conn, []byte(constants.CONFIG)) // Send hard-coded config.
 	if err != nil {
 		return
 	}
 
 	log.Println("Sending OKAY...")
-	err = writePacket(conn, []byte(constants.OKAY))
+	err = writePacket(conn, []byte(constants.OKAY)) // Tells plug to start sending data.
 	if err != nil {
 		return
 	}
@@ -105,6 +101,8 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 
 // writePacket writes a message to the specified connection with proper error handling.
 func writePacket(conn net.Conn, data []byte) (err error) {
+
+	// Set write timeout. If the write times out, the connection is most likely dead.
 	conn.SetWriteDeadline(time.Now().Add(time.Second * constants.WRITE_TIME_LIMIT))
 	write_length, err := conn.Write(data)
 	if err != nil {
@@ -147,7 +145,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	log.Println(string(data))
 
 	log.Println("Sending ACK...")
-	err = writePacket(conn, []byte(constants.ACK))
+	err = writePacket(conn, []byte(constants.ACK)) // Tell plug that packet was successfully received.
 	if err != nil {
 		return
 	}
@@ -158,7 +156,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 // readError checks the error and prints an appropriate friendly error message.
 func readError(err error) {
 	if err == io.EOF {
-		log.Println("Done reading bytes.")
+		log.Println("Done reading bytes.") // Doesn't seem to be used with current SEAD plug code.
 	} else {
 		log.Println("Read error:", err)
 	}
@@ -166,6 +164,8 @@ func readError(err error) {
 
 // readBytes reads the specified number of bytes from the connection with a time limit store in constants.READ_TIME_LIMIT. The timeout kills unneeded connections and helps unstick stuck plug interactions.
 func readBytes(conn net.Conn, bytes int) (data []byte, err error) {
+
+	// Set timeout for read. If the required number of bytes are not read within the specified amount of time, an error is returned. If the read times out, the connection is either dead or no new data has been sent in the specified amount of time.
 	conn.SetReadDeadline(time.Now().Add(time.Second * constants.READ_TIME_LIMIT))
 
 	buffer := make([]byte, bytes)

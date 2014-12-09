@@ -1,3 +1,6 @@
+/*
+ * Package contains functions to decode raw packets.
+ */
 package decoders
 
 import (
@@ -20,7 +23,10 @@ type SeadPacket struct {
 	Serial    int
 }
 
+// Header regex. Stored globally so it only needs to be compiled once in init.
 var headerRegex *regexp.Regexp
+
+// Errors
 var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 var InvalidTime = errors.New("Invalid time.")
@@ -38,6 +44,7 @@ func init() {
 func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
 	headerStrings := headerRegex.FindSubmatch(packet)
 
+	// Header has two parts, serial number and offset. The headerStrings should contain the entire header string in position 0, the serial number in position 1, and the offset in position 2.
 	if headerStrings == nil || len(headerStrings) != 3 {
 		err = InvalidHeader
 		return
@@ -53,7 +60,7 @@ func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
 
 	offset = time.Now().Add(-1 * duration)
 
-	serial, err = strconv.Atoi(string(headerStrings[1]))
+	serial, err = strconv.Atoi(string(headerStrings[1])) // Serial number should be 5 digit integer
 	return
 }
 
@@ -89,7 +96,7 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 			i += 2
 		case datatype == 'D':
 			// Data
-			// if count isn't set, return error
+			// if count isn't set, return error. Count is required to tell us how much data we have.
 			if packet.Count == 0 {
 				err = InvalidPacket
 			} else {
@@ -98,6 +105,7 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 				data := buffer[i : i+bytes]
 				packet.Data = make([]int16, count)
 				for i := 0; i < bytes; i += 2 {
+					// Data is an array of 16 bit (2 byte) integers.
 					packet.Data[i/2] = int16(Binary2uint(data[i : i+2]))
 				}
 				i += bytes
@@ -107,15 +115,19 @@ func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error
 			packet.Serial, err = strconv.Atoi(string(buffer[i : i+6]))
 			i += 6
 		case datatype == 'X':
+			// End of packet
 			return
 		default:
 			err = InvalidPacket
 		}
 
+		// Return any error generated during loop iteration
 		if err != nil {
 			return
 		}
 	}
+
+	// Breaking out of loop constitutes an error.
 	err = InvalidPacket
 	return
 }
@@ -128,11 +140,14 @@ func Binary2uint(data []byte) (total uint) {
 	return
 }
 
+// AsciiTimeToDuration converts plug time string to an integral duration type
 func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) {
 	// Check time string format
 	if len(ascii_time) != 16 {
 		err = InvalidTime
 	}
+
+	// Check that all characters are integers.
 	_, err = strconv.Atoi(string(ascii_time))
 	if err != nil {
 		return
