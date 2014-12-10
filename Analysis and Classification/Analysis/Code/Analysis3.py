@@ -281,7 +281,7 @@ def record(spectrum):
 #	clf = neighbors.NearestCentroid() if (makeclf == True) else None
 	if (clf != None):
 		print("make fit")
-	       	clf.fit(data, target)
+		clf.fit(data, target)
 	#dictionary so just one object would be pickled
 	combined = {'data':data, 'target':target, 'clf':clf}
 	f = open("clf.p", "w+")
