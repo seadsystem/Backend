@@ -1,12 +1,10 @@
+#!/usr/bin/env python3
+
 ##
-# Analysis.py
+# Analysis3.py
 #
-# Author: Vincent Steffens, vsteffen@ucsc.edu
-# Date:   16 November 2014
-#
-# Altered by: Asiiah 
-# added def record, def count_inputs
-# rewrote def classify
+# Author: Ian Gudger <igudger@ucsc.edu>
+# Date:   10 December 2014
 #
 # Produces a mean power spectrum of raw SEAD plug current 
 # data, normalized by total current.
