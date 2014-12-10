@@ -313,42 +313,43 @@ def classify(spectrum):
 		count_inputs(target) #prints out what is needed to make a classifier
 
 #Execution begins here
-classification_data = np.array([])
-classification_target = np.array([])
-blockwidth = 200
-Currents = []
-filename_arg_index = len(sys.argv) - 1
-if (os.path.isfile(sys.argv[filename_arg_index]) == False):
-	    print_help()
-	    exit(0)
-Options = init()
-Currents = import_and_trim()
-Blocklist = produce_blocklist()
-Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
+if __name__ == "__main__":
+	classification_data = np.array([])
+	classification_target = np.array([])
+	blockwidth = 200
+	Currents = []
+	filename_arg_index = len(sys.argv) - 1
+	if (os.path.isfile(sys.argv[filename_arg_index]) == False):
+			print_help()
+			exit(0)
+	Options = init()
+	Currents = import_and_trim()
+	Blocklist = produce_blocklist()
+	Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
-#mean and std are used by both display() and classify()
-#only calculate once.
-mean = np.mean(Spectrum)
-standard_deviation = np.std(Spectrum)
+	#mean and std are used by both display() and classify()
+	#only calculate once.
+	mean = np.mean(Spectrum)
+	standard_deviation = np.std(Spectrum)
 
-picklename = "clf.p"
+	picklename = "clf.p"
 
-#This should be done first
-if 'h' in Options:
-	print_help()
-if 'c' in Options:
-	if len(sys.argv) < 3:
+	#This should be done first
+	if 'h' in Options:
 		print_help()
-	else:
-		classify(Spectrum)
-if 'p' in Options:
-	print Spectrum
-if 'w' in Options:
-	write_output()
-if 'v' in Options or 'V' in Options:
-	display(Spectrum)
-if 'r' in Options:
-	if len(sys.argv) < 4:
-		print_help()
-	else:
-		record(Spectrum)
+	if 'c' in Options:
+		if len(sys.argv) < 3:
+			print_help()
+		else:
+			classify(Spectrum)
+	if 'p' in Options:
+		print Spectrum
+	if 'w' in Options:
+		write_output()
+	if 'v' in Options or 'V' in Options:
+		display(Spectrum)
+	if 'r' in Options:
+		if len(sys.argv) < 4:
+			print_help()
+		else:
+			record(Spectrum)
