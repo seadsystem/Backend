@@ -260,7 +260,7 @@ def print_help():
 	print("-V:\t View. Display plot of spectrum, with the mean and multiples of the standard deviation.")
 	print("-v:\t Visualize. Print plot to file.")
 	print("-w:\t Write. Write spectrum to file, each array element on its own line")
-	print("-r:\t Record. Record signature and device type into scikit-learn; note that it overwrites existing clf.p")
+	print("-r:\t Record. Record signature and device type into scikit-learn; note that it overwrites existing classifier.p")
 
 	print("\nExamples:")
 	print("1: Handle fragmented data, view plot, write spectrum to file")
@@ -271,18 +271,18 @@ def print_help():
 
 def count_inputs(target):#makes sure that device count >=2; inputs per device >=minimum
 	minimum = 5
-	makeclf = True # if True make classifier
+	make_classifier = True # if True make classifier
 	target_list = target.tolist() #target is the array containing device types
 	if (np.unique(target_list).size < 2): #if device count <2
-		makeclf = False
+		make_classifier = False
 		print("At least 2 device types needed.")
 	for element in set(target):
 		temp = target_list.count(element)
 		print(element, "has", temp, "inputs")
 		if (temp < minimum):
 			print("needs", minimum-temp, "more inputs")
-			makeclf = False
-	return makeclf # if True make classifier
+			make_classifier = False
+	return make_classifier # if True make classifier
 
 def record(spectrum):
 	#Why is data analysis and processing happening in the record() function?
@@ -293,15 +293,17 @@ def record(spectrum):
 
 	device = sys.argv[len(sys.argv)-2]
 
-	#scikit nearest neighbors requires two sets of inputs
-	#a set of signatures that correspond to a set of classifications
-	#variables named data and target here
+	#scikit nearest neighbors requires two sets of inputs:
+	#a set of signatures that correspond to a set of classifications, and
+	#"variables named data and target here"???
+	#what do these variables represent?
 	data = np.array([[]])
 	target = np.array([])
+
 	#pickle stores a dictionary of data, target, and the classifier
 	#if pickle file exists, open it
 	if os.path.isfile(picklename):                                               
-		f = open("clf.p", "r+")
+		f = open("classifier.p", "r+") #this should use the varible picklename
 		combined = pickle.load(f)
 		data = combined['data']
 		target = combined['target']
@@ -311,38 +313,42 @@ def record(spectrum):
 		data = np.append(data, [spectrum], axis=1)
 	target = np.append(target, [device], axis=0)
 
-	makeclf = count_inputs(target) #checks if enough data to make target now
-	clf = None #classifier
-	if (makeclf == True):
-		print("make clf")
-		clf = neighbors.NearestCentroid()
-#	clf = neighbors.NearestCentroid() if (makeclf == True) else None
-	if (clf != None):
+	make_classifier = count_inputs(target) #checks if enough data to make target now
+	classifier = None #classifier
+	if (make_classifier == True):
+		print("make classifier")
+		classifier = neighbors.NearestCentroid()
+
+	if (classifier != None):
 		print("make fit")
-		clf.fit(data, target)
+		classifier.fit(data, target)
 	#dictionary so just one object would be pickled
-	combined = {'data':data, 'target':target, 'clf':clf}
-	f = open("clf.p", "w+")
+	combined = {'data':data, 'target':target, 'classifier':classifier}
+	f = open("classifier.p", "w+")
 	pickle.dump(combined, f) #stores pickle
 	f.close()
 
 
 def classify(spectrum):
-	variation_coefficient = standard_deviation
+	#what is this line for? Both of these variables are accessible without 
+	#needing to do anything. Additionally, only classification should happen 
+	#here. Data analysis should happen elsewhere.
+	
+	variation_coefficient = standard_deviation 
 	#for i in range(0, spectrum.size):
 	#	spectrum[i] /= mean
 	#already normalized, no need to divide by mean again..
-	clf = None #classifier
+	classifier = None #classifier
 	if os.path.isfile(picklename): #reads in classifier, if it exists                                               
-		f = open("clf.p", "r+")
+		f = open("classifier.p", "r+")
 		combined = pickle.load(f)
-		clf = combined['clf']
+		classifier = combined['classifier']
 		f.close()
 	else:
 		print("there is no classifier!")
 
-	if (clf):
-		print("recorded from", clf.predict(spectrum)[0])
+	if (classifier):
+		print("recorded from", classifier.predict(spectrum)[0])
 		# .predict returns a one-dimensional array, so take index 0
 	else:
 		print("More input needed to create a classifier:")
@@ -368,7 +374,7 @@ if __name__ == "__main__":
 	mean = np.mean(Spectrum)
 	standard_deviation = np.std(Spectrum)
 
-	picklename = "clf.p"
+	picklename = "classifier.p"
 
 	#This should be done first
 	if 'h' in Options:
