@@ -3,12 +3,16 @@
 ##
 # Analysis3.py
 #
-# Author: Ian Gudger <igudger@ucsc.edu>
+# Authors: Vincent Steffens
+#          Lanjing Zhang 
+#          Kevin Doyle
+#          Ian Gudger <igudger@ucsc.edu>
+#
 # Date:   10 December 2014
 #
-# Produces a mean power spectrum of raw SEAD plug current 
-# data, normalized by total current.
-# Outputs to spectrum in a numpy array to stdout or a text 
+# Produces mean power spectra from raw SEAD plug current 
+# data, normalized by time and current. 
+# Outputs spectrua in numpy arrays to stdout or a text 
 # file, each array element on a line.
 ##  
 
@@ -30,11 +34,18 @@ import sys
 import os 
                                                               
 #For using regular expressions                                          
-import re                                                               
-                                                                        
+import re
+
 def init():
+	""" 
+	Starts the program. Verifies proper input, handles user-specified options.
+	To add:
+	* Verify that the input file exists
+	"""
+
 	#Check for proper number of arguments, die if necessary
-	#max args = 2 + number of valid options
+	#max args = 2 + number of valid options, one for program name, one for 
+	#input file name.
 	max_args = 10
 	if len(sys.argv) < 2:
 		print("Usage: Analysis.py [-cfhpvVw] source_file")
@@ -57,6 +68,16 @@ def init():
 
 	#When adding options, be sure to add a description to the -h section
 	#below
+	#for reference
+	#c: classify
+	#d: debug
+	#f: fragmented data (now obselete)
+	#h: help
+	#p: print spectrum to stdout
+	#v: save plot of spectrum
+	#V: display plot of spectrum
+	#w: write spectrum to file
+	#r: record spectrum and device type into scikit learn
 	valid_options = 'cdfhpvVwr'
 	alleged_options = list(set(''.join(sys.argv[1:2])))
 	options = [x for x in alleged_options if re.search(x, valid_options)]
@@ -67,11 +88,16 @@ def init():
 
 	return options
 
-def import_and_trim():
-	Currents = []
-	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
+'''
+This is probably obselete
+def import_and_trim(currents):
+	"""
+	Handles data input in various formats. Data is gathered from the db.
+	This may now be obselete.
+	"""
 
-	#Try to open source file for reading                                    
+	#Try to open source file for reading  
+	#we'll be taking data as a 1-d array                                  
 	filename = sys.argv[len(sys.argv) - 1]                                  
 	if os.path.isfile(filename):                                               
 		with open(filename) as f:
@@ -86,34 +112,41 @@ def import_and_trim():
 				#discard first one
 				for line in f:
 					line = line.split(',')
-					Currents.append(line[1])
+					currents.append(line[1])
 			elif line[0] == '1':
 				if line[1] == 'I':
-					Currents.append(line[3])
+					currents.append(line[3])
 				for line in f:
 					line = line.split(',')
 					if line[1] == 'I':
-						Currents.append(line[2])
+						currents.append(line[2])
 			else:
 				for line in f:
 					line = re.split(',|\t', line)
 					if int(line[0]) in amp_ids:
-						Currents.append(line[1])
+						currents.append(line[1])
 	else:
 		print("Analysis: cannot open file:", filename)
       
 	#Convert currents to milliamps                                                                 
-	Currents = [ 27*float(x)/1000 for x in Currents ] 
+	#this scale factor is currently not calibrated
+	currents = [ 27*float(x)/1000 for x in currents ] 
 
 	return Currents
+'''
 
-def produce_blocklist():
+def produce_blocklist(blockwidth):
+	"""
+	Formats the data into timesteps of a given width. This is necessary to 
+	force the fft to produce components within a regular range of frequencies.
+	"""
+
 	blocklist = []
 
 	data_length = len(Currents) 
 	i = 0
 	while i < data_length:
-		if i + 200 > len(Currents):                                       
+		if i + blockwidth > len(Currents):                                       
 			break   
 		blocklist.append(Currents[i:i+blockwidth])                        
 		i += blockwidth 
@@ -227,7 +260,7 @@ def print_help():
 	print("-V:\t View. Display plot of spectrum, with the mean and multiples of the standard deviation.")
 	print("-v:\t Visualize. Print plot to file.")
 	print("-w:\t Write. Write spectrum to file, each array element on its own line")
-	print("-r:\t Record. Record signature and device type into scikit-learn; note that it overwrites existing clf.p")
+	print("-r:\t Record. Record signature and device type into scikit-learn; note that it overwrites existing classifier.p")
 
 	print("\nExamples:")
 	print("1: Handle fragmented data, view plot, write spectrum to file")
@@ -238,32 +271,39 @@ def print_help():
 
 def count_inputs(target):#makes sure that device count >=2; inputs per device >=minimum
 	minimum = 5
-	makeclf = True # if True make classifier
+	make_classifier = True # if True make classifier
 	target_list = target.tolist() #target is the array containing device types
 	if (np.unique(target_list).size < 2): #if device count <2
-		makeclf = False
+		make_classifier = False
 		print("At least 2 device types needed.")
 	for element in set(target):
 		temp = target_list.count(element)
 		print(element, "has", temp, "inputs")
 		if (temp < minimum):
 			print("needs", minimum-temp, "more inputs")
-			makeclf = False
-	return makeclf # if True make classifier
+			make_classifier = False
+	return make_classifier # if True make classifier
 
 def record(spectrum):
+	#Why is data analysis and processing happening in the record() function?
+	#Why is this extra data analysis happening at all? If this should remain,
+	#it needs to be put elsewhere.
 	for i in range(0, spectrum.size):
 		spectrum[i] /= mean
+
 	device = sys.argv[len(sys.argv)-2]
-	#scikit nearest neighbors requires two sets of inputs
-	#a set of signatures that correspond to a set of classifications
-	#variables named data and target here
+
+	#scikit nearest neighbors requires two sets of inputs:
+	#a set of signatures that correspond to a set of classifications, and
+	#"variables named data and target here"???
+	#what do these variables represent?
 	data = np.array([[]])
 	target = np.array([])
+
 	#pickle stores a dictionary of data, target, and the classifier
 	#if pickle file exists, open it
 	if os.path.isfile(picklename):                                               
-		f = open("clf.p", "r+")
+		f = open("classifier.p", "r+") #this should use the varible picklename
 		combined = pickle.load(f)
 		data = combined['data']
 		target = combined['target']
@@ -273,38 +313,42 @@ def record(spectrum):
 		data = np.append(data, [spectrum], axis=1)
 	target = np.append(target, [device], axis=0)
 
-	makeclf = count_inputs(target) #checks if enough data to make target now
-	clf = None #classifier
-	if (makeclf == True):
-		print("make clf")
-		clf = neighbors.NearestCentroid()
-#	clf = neighbors.NearestCentroid() if (makeclf == True) else None
-	if (clf != None):
+	make_classifier = count_inputs(target) #checks if enough data to make target now
+	classifier = None #classifier
+	if (make_classifier == True):
+		print("make classifier")
+		classifier = neighbors.NearestCentroid()
+
+	if (classifier != None):
 		print("make fit")
-		clf.fit(data, target)
+		classifier.fit(data, target)
 	#dictionary so just one object would be pickled
-	combined = {'data':data, 'target':target, 'clf':clf}
-	f = open("clf.p", "w+")
+	combined = {'data':data, 'target':target, 'classifier':classifier}
+	f = open("classifier.p", "w+")
 	pickle.dump(combined, f) #stores pickle
 	f.close()
 
 
 def classify(spectrum):
-	variation_coefficient = standard_deviation
+	#what is this line for? Both of these variables are accessible without 
+	#needing to do anything. Additionally, only classification should happen 
+	#here. Data analysis should happen elsewhere.
+	
+	variation_coefficient = standard_deviation 
 	#for i in range(0, spectrum.size):
 	#	spectrum[i] /= mean
 	#already normalized, no need to divide by mean again..
-	clf = None #classifier
+	classifier = None #classifier
 	if os.path.isfile(picklename): #reads in classifier, if it exists                                               
-		f = open("clf.p", "r+")
+		f = open("classifier.p", "r+")
 		combined = pickle.load(f)
-		clf = combined['clf']
+		classifier = combined['classifier']
 		f.close()
 	else:
 		print("there is no classifier!")
 
-	if (clf):
-		print("recorded from", clf.predict(spectrum)[0])
+	if (classifier):
+		print("recorded from", classifier.predict(spectrum)[0])
 		# .predict returns a one-dimensional array, so take index 0
 	else:
 		print("More input needed to create a classifier:")
@@ -314,14 +358,14 @@ def classify(spectrum):
 if __name__ == "__main__":
 	classification_data = np.array([])
 	classification_target = np.array([])
-	blockwidth = 200
+	Blockwidth = 200
 	Currents = []
 	filename_arg_index = len(sys.argv) - 1
 	if (os.path.isfile(sys.argv[filename_arg_index]) == False):
 			print_help()
 			exit(0)
 	Options = init()
-	Currents = import_and_trim()
+	Currents = import_and_trim(Currents)
 	Blocklist = produce_blocklist()
 	Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
@@ -330,7 +374,7 @@ if __name__ == "__main__":
 	mean = np.mean(Spectrum)
 	standard_deviation = np.std(Spectrum)
 
-	picklename = "clf.p"
+	picklename = "classifier.p"
 
 	#This should be done first
 	if 'h' in Options:
