@@ -3,12 +3,16 @@
 ##
 # Analysis3.py
 #
-# Author: Ian Gudger <igudger@ucsc.edu>
+# Authors: Vincent Steffens
+#          Lanjing Zhang 
+#          Kevin Doyle
+#          Ian Gudger <igudger@ucsc.edu>
+#
 # Date:   10 December 2014
 #
-# Produces a mean power spectrum of raw SEAD plug current 
-# data, normalized by total current.
-# Outputs to spectrum in a numpy array to stdout or a text 
+# Produces mean power spectra from raw SEAD plug current 
+# data, normalized by time and current. 
+# Outputs spectrua in numpy arrays to stdout or a text 
 # file, each array element on a line.
 ##  
 
@@ -30,11 +34,18 @@ import sys
 import os 
                                                               
 #For using regular expressions                                          
-import re                                                               
-                                                                        
+import re
+
 def init():
+	""" 
+	Starts the program. Verifies proper input, handles user-specified options.
+	To add:
+	* Verify that the input file exists
+	"""
+
 	#Check for proper number of arguments, die if necessary
-	#max args = 2 + number of valid options
+	#max args = 2 + number of valid options, one for program name, one for 
+	#input file name.
 	max_args = 10
 	if len(sys.argv) < 2:
 		print("Usage: Analysis.py [-cfhpvVw] source_file")
@@ -57,6 +68,16 @@ def init():
 
 	#When adding options, be sure to add a description to the -h section
 	#below
+	#for reference
+	#c: classify
+	#d: debug
+	#f: fragmented data (now obselete)
+	#h: help
+	#p: print spectrum to stdout
+	#v: save plot of spectrum
+	#V: display plot of spectrum
+	#w: write spectrum to file
+	#r: record spectrum and device type into scikit learn
 	valid_options = 'cdfhpvVwr'
 	alleged_options = list(set(''.join(sys.argv[1:2])))
 	options = [x for x in alleged_options if re.search(x, valid_options)]
@@ -67,11 +88,16 @@ def init():
 
 	return options
 
-def import_and_trim():
-	Currents = []
-	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
+'''
+This is probably obselete
+def import_and_trim(currents):
+	"""
+	Handles data input in various formats. Data is gathered from the db.
+	This may now be obselete.
+	"""
 
-	#Try to open source file for reading                                    
+	#Try to open source file for reading  
+	#we'll be taking data as a 1-d array                                  
 	filename = sys.argv[len(sys.argv) - 1]                                  
 	if os.path.isfile(filename):                                               
 		with open(filename) as f:
@@ -86,34 +112,41 @@ def import_and_trim():
 				#discard first one
 				for line in f:
 					line = line.split(',')
-					Currents.append(line[1])
+					currents.append(line[1])
 			elif line[0] == '1':
 				if line[1] == 'I':
-					Currents.append(line[3])
+					currents.append(line[3])
 				for line in f:
 					line = line.split(',')
 					if line[1] == 'I':
-						Currents.append(line[2])
+						currents.append(line[2])
 			else:
 				for line in f:
 					line = re.split(',|\t', line)
 					if int(line[0]) in amp_ids:
-						Currents.append(line[1])
+						currents.append(line[1])
 	else:
 		print("Analysis: cannot open file:", filename)
       
 	#Convert currents to milliamps                                                                 
-	Currents = [ 27*float(x)/1000 for x in Currents ] 
+	#this scale factor is currently not calibrated
+	currents = [ 27*float(x)/1000 for x in currents ] 
 
 	return Currents
+'''
 
-def produce_blocklist():
+def produce_blocklist(blockwidth):
+	"""
+	Formats the data into timesteps of a given width. This is necessary to 
+	force the fft to produce components within a regular range of frequencies.
+	"""
+
 	blocklist = []
 
 	data_length = len(Currents) 
 	i = 0
 	while i < data_length:
-		if i + 200 > len(Currents):                                       
+		if i + blockwidth > len(Currents):                                       
 			break   
 		blocklist.append(Currents[i:i+blockwidth])                        
 		i += blockwidth 
@@ -252,9 +285,14 @@ def count_inputs(target):#makes sure that device count >=2; inputs per device >=
 	return makeclf # if True make classifier
 
 def record(spectrum):
+	#Why is data analysis and processing happening in the record() function?
+	#Why is this extra data analysis happening at all? If this should remain,
+	#it needs to be put elsewhere.
 	for i in range(0, spectrum.size):
 		spectrum[i] /= mean
+
 	device = sys.argv[len(sys.argv)-2]
+
 	#scikit nearest neighbors requires two sets of inputs
 	#a set of signatures that correspond to a set of classifications
 	#variables named data and target here
@@ -314,14 +352,14 @@ def classify(spectrum):
 if __name__ == "__main__":
 	classification_data = np.array([])
 	classification_target = np.array([])
-	blockwidth = 200
+	Blockwidth = 200
 	Currents = []
 	filename_arg_index = len(sys.argv) - 1
 	if (os.path.isfile(sys.argv[filename_arg_index]) == False):
 			print_help()
 			exit(0)
 	Options = init()
-	Currents = import_and_trim()
+	Currents = import_and_trim(Currents)
 	Blocklist = produce_blocklist()
 	Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
