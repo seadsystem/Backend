@@ -6,11 +6,11 @@
 #              usage: spectrogram.py [folder path directory][sensor ID's]
 #              (2) Takes in alternating new data from plug with new server
 # .csv export
-#              usage: spectrogram.py [folder path directory] [sensor ID's]
+#              usage: spectrogram.py [folder path directory]
 # Created by Henry Crute
 # 9/16/2014
 # Modified by Diem Chau
-# 11/25/14
+# 12/10/14
 # ==========================================================================
 
 import sys, os
@@ -40,13 +40,13 @@ def get_data(filename, wattage, temperature, ac, voltage):
     if line[0] == '1':
         for line in filename:
             line_id = line[2]
-            if line_id == ac_id:
+            if line_id == 'I':
                 ac.append(float(line.split(delimiter)[2]))
-            elif line_id == voltage_id:
+            elif line_id == 'V':
                 voltage.append(float(line.split(delimiter)[2]))
-            elif line_id == wattage_id:
+            elif line_id == 'W':
                 wattage.append(float(line.split(delimiter)[2]))
-            elif line_id == temperature_id:
+            elif line_id == 'T':
                 temperature.append(float(line.split(delimiter)[2]))
         correct_ac_data(ac)
 
