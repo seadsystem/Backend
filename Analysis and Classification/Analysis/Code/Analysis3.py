@@ -21,18 +21,18 @@ import numpy as np
 import math
 
 #For automatic feature extraction and classification
-from sklearn import neighbors
+from sklearn.naive_bayes import GaussianNB
 import pickle
 
 #For visualization                                                      
 import matplotlib.pyplot as pyp                                         
-                                                                        
+																								
 #For manipulating command-line arguments                                
 import sys                                                              
-                                                                        
+																								
 #For handling files                                                      
 import os 
-                                                              
+																				
 #For using regular expressions                                          
 import re
 
@@ -127,7 +127,7 @@ def import_and_trim(currents):
 						currents.append(line[1])
 	else:
 		print("Analysis: cannot open file:", filename)
-      
+		
 	#Convert currents to milliamps                                                                 
 	#this scale factor is currently not calibrated
 	currents = [ 27*float(x)/1000 for x in currents ] 
@@ -269,6 +269,74 @@ def print_help():
 	print("2: View plot of spectrum")
 	print("   python Analysis.py -V 1_raw.csv")
 
+
+# Makes a classifier from pre-existing group of spectrum pickle files
+# DBUG Kevin 12-8-2014: The code for exporting spectrum pickle files has
+#                       not been added to this file yet. 
+# DBUG Kevin 12-10-2014: Not integrated at all, uncallable 
+# DBUG Needs to get spectrum data from a different source?? May not work with database
+#      without dramatic alteration
+def preload_classifier( ):
+	dir = 'training_data/'
+	training_data = np.array([[]])
+	labels = np.array([])
+	first = True
+	
+	# Puts training data into an array
+	for subdir, dirs, files in os.walk( dir ):
+		for file in files:
+			if file.endswith('Spectrum'):
+				# Assembles training data feature set
+				pkl_file = open( os.path.join( subdir, file ), 'r' )
+				spec = pickle.load( pkl_file )
+				spec = spec.tolist()
+				if first:
+					training_data = np.append( training_data, [spec], axis=1 )
+					first = False
+				else:
+					training_data = np.append( training_data, [spec], axis=0 )
+				
+				# Assembles labels corresponding with feature set data
+				# Note that the file names must be properly formatted
+				# Note that this solution does not allow the user to add device types
+				first_four_letters = file[0:4]
+
+				labels = np.append( labels, [first_four_letters], axis=0 )
+				
+				#else:
+				#   print "Error processing training data. Check the filename formats."
+				#   exit()
+		
+	# Verify each training_data value has a corresponding label
+	if len(training_data) != len(labels):
+		print "Error processing training data. Something is wrong, good luck finding it."
+		exit()
+	
+	# Make the classifier (yay!)
+	# Using Naive Bayes
+	clf = GaussianNB()
+	clf.fit( training_data, labels )
+	
+	### Cross Validation, include ALL data
+	#print(cross_validation.cross_val_score( clf, training_data, labels, cv=3 ))
+	###
+	
+	### Used to check accuracy, include ALL data
+	#X_train, X_test, y_train, y_test = cross_validation.train_test_split( training_data, labels, test_size=0.3, random_state=0)
+	#clf = GaussianNB()
+	#clf.fit( X_train, y_train )
+	#print( clf.score(X_test, y_test) )
+	###
+	
+	data_group = { 'data':training_data, 'target':labels, 'clf':clf }
+	
+	# Save classifier
+	pkl_file = open( 'clf.p', 'w' )
+	pickle.dump( data_group, pkl_file )
+	pkl_file.close()
+	
+"""
+	Does not work for our small data set, should be used in later work
 def count_inputs(target):#makes sure that device count >=2; inputs per device >=minimum
 	minimum = 5
 	make_classifier = True # if True make classifier
@@ -283,17 +351,93 @@ def count_inputs(target):#makes sure that device count >=2; inputs per device >=
 			print("needs", minimum-temp, "more inputs")
 			make_classifier = False
 	return make_classifier # if True make classifier
+"""
+
+# Condenses data set to allow for balanced training of classifier 
+def prep_training( data, target ):
+	temp_data = np.array([[]])
+	temp_target = np.array([])
+	
+	label_dict = {}
+	
+	min_count = 99999
+	min_label = ""
+	
+	# Count the data points for each device type
+	for feature, label in zip( data, target ):
+		
+		if label_dict.has_key( label ):
+			label_dict[ label ] = label_dict[ label ] + 1
+				
+		else:
+			label_dict[ label ] = 1
+			
+	# Identify the least represented device
+	for key in label_dict.keys():
+		if label_dict[ key ] < min_count:
+			min_count = label_dict[ key ]
+			min_label = key
+
+	feat_len = len( data[0] )
+	first = True
+	
+	# Create averages for the data 
+	for key in label_dict.keys():
+		# Creates 'min_count' many arrays, initialized to zero
+		temp_feat_array = np.zeros(( min_count, feat_len ))
+		temp_feat_array_count = np.zeros(( min_count, 1 ))
+		counter = 0
+		for feature, label in zip( data, target ):
+			if key == label:
+				counter = counter + 1
+				
+				# Using the modulo operator, the feature arrays are evenly distributed 
+				# among the 'min_count' many arrays
+				array_idx = counter % min_count
+				for value, ( idx, sum ) in zip( feature, enumerate(temp_feat_array[ array_idx ] ) ) :
+						temp_feat_array[ array_idx ][ idx ] = np.add( value, sum )
+				#print label.tostring()
+				temp_feat_array_count[ array_idx ] = np.add( temp_feat_array_count[ array_idx ], 1 )
+				#print temp_feat_array_count[ array_idx ]
+						
+		for idx, feature in enumerate( temp_feat_array ):
+			# Divide the sum of features by the number of features summed
+			feature = np.divide( feature, temp_feat_array_count[ idx ] )
+			if first:
+				temp_data = np.append( temp_data, [feature], axis=1 )
+				first = False
+			else:
+				temp_data = np.append( temp_data, [feature], axis=0 )
+			temp_target = np.append( temp_target, [key.tostring()], axis = 0 )
+	
+	
+	## Verification for DBUG purposes
+	l_dict = {}
+	for feature, label in zip( temp_data, temp_target ):
+	
+		# If label is in dict, increment counter
+		if l_dict.has_key( label ):
+			l_dict[ label ] = l_dict[ label ] + 1
+				
+		# Else add to dict
+		else:
+			l_dict[ label ] = 1
+	print label_dict
+	print l_dict
+	##
+	
+	return ( temp_data, temp_target )
 
 def record(spectrum):
 	#Why is data analysis and processing happening in the record() function?
 	#Why is this extra data analysis happening at all? If this should remain,
 	#it needs to be put elsewhere.
-	for i in range(0, spectrum.size):
-		spectrum[i] /= mean
+	#for i in range(0, spectrum.size):
+	#	spectrum[i] /= mean
 
 	device = sys.argv[len(sys.argv)-2]
 
-	#scikit nearest neighbors requires two sets of inputs:
+	#scikit naive bayes requires two sets of inputs:
 	#a set of signatures that correspond to a set of classifications, and
 	#"variables named data and target here"???
 	#what do these variables represent?
@@ -313,14 +457,16 @@ def record(spectrum):
 		data = np.append(data, [spectrum], axis=1)
 	target = np.append(target, [device], axis=0)
 
-	make_classifier = count_inputs(target) #checks if enough data to make target now
+	#make_classifier = count_inputs(target) #checks if enough data to make target now
+	make_classifier = True
 	classifier = None #classifier
 	if (make_classifier == True):
 		print("make classifier")
-		classifier = neighbors.NearestCentroid()
+		classifier = GaussianNB()
 
 	if (classifier != None):
 		print("make fit")
+		temp_data, temp_target = prep_training( data, target )
 		classifier.fit(data, target)
 	#dictionary so just one object would be pickled
 	combined = {'data':data, 'target':target, 'classifier':classifier}
