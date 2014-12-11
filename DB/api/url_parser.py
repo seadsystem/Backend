@@ -34,10 +34,10 @@ def parse(url):
 			query_options[param] = int(params[param][0])
 	if 'type' in params.keys():  # Set character parameter
 		query_options['type'] = params['type'][0]
-	if 'json' in params.keys():  # Set boolean parameter
-		query_options['json'] = True
-	if 'reverse' in params.keys():  # Set boolean parameter
-		query_options['reverse'] = True
+	# Set boolean parameters
+	for param in ['json', 'reverse', 'classify']:
+		if param in params.keys():
+			query_options[param] = True
 
 	# Serial number required
 	if not query_options['device_id']:
