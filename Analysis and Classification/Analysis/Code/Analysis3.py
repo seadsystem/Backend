@@ -88,13 +88,13 @@ def init():
 
 	return options
 
-'''
-This is probably obselete
+
 def import_and_trim(currents):
 	"""
 	Handles data input in various formats. Data is gathered from the db.
 	This may now be obselete.
 	"""
+	amp_ids = [70, 66, 74, 62, 78, 58, 50, 14, 54]
 
 	#Try to open source file for reading  
 	#we'll be taking data as a 1-d array                                  
@@ -133,7 +133,7 @@ def import_and_trim(currents):
 	currents = [ 27*float(x)/1000 for x in currents ] 
 
 	return Currents
-'''
+
 
 def produce_blocklist(blockwidth):
 	"""
@@ -512,7 +512,7 @@ if __name__ == "__main__":
 			exit(0)
 	Options = init()
 	Currents = import_and_trim(Currents)
-	Blocklist = produce_blocklist()
+	Blocklist = produce_blocklist(Blockwidth)
 	Spectrum = produce_mean_normalized_power_spectrum(Blocklist)
 
 	#mean and std are used by both display() and classify()

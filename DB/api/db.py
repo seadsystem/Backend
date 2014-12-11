@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import Analysis_3 as A
 
 # Database user credentials
 DATABASE = "seads"
@@ -15,11 +16,11 @@ def query(parsed_url):
 	:return: Generator of result strings
 	"""
 	if 'device_id' not in parsed_url.keys():
-		raise Exception("Relieved malformed URL data")
+		raise Exception("Received malformed URL data")
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = None
-	json = reverse = False
+	json = reverse = classify = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -35,6 +36,8 @@ def query(parsed_url):
 		json = parsed_url['json']
 	if 'reverse' in parsed_url.keys():
 		reverse = parsed_url['reverse']
+	if 'classify' in parsed_url.keys():
+		classify = parsed_url['classify']
 
 	results = retrieve_within_filters(
 		parsed_url['device_id'],
@@ -46,7 +49,14 @@ def query(parsed_url):
 		reverse,
 	)
 
-	return format_data(header, results, json)
+	if classify:
+		if serial and start_time and end_time:
+			classification = A.run(results)
+			return classification
+		else:
+			raise Exception("Received malformed URL data")
+	else:
+		return format_data(header, results, json)
 
 
 def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse):
@@ -113,7 +123,6 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	query += ";"
 	rows = perform_query(query, tuple(params))
 	return rows
-
 
 def write_crosstab(where, data = TABLE):
 	"""
