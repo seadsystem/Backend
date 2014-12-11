@@ -1,12 +1,17 @@
 #!/usr/bin/python
-# ============================================================
+# ==========================================================================
 # File: spectrogram.py
-# Description: Takes in alternating current data from plug,
-# shemp database export, specify sensor ID's to be what
+# Description: (1) Takes in alternating old data from plug with old server,
+# .csv export
+#              usage: spectrogram.py [folder path directory][sensor ID's]
+#              (2) Takes in alternating new data from plug with new server
+# .csv export
 #              usage: spectrogram.py [folder path directory]
 # Created by Henry Crute
 # 9/16/2014
-# ============================================================
+# Modified by Diem Chau
+# 12/10/14
+# ==========================================================================
 
 import sys, os
 import numpy as np
@@ -15,6 +20,7 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from pylab import *
 
+#from openpyxl import load_workbook
 #creates folder if it doesn't exist in the directory
 def ensure_dir(directory):
    if not os.path.exists(directory):
@@ -28,17 +34,35 @@ def correct_ac_data(ac):
 
 #gets data from file
 def get_data(filename, wattage, temperature, ac, voltage):
-   for line in filename:
-      line_id = line[:2]
-      if ac_id in line_id:
-         ac.append(float(line.split()[1]))
-      elif voltage_id in line_id:
-         voltage.append(float(line.split()[1]))
-      elif wattage_id in line_id:
-         wattage.append(float(line.split()[1]))
-      elif temperature_id in line_id:
-         temperature.append(float(line.split()[1]))
-   correct_ac_data(ac)
+    #filename = load_workbook(filename, use_iterators = True)
+    line = filename.readline().split(delimiter)
+    # works with new data
+    if line[0] == '1':
+        for line in filename:
+            line_id = line[2]
+            if line_id == 'I':
+                ac.append(float(line.split(delimiter)[2]))
+            elif line_id == 'V':
+                voltage.append(float(line.split(delimiter)[2]))
+            elif line_id == 'W':
+                wattage.append(float(line.split(delimiter)[2]))
+            elif line_id == 'T':
+                temperature.append(float(line.split(delimiter)[2]))
+        correct_ac_data(ac)
+
+    # works with old data
+    else:
+        for line in filename:
+            line_id = line[:2]
+            if ac_id in line_id:
+                ac.append(float(line.split(delimiter)[1]))
+            elif voltage_id in line_id:
+                voltage.append(float(line.split(delimiter)[1]))
+            elif wattage_id in line_id:
+                wattage.append(float(line.split(delimiter)[1]))
+            elif temperature_id in line_id:
+                temperature.append(float(line.split(delimiter)[1]))
+        correct_ac_data(ac)
 
 def visualize_data(wattage, temperature, ac, voltage, filename):
    ensure_dir(output_dir + filename)
@@ -113,6 +137,7 @@ def visualize_spec(signal, signal_type, filename):
    plt.yticks(np.arange(0, 21, 1))
 
    savefig(output_dir + filename + '/' + filename + '_' + signal_type + '_psd.png')
+
    #spectrogram angle
    fig = plt.figure(figsize=(8, 4.5))
    ax1 = plt.subplot(111)
@@ -178,8 +203,9 @@ def process_data(file_directory):
 
 
 #START OF PROGRAM
-if len(sys.argv) < 3:
-   print "usage: " + sys.argv[0] + " [input folder path dir] [output filder path]"
+if len(sys.argv) < 6:
+   print "Use .csv file only\n"
+   print "usage: " + sys.argv[0] + " [input folder path dir] [output folder path] [ac_id] [wattage_id] [temperature_id]"
    exit(1)
 
 #opens specified directory to read from
@@ -189,10 +215,13 @@ path = sys.argv[1]
 output_dir = sys.argv[2]
 
 #defined sensor ID's
-wattage_id = '15'
-temperature_id = '16'
-ac_id = '14'
+wattage_id = sys.argv[4]
+temperature_id = sys.argv[5]
+ac_id = sys.argv[3]
 voltage_id = '13'
+
+#delimiter for Microsoft Excel(.csv) file
+delimiter = ','
 
 for root, dirs, filenames in os.walk(path):
    for f in filenames:
