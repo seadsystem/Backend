@@ -39,13 +39,6 @@ def query(parsed_url):
 	if 'classify' in parsed_url.keys():
 		classify = parsed_url['classify']
 
-	if classify:
-		if serial and start_time and end_time:
-			classification = classify_data(serial, start_time, end_time)
-			return classification
-		else:
-			raise Exception("Received malformed URL data")
-
 	results = retrieve_within_filters(
 		parsed_url['device_id'],
 		start_time,
@@ -56,7 +49,14 @@ def query(parsed_url):
 		reverse,
 	)
 
-	return format_data(header, results, json)
+	if classify:
+		if serial and start_time and end_time:
+			classification = A.run(results)
+			return classification
+		else:
+			raise Exception("Received malformed URL data")
+	else:
+		return format_data(header, results, json)
 
 
 def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse):
@@ -123,20 +123,6 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	query += ";"
 	rows = perform_query(query, tuple(params))
 	return rows
-
-def classify_data(serial, start_time, end_time):
-	"""
-	Classify a set of raw data
-
-	:param serial: Integer device serial number
-	:param start_time: First occuring timestamp
-	:param end_time: First occuring timestamp
-	:return: classification type as string
-	"""
-	query = "SELECT data FROM data_raw WHERE type = 'I' AND serial = %s AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
-	current_data = perform_query(query, (serial, start_time, end_time))
-	classification = A.run(current_data)
-	return classification
 
 def write_crosstab(where, data = TABLE):
 	"""
