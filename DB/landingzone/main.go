@@ -36,6 +36,6 @@ func main() {
 			log.Println("Failed to accept request: " + err.Error())
 			continue
 		}
-		go handlers.HandleRequest(conn, db) // Handle request in a new go routine
+		go handlers.HandleRequest(conn, db) // Handle request in a new go routine. The database object is thread safe.
 	}
 }
