@@ -5,7 +5,8 @@ package constants
 
 const (
 	HOST = "0.0.0.0" // All host names
-	PORT = "9000"
+	SEAD_PLUG_PORT = "9000"
+	RPI_1_PORT = "9001"
 
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 

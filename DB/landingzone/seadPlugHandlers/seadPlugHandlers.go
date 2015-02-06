@@ -1,7 +1,7 @@
 /*
- * Package contains functions to handle connections and network communication.
+ * Package contains functions to handle sead plug connections and network communication.
  */
-package handlers
+package seadPlugHandlers
 
 import (
 	"errors"

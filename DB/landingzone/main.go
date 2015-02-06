@@ -9,17 +9,11 @@ import (
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
-	"github.com/seadsystem/Backend/DB/landingzone/handlers"
+	"github.com/seadsystem/Backend/DB/landingzone/seadPlugHandlers"
 )
 
 func main() {
-	// Set up connection
-	listener, err := net.Listen("tcp4", constants.HOST+":"+constants.PORT) // The plugs only support IPv4.
-	if err != nil {
-		log.Println("Failed to open listener on port " + constants.PORT)
-		log.Panic("Error was: " + err.Error())
-	}
-	defer listener.Close()
+
 
 	// Setup database
 	db, err := database.New()
@@ -29,6 +23,19 @@ func main() {
 
 	log.Println("Listening for connections...")
 
+	go listener(seadPlugHandlers.HandleRequest, constants.RPI_1_PORT, db)
+	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
+}
+
+func listener(handler func (net.Conn, database.DB), port string, db database.DB) {
+	// Set up connection
+	listener, err := net.Listen("tcp4", constants.HOST+":"+port) // The plugs only support IPv4.
+	if err != nil {
+		log.Println("Failed to open listener on port " + port)
+		log.Panic("Error was: " + err.Error())
+	}
+	defer listener.Close()
+	
 	// Wait for requests forever
 	for {
 		conn, err := listener.Accept() // Blocking
@@ -36,6 +43,6 @@ func main() {
 			log.Println("Failed to accept request: " + err.Error())
 			continue
 		}
-		go handlers.HandleRequest(conn, db) // Handle request in a new go routine. The database object is thread safe.
+		go handler(conn, db) // Handle request in a new go routine. The database object is thread safe.
 	}
 }
