@@ -4,9 +4,9 @@
 package constants
 
 const (
-	HOST = "0.0.0.0" // All host names
+	HOST           = "0.0.0.0" // All host names
 	SEAD_PLUG_PORT = "9000"
-	RPI_1_PORT = "9001"
+	RPI_1_PORT     = "9001"
 
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 
@@ -21,10 +21,19 @@ const (
 
 	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
 
-	// Database
+	// Postgres Database
 	DB_SOCKET   = "/var/run/postgresql" // Use localhost or appropriate hostname for IP connection
 	DB_PORT     = 5432
 	DB_USER     = "landingzone"
 	DB_NAME     = "seads"
 	DB_PASSWORD = "" // Password unneeded for Postgres peer authentication.
+
+	// Influxdb
+	INFLUX_HOST             = "localhost"
+	INFLUX_USERNAME         = "root"
+	INFLUX_PASSWORD         = "root"
+	INFLUX_PORT             = 8086
+	INFLUX_PROTOCOL         = "http"
+	INFLUX_DB_NAME          = "seads"
+	INFLUX_SEAD_PLUG_PREFIX = "seadplug"
 )

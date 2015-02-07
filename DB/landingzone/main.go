@@ -14,7 +14,6 @@ import (
 
 func main() {
 
-
 	// Setup database
 	db, err := database.New()
 	if err != nil {
@@ -27,7 +26,7 @@ func main() {
 	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
 }
 
-func listener(handler func (net.Conn, database.DB), port string, db database.DB) {
+func listener(handler func(net.Conn, database.DB), port string, db database.DB) {
 	// Set up connection
 	listener, err := net.Listen("tcp4", constants.HOST+":"+port) // The plugs only support IPv4.
 	if err != nil {
@@ -35,7 +34,7 @@ func listener(handler func (net.Conn, database.DB), port string, db database.DB)
 		log.Panic("Error was: " + err.Error())
 	}
 	defer listener.Close()
-	
+
 	// Wait for requests forever
 	for {
 		conn, err := listener.Accept() // Blocking
