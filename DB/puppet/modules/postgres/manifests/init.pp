@@ -36,6 +36,9 @@ class postgres {
   # Set up postgres configuration
   file {'postgresql.conf':
     ensure  => file,
+    owner   => 'postgres',
+    group   => 'postgres',
+    mode    => '0644',
     path    => '/etc/postgresql/9.4/main/postgresql.conf',
     source  => 'puppet:///modules/postgres/postgresql.conf',
     require => Package['postgresql-9.4'],
