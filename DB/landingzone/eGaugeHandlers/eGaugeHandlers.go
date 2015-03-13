@@ -21,6 +21,6 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 	if err != nil {
 		log.Println("Error dumping request:", err)
 	} else {
-		log.Println(data)
+		log.Println(string(data))
 	}
 }
