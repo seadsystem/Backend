@@ -17,7 +17,7 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 		log.Printf("Request from (%s) is of type POST\n", req.RemoteAddr)
 	}
 
-	data, err := httputil.DumpRequestOut(req, true)
+	data, err := httputil.DumpRequest(req, true)
 	if err != nil {
 		log.Println("Error dumping request:", err)
 	} else {
