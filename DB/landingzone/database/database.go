@@ -11,7 +11,7 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
-	"github.com/seadsystem/Backend/DB/landingzone/decoders"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders/seadPlugDecoders"
 )
 
 type DB struct {
@@ -23,7 +23,7 @@ func New() (DB, error) {
 	return DB{conn}, err
 }
 
-func (db DB) InsertRawPacket(data decoders.SeadPacket) {
+func (db DB) InsertRawPacket(data seadPlugDecoders.SeadPacket) {
 	log.Println("Beginning transaction...")
 	// Begin transaction. Required for bulk insert
 	txn, err := db.conn.Begin()

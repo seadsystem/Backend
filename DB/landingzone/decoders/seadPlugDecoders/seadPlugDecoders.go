@@ -1,10 +1,11 @@
-package decoders
+/*
+ * Package contains functions to decode raw packets.
+ */
+package seadPlugDecoders
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"math"
 	"regexp"
 	"strconv"
 	"time"
@@ -16,13 +17,16 @@ type SeadPacket struct {
 	Type      byte
 	Location  byte
 	Timestamp time.Time
-	Period    float64
+	Period    time.Duration
 	Count     uint
-	Data      float32
+	Data      []int16
 	Serial    int
 }
 
+// Header regex. Stored globally so it only needs to be compiled once in init.
 var headerRegex *regexp.Regexp
+
+// Errors
 var InvalidHeader = errors.New("Invalid header.")
 var InvalidPacket = errors.New("Invalid packet.")
 var InvalidTime = errors.New("Invalid time.")
@@ -37,22 +41,31 @@ func init() {
 }
 
 // DecodeHeader verifies that the header is in the correct format and extracts the serial number
-func DecodeHeader(packet []byte) (serial int, err error) {
-	serialStrings := headerRegex.FindSubmatch(packet)
+func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
+	headerStrings := headerRegex.FindSubmatch(packet)
 
-	if serialStrings == nil || len(serialStrings) != 2 {
+	// Header has two parts, serial number and offset. The headerStrings should contain the entire header string in position 0, the serial number in position 1, and the offset in position 2.
+	if headerStrings == nil || len(headerStrings) != 3 {
 		err = InvalidHeader
 		return
 	}
 
-	log.Printf("Header serial string: %s\n", string(serialStrings[1]))
+	log.Printf("Header serial string: %s\n", string(headerStrings[1]))
 
-	serial, err = strconv.Atoi(string(serialStrings[1]))
+	var duration time.Duration
+	duration, err = AsciiTimeToDuration(headerStrings[2])
+	if err != nil {
+		return
+	}
+
+	offset = time.Now().Add(-1 * duration)
+
+	serial, err = strconv.Atoi(string(headerStrings[1])) // Serial number should be 5 digit integer
 	return
 }
 
 // DecodePacket extracts the data sent from sensor
-func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
+func DecodePacket(buffer []byte, offset time.Time) (packet SeadPacket, err error) {
 	for i := 0; i < len(buffer); {
 		datatype := buffer[i]
 		i++
@@ -69,16 +82,13 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i++
 		case datatype == 't':
 			// Timestamp
-			var double_time float64
-			double_time, err = asciiTimeToDouble(buffer[i : i+14])
-			int_time = int64(double_time * math.Pow10(12))
-			nano = int64(math.Pow10(6))
-			packet.Timestamp = time.Unix(int_time / nano, int_time % nano)
-			//packet.Timestamp, err = asciiTimeToDouble(buffer[i : i+14])
+			var on_time time.Duration
+			on_time, err = AsciiTimeToDuration(buffer[i : i+14])
+			packet.Timestamp = offset.Add(on_time)
 			i += 14
 		case datatype == 'P':
 			// Period separator
-			packet.Period, err = asciiTimeToDouble(buffer[i : i+14])
+			packet.Period, err = AsciiTimeToDuration(buffer[i : i+14])
 			i += 14
 		case datatype == 'C':
 			// Count
@@ -86,104 +96,40 @@ func DecodePacket(buffer []byte) (packet SeadPacket, err error) {
 			i += 2
 		case datatype == 'D':
 			// Data
-			// if count isn't set, return error
+			// if count isn't set, return error. Count is required to tell us how much data we have.
 			if packet.Count == 0 {
 				err = InvalidPacket
 			} else {
-				count := 2 * int(packet.Count)
-				packet.Data = math.Float32frombits(uint32(Binary2uint(buffer[i : i+count])))
-				i += count
+				count := int(packet.Count)
+				bytes := count * 2
+				data := buffer[i : i+bytes]
+				packet.Data = make([]int16, count)
+				for i := 0; i < bytes; i += 2 {
+					// Data is an array of 16 bit (2 byte) integers.
+					packet.Data[i/2] = int16(Binary2uint(data[i : i+2]))
+				}
+				i += bytes
 			}
 		case datatype == 'S':
 			// Serial
 			packet.Serial, err = strconv.Atoi(string(buffer[i : i+6]))
 			i += 6
 		case datatype == 'X':
+			// End of packet
 			return
 		default:
 			err = InvalidPacket
 		}
 
+		// Return any error generated during loop iteration
 		if err != nil {
 			return
 		}
 	}
+
+	// Breaking out of loop constitutes an error.
 	err = InvalidPacket
 	return
-}
-
-func doubleToAsciiTime(double_time float64) string {
-	// TODO: Check if this logic is correct or if we need to use http://golang.org/pkg/math/#Mod
-	int_time := int(double_time)
-	var days = math.Floor(double_time / (60 * 60 * 24))
-	var hours = (int_time % (60 * 60 * 24)) / (60 * 60)
-	var minutes = (int_time % (60 * 60)) / 60
-	var seconds = (int_time % (60)) / 1
-	var milliseconds = (int_time * 1000) % 1000
-	var clock_time = (int_time * 12000) % 12
-
-	return fmt.Sprintf("%03d%02d%02d%02d%03d%02d", days, hours, minutes, seconds, milliseconds, clock_time)
-}
-
-func asciiTimeToDouble(ascii_time []byte) (time float64, err error) {
-	// Check time string format
-	if len(ascii_time) != 16 {
-		err = InvalidTime
-	}
-	_, err = strconv.Atoi(string(ascii_time))
-	if err != nil {
-		return
-	}
-
-	// Do the conversion now that we know it should work
-	var ptr int = 0
-	days, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
-	ptr += 3
-	time += float64(60 * 60 * 24 * days)
-	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(60 * 60 * hours)
-	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(60 * minutes)
-	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(seconds)
-	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
-	ptr += 3
-	time += float64(milliseconds) / 1000.0
-	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
-	ptr += 2
-	time += float64(clock) / 12000.0
-	return
-}
-
-// Every checks if every byte in a slice meets some criteria
-func Every(data []byte, check func(byte) bool) bool {
-	for _, element := range data {
-		if !check(element) {
-			return false
-		}
-	}
-	return true
 }
 
 // Binary2uint converts a byte array containing binary data into an int
@@ -194,10 +140,57 @@ func Binary2uint(data []byte) (total uint) {
 	return
 }
 
-// Binary2uint64 converts a byte array containing binary data into an int
-func Binary2uint64(data []byte) (total uint64) {
-	for index, element := range data {
-		total += uint64(element) << uint64(index*8)
+// AsciiTimeToDuration converts plug time string to an integral duration type
+func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) {
+	// Check time string format
+	if len(ascii_time) != 16 {
+		err = InvalidTime
 	}
+
+	// Check that all characters are integers.
+	_, err = strconv.Atoi(string(ascii_time))
+	if err != nil {
+		return
+	}
+
+	// Do the conversion now that we know it should work
+	var ptr int = 0
+
+	days, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
+	if err != nil {
+		return
+	}
+	ptr += 3
+	duration += time.Hour * time.Duration(24*days)
+	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
+	ptr += 2
+	duration += time.Hour * time.Duration(hours)
+	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
+	ptr += 2
+	duration += time.Minute * time.Duration(minutes)
+	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
+	ptr += 2
+	duration += time.Second * time.Duration(seconds)
+	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
+	if err != nil {
+		return
+	}
+	ptr += 3
+	duration += time.Millisecond * time.Duration(milliseconds)
+	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
+	if err != nil {
+		return
+	}
+	ptr += 2
+	duration += time.Millisecond * time.Duration(clock) / 12
 	return
 }

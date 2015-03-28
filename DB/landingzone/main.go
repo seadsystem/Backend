@@ -10,8 +10,8 @@ import (
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
-	"github.com/seadsystem/Backend/DB/landingzone/eGaugeHandlers"
-	"github.com/seadsystem/Backend/DB/landingzone/seadPlugHandlers"
+	"github.com/seadsystem/Backend/DB/landingzone/handlers/eGaugeHandlers"
+	"github.com/seadsystem/Backend/DB/landingzone/handlers/seadPlugHandlers"
 )
 
 func main() {

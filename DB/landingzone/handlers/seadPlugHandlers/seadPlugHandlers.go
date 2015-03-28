@@ -12,7 +12,7 @@ import (
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
-	"github.com/seadsystem/Backend/DB/landingzone/decoders"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders/seadPlugDecoders"
 )
 
 // Errors
@@ -45,7 +45,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 		}
 
 		log.Println("Parsing data...")
-		data, err := decoders.DecodePacket(packet, offset)
+		data, err := seadPlugDecoders.DecodePacket(packet, offset)
 		if err != nil {
 			readError(err)
 			break // Kill the connection. This will fix most problems including alignment issues.
@@ -77,7 +77,7 @@ func sync(conn net.Conn) (serial int, offset time.Time, err error) {
 	}
 
 	log.Println("Parsing header for serial...")
-	serial, offset, err = decoders.DecodeHeader(data)
+	serial, offset, err = seadPlugDecoders.DecodeHeader(data)
 	if err != nil {
 		return
 	}
@@ -125,7 +125,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	}
 
 	log.Printf("Received length header: %s\n", length_header)
-	data_length := decoders.Binary2uint(length_header[1:3])
+	data_length := seadPlugDecoders.Binary2uint(length_header[1:3])
 
 	// Check that we got a length header
 	if length_header[0] != 'L' || data_length == 0 {

@@ -1,9 +1,9 @@
-package decoders
+package seadPlugDecoders
 
 import (
 	"testing"
 
-	"github.com/seadsystem/Backend/DB/landingzone/decoders"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders/seadPlugDecoders"
 )
 
 func TestDoubleToAsciiTime(t *testing.T) {
