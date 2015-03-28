@@ -18,7 +18,7 @@ rsync -avc ${SRC}/landingzone/ ${LZ}/
 chown -R landingzone:landingzone $LZ
 rsync -avc ${SRC}/api/ ${API}/
 chown -R seadapi:seadapi ${API}
-for module in constants database decoders eGaugeHandlers seadPlugHandlers rpi1Handlers; do
+for module in constants database decoders handlers; do
     mkdir -p /home/landingzone/go/src/github.com/seadsystem/Backend/DB/landingzone/$module
     rsync -avc ${LZ}/$module/ /home/landingzone/go/src/github.com/seadsystem/Backend/DB/landingzone/$module/
 done
