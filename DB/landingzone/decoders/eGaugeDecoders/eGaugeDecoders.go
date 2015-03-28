@@ -15,14 +15,14 @@ type Row struct {
 
 type Data struct {
 	Columns   int     `xml:"columns,attr"`
-	Timestamp int64   `xml:"time_stamp,attr"`
+	Timestamp string  `xml:"time_stamp,attr"`
 	Delta     int     `xml:"time_delta,attr"`
 	Rows      []Row   `xml:"r"`
 	Cnames    []Cname `xml:"cname"`
 }
 
 type Packet struct {
-	Serial int64  `xml:"serial,attr"`
+	Serial string `xml:"serial,attr"`
 	Data   []Data `xml:"data"`
 }
 
