@@ -22,5 +22,6 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 		log.Println("Error dumping request:", err)
 	} else {
 		log.Println(string(data))
+		log.Println("b2a:", http.PostFormValue("b2a"))
 	}
 }
