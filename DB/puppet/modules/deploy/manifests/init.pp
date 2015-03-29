@@ -7,7 +7,7 @@ CREATE TABLE data_raw (
   serial BIGINT NOT NULL,
   type CHAR(1) NOT NULL,
   device TEXT NULL,
-  data INTEGER NOT NULL,
+  data BIGINT NOT NULL,
   time TIMESTAMP NOT NULL
 );
 
