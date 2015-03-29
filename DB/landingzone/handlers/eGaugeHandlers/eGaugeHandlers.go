@@ -25,7 +25,7 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 				log.Println("Error:", err)
 				return
 			}
-			log.Printf("Data:\n%+v\n", packet)
+			log.Printf("Data:\n%#v\n", packet)
 			go db.InsertEGaugePacket(packet)
 		}
 	}

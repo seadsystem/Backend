@@ -153,8 +153,19 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 			log.Println("Error: Invalid row.")
 			continue
 		}
-		for i := 0; i < len(*columns); i++ {
-			_, err = stmt.Exec(serial,
+
+		// Skip first row because it is not a data point
+		for i := 1; i < len(*columns); i++ {
+			log.Printf(
+				"%d, %s, %s, %d, %v\n"
+				serial,
+				(*columns)[i].Type,
+				(*columns)[i].Name,
+				row.Columns[i],
+				interp_time,
+			)
+			_, err = stmt.Exec(
+				serial,
 				(*columns)[i].Type,
 				(*columns)[i].Name,
 				row.Columns[i],
