@@ -10,7 +10,7 @@ type Cname struct {
 }
 
 type Row struct {
-	Columns []string `xml:"c"`
+	Columns []int `xml:"c"`
 }
 
 type Data struct {
