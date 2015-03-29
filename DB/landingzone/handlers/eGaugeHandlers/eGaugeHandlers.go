@@ -21,8 +21,12 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(req.Body)
 			packet, err := eGaugeDecoders.DecodePacket(buf.Bytes())
-			log.Println("Error:", err)
+			if err != nil {
+				log.Println("Error:", err)
+				return
+			}
 			log.Printf("Data:\n%+v\n", packet)
+			go db.InsertEGaugePacket(packet)
 		}
 	}
 }
