@@ -89,7 +89,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 
 	// Process data packet
 	log.Println("Reading serial:", packet.Serial)
-	serial, err := strconv.ParseInt(packet.Serial, 16, 64)
+	serial, err := strconv.ParseInt(packet.Serial, 0, 64)
 	if err != nil || serial <= 0 {
 		log.Println()
 		if err != nil {
@@ -124,7 +124,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 
 	// Get data set start time
 	log.Println("Reading start time:", data.Timestamp)
-	startUnixTime, err := strconv.ParseInt(data.Timestamp, 16, 64)
+	startUnixTime, err := strconv.ParseInt(data.Timestamp, 0, 64)
 	if err != nil || startUnixTime <= 0 {
 		log.Println()
 		if err != nil {
