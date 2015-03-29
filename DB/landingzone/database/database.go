@@ -146,7 +146,8 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		goto closetrans
 	}
 
-	for _, row := range data.Rows {
+	// Skip first row because it is not a data point
+	for _, row := range data.Rows[1:] {
 		log.Println("Row:", row.Columns)
 		log.Println("Time:", interp_time)
 		if len(row.Columns) != len(*columns) {
@@ -154,8 +155,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 			continue
 		}
 
-		// Skip first row because it is not a data point
-		for i := 1; i < len(*columns); i++ {
+		for i := 0; i < len(*columns); i++ {
 			log.Printf(
 				"%d, %s, %s, %d, %v\n",
 				serial,

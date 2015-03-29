@@ -14,9 +14,9 @@ type Row struct {
 }
 
 type Data struct {
-	Columns   int     `xml:"columns,attr"`
+	Columns   int64   `xml:"columns,attr"`
 	Timestamp string  `xml:"time_stamp,attr"`
-	Delta     int     `xml:"time_delta,attr"`
+	Delta     int64   `xml:"time_delta,attr"`
 	Rows      []Row   `xml:"r"`
 	Cnames    []Cname `xml:"cname"`
 }
