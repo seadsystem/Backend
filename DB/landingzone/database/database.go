@@ -157,7 +157,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		// Skip first row because it is not a data point
 		for i := 1; i < len(*columns); i++ {
 			log.Printf(
-				"%d, %s, %s, %d, %v\n"
+				"%d, %s, %s, %d, %v\n",
 				serial,
 				(*columns)[i].Type,
 				(*columns)[i].Name,
