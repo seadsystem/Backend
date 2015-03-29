@@ -4,14 +4,15 @@ class deploy {
   # Postgres table data_raw
   $table_schema =  '
 CREATE TABLE data_raw (
-  serial INTEGER NOT NULL,
+  serial BIGINT NOT NULL,
   type CHAR(1) NOT NULL,
-  data SMALLINT NOT NULL,
+  device TEXT NULL,
+  data INTEGER NOT NULL,
   time TIMESTAMP NOT NULL
 );
 
 CREATE TABLE classifications (
-  Serial INTEGER NOT NULL,
+  Serial BIGINT NOT NULL,
   StartTime TIMESTAMP NOT NULL,
   EndTime TIMESTAMP NOT NULL,
   Classification TEXT NOT NULL

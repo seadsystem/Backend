@@ -54,7 +54,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 		log.Printf("Data: %+v\n", data)
 
 		log.Println("Sending to database...")
-		go db.InsertRawPacket(data) // Inset data into database in a new go routine. Non-blocking.
+		go db.InsertSeadPacket(data) // Inset data into database in a new go routine. Non-blocking.
 	}
 
 	log.Println("Closing connection...")
