@@ -122,6 +122,11 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		}
 	}
 
+	if len(data.Rows) < 2 {
+		log.Println("Error: Packet only contains summary.")
+		return
+	}
+
 	// Get data set start time
 	log.Println("Reading start time:", data.Timestamp)
 	startUnixTime, err := strconv.ParseInt(data.Timestamp, 0, 64)
