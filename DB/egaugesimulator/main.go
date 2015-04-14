@@ -12,10 +12,12 @@ import (
 
 func simulate(url string, serial int) {
 	for {
-		data := bytes.NewBufferString(sample)
-		_, err := http.Post(url, "application/xml", data)
-		if err != nil {
-			log.Println("Error:", err)
+		go func() {
+			data := bytes.NewBufferString(sample)
+			_, err := http.Post(url, "application/xml", data)
+			if err != nil {
+				log.Println("Error:", err)
+			}
 		}
 
 		time.Sleep(2 * time.Second)
