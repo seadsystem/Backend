@@ -5,22 +5,56 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 )
 
-func simulate(url string, serial int) {
-	for {
-		go func() {
-			data := bytes.NewBufferString(sample)
-			_, err := http.Post(url, "application/xml", data)
-			if err != nil {
-				log.Println("Error:", err)
-			}
-		}
+var reportTemplate *template.Template
 
-		time.Sleep(2 * time.Second)
+func init() {
+	reportTemplate = template.Must(template.New("reportTemplate").Parse(reportTemplateText))
+}
+
+func transmit(url string, serial int, epoch int64) {
+	content := map[string]interface{}{}
+	content["epoch"] = epoch
+	content["serial"] = serial
+	content["timestamp"] = time.Now().Unix()
+
+	data := [rows][columns]int32{}
+	for row := 0; row < rows; row++ {
+		for column := 0; column < columns; column++ {
+			data[row][column] = rand.Int31()
+		}
+	}
+	content["data"] = data
+
+	buf := bytes.Buffer{}
+	reportTemplate.Execute(&buf, content)
+
+	_, err := http.Post(url, "application/xml", &buf)
+	if err != nil {
+		log.Println("Error:", err)
+		log.Println("Data:")
+		log.Println(string(buf.Bytes()))
+	} else {
+		log.Printf("eGauge simulator #%d with serial 0x%08x successfully sent data.\n", serial, serial)
+	}
+}
+
+func simulate(url string, serial int) {
+	epoch := time.Now().Unix()
+
+	log.Printf("Starting eGauge simulator #%d with serial 0x%08x at time 0x%08x.\n", serial, serial, epoch)
+
+	for {
+		// Data "gathering" time
+		time.Sleep(time.Minute)
+
+		go transmit(url, serial, epoch)
 	}
 }
 
@@ -28,100 +62,51 @@ func main() {
 	num := flag.Int("n", 1, "Number of eGauges.")
 	flag.Parse()
 
+	isFatalError := false
+
 	// Check for remote URL
 	if flag.NArg() != 1 {
 		fmt.Println("Error: Remote URL must be specified.")
+		isFatalError = true
+	}
+
+	if *num <= 0 {
+		fmt.Println("Error: Number of eGauges must be positive.")
+		isFatalError = true
+	}
+
+	if isFatalError {
 		fmt.Println("Default flag values:")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
 	url := flag.Arg(0)
 
 	for i := 1; i <= *num; i++ {
 		go simulate(url, i)
+
+		// Spread out egauge reports
+		time.Sleep(time.Minute / time.Duration(*num))
 	}
+
+	log.Println("Finished starting eGauge simulators.")
 
 	// Block forever as all processing is in other goroutines.
 	select {}
 }
 
-const sample = `<?xml version="1.0" encoding="UTF-8" ?>
+const (
+	rows               = 62
+	columns            = 3
+	reportTemplateText = `<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
-<group serial="0x1bcd005e">
-<data columns="3" time_stamp="0x55036c9e" time_delta="1" delta="true" epoch="0x54914d54">
+<group serial="{{.serial | printf "0x%08x"}}">
+<data columns="3" time_stamp="{{.timestamp | printf "0x%08x"}}" time_delta="1" delta="true" epoch="{{.epoch | printf "0x%08x"}}">
  <cname t="P">heater</cname>
  <cname t="P">lamp</cname>
- <cname t="P">lamp+</cname>
- <r><c>-379726</c><c>1346313</c><c>2748</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>188</c><c>188</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>62</c><c>0</c></r>
- <r><c>61</c><c>61</c><c>0</c></r>
- <r><c>62</c><c>61</c><c>0</c></r>
- <r><c>61</c><c>62</c><c>0</c></r>
- <r><c>204431</c><c>332</c><c>0</c></r>
-</data>
-<data time_stamp="0x55036c2c" time_delta="60">
- <r><c>-204431</c><c>-332</c><c>0</c></r>
- <r><c>568</c><c>29</c><c>0</c></r>
- <r><c>296</c><c>14</c><c>0</c></r>
- <r><c>296</c><c>14</c><c>0</c></r>
- <r><c>296</c><c>14</c><c>0</c></r>
- <r><c>296</c><c>14</c><c>0</c></r>
- <r><c>296</c><c>14</c><c>0</c></r>
+ <cname t="P">lamp+</cname>{{range $row_number, $row := $.data}}
+ <r>{{range $col_number, $point := $row}}<c>{{$point}}</c>{{end}}</r>{{end}}
 </data>
 </group>`
+)
