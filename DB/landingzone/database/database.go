@@ -122,7 +122,8 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		}
 	}
 
-	if len(data.Rows) < 2 {
+	// First and last rows don't contain data
+	if len(data.Rows) <= 2 {
 		log.Println("Error: Packet only contains summary.")
 		return
 	}
@@ -151,8 +152,8 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		goto closetrans
 	}
 
-	// Skip first row because it is not a data point
-	for _, row := range data.Rows[1:] {
+	// Skip first and last rows because it is not a data point
+	for _, row := range data.Rows[1 : len(data.Rows)-1] {
 		log.Println("Row:", row.Columns)
 		log.Println("Time:", interp_time)
 		if len(row.Columns) != len(*columns) {
