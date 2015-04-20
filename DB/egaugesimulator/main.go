@@ -50,7 +50,11 @@ func transmit(url string, serial int, epoch int64) {
 	if resp.StatusCode == http.StatusOK {
 		log.Printf("eGauge simulator #%d with serial 0x%08x successfully sent data.\n", serial, serial)
 	} else {
-		log.Printf("eGauge simulator #%d with serial 0x%08x received HTTP error code %s.\n", serial, serial, resp.Status)
+		log.Printf("eGauge simulator #%d with serial 0x%08x received HTTP error code %s:\n", serial, serial, resp.Status)
+
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+		log.Println(string(buf.Bytes()))
 	}
 }
 
