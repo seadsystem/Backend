@@ -35,13 +35,22 @@ func transmit(url string, serial int, epoch int64) {
 	buf := bytes.Buffer{}
 	reportTemplate.Execute(&buf, content)
 
-	_, err := http.Post(url, "application/xml", &buf)
+	resp, err := http.Post(url, "application/xml", &buf)
 	if err != nil {
 		log.Println("Error:", err)
-		log.Println("Data:")
-		log.Println(string(buf.Bytes()))
-	} else {
+		if len(buf.Bytes()) > 0 {
+			log.Println("Data:")
+			log.Println(string(buf.Bytes()))
+		}
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
 		log.Printf("eGauge simulator #%d with serial 0x%08x successfully sent data.\n", serial, serial)
+	} else {
+		log.Printf("eGauge simulator #%d with serial 0x%08x received HTTP error code %s.\n", serial, serial, resp.Status)
 	}
 }
 
