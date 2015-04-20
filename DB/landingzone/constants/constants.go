@@ -29,3 +29,5 @@ const (
 	DB_NAME     = "seads"
 	DB_PASSWORD = "" // Password unneeded for Postgres peer authentication.
 )
+
+var Verbose bool = false

@@ -9,6 +9,7 @@ import (
 	//"net/http/httputil"
 	"bytes"
 
+	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders/eGaugeDecoders"
 )
@@ -20,6 +21,12 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 		if req.Body != nil { // Should always be true according to spec
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(req.Body)
+
+			if constants.Verbose {
+				log.Println("Data:")
+				log.Println(string(buf.Bytes()))
+			}
+
 			packet, err := eGaugeDecoders.DecodePacket(buf.Bytes())
 			if err != nil {
 				log.Println("Error:", err)

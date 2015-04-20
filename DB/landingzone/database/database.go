@@ -54,8 +54,11 @@ func (db DB) InsertSeadPacket(data seadPlugDecoders.SeadPacket) {
 
 	// Process data
 	for _, element := range data.Data {
-		log.Println("Data:", element)
-		log.Println("Time:", interp_time)
+		if constants.Verbose {
+			log.Println("Data:", element)
+			log.Println("Time:", interp_time)
+		}
+
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time) // Insert data. This is buffered.
 		interp_time = interp_time.Add(data.Period)                       // Add data point time spacing for next data point
 		if err != nil {
@@ -166,14 +169,16 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		}
 
 		for i := 0; i < len(*columns); i++ {
-			log.Printf(
-				"%d, %s, %s, %d, %v\n",
-				serial,
-				(*columns)[i].Type,
-				(*columns)[i].Name,
-				row.Columns[i],
-				interp_time,
-			)
+			if constants.Verbose {
+				log.Printf(
+					"%d, %s, %s, %d, %v\n",
+					serial,
+					(*columns)[i].Type,
+					(*columns)[i].Name,
+					row.Columns[i],
+					interp_time,
+				)
+			}
 			_, err = stmt.Exec(
 				serial,
 				(*columns)[i].Type,
