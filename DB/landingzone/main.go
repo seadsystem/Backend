@@ -4,6 +4,8 @@
 package main
 
 import (
+	"flag"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -15,6 +17,15 @@ import (
 )
 
 func main() {
+	logLevel := flag.Int("log", 0, "Logging level. 0=No logging, 1=Most logging, 2=Log data.")
+	flag.Parse()
+
+	if *logLevel <= 0 {
+		log.SetOutput(ioutil.Discard)
+	}
+	if *logLevel >= 2 {
+		constants.Verbose = true
+	}
 
 	// Setup database
 	db, err := database.New()
