@@ -161,8 +161,11 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 
 	// Skip first and last rows because it is not a data point
 	for _, row := range data.Rows[1 : len(data.Rows)-1] {
-		log.Println("Row:", row.Columns)
-		log.Println("Time:", interp_time)
+		if constants.Verbose {
+			log.Println("Row:", row.Columns)
+			log.Println("Time:", interp_time)
+		}
+
 		if len(row.Columns) != len(*columns) {
 			log.Println("Error: Invalid row.")
 			continue
