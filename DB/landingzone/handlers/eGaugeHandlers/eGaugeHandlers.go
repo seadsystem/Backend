@@ -23,10 +23,17 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 			packet, err := eGaugeDecoders.DecodePacket(buf.Bytes())
 			if err != nil {
 				log.Println("Error:", err)
+				http.Error(res, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			log.Printf("Data:\n%#v\n", packet)
-			go db.InsertEGaugePacket(packet)
+
+			err = db.InsertEGaugePacket(packet)
+			if err != nil {
+				log.Println("Error:", err)
+				http.Error(res, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 	}
 }
