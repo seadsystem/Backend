@@ -22,6 +22,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Causes operations which require a new connection to block instead of failing.
+	db.SetMaxOpenConns(constants.DB_MAX_CONNS)
+
 	log.Println("Listening for connections...")
 
 	go httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db)

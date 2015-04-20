@@ -26,6 +26,10 @@ func New() (DB, error) {
 	return DB{conn}, err
 }
 
+func (db DB) SetMaxOpenConns(n int) {
+	db.conn.SetMaxOpenConns(n)
+}
+
 func (db DB) InsertSeadPacket(data seadPlugDecoders.SeadPacket) {
 	log.Println("Beginning transaction...")
 	// Begin transaction. Required for bulk insert
