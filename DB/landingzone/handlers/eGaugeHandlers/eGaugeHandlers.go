@@ -33,7 +33,10 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 				http.Error(res, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			log.Printf("Data:\n%#v\n", packet)
+
+			if constants.Verbose {
+				log.Printf("Data:\n%#v\n", packet)
+			}
 
 			err = db.InsertEGaugePacket(packet)
 			if err != nil {
