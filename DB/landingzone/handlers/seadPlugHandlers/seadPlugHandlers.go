@@ -141,8 +141,10 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 		return
 	}
 
-	log.Println("Read data:")
-	log.Println(string(data))
+	if constants.Verbose {
+		log.Println("Read data:")
+		log.Println(string(data))
+	}
 
 	log.Println("Sending ACK...")
 	err = writePacket(conn, []byte(constants.ACK)) // Tell plug that packet was successfully received.

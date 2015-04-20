@@ -5,6 +5,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -16,6 +17,9 @@ import (
 	"github.com/seadsystem/Backend/DB/landingzone/decoders/eGaugeDecoders"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders/seadPlugDecoders"
 )
+
+var NoData error = errors.New("No data in packet.")
+var InvalidTime error = errors.New("Invalid time.")
 
 type DB struct {
 	conn *sql.DB
@@ -54,8 +58,11 @@ func (db DB) InsertSeadPacket(data seadPlugDecoders.SeadPacket) {
 
 	// Process data
 	for _, element := range data.Data {
-		log.Println("Data:", element)
-		log.Println("Time:", interp_time)
+		if constants.Verbose {
+			log.Println("Data:", element)
+			log.Println("Time:", interp_time)
+		}
+
 		_, err = stmt.Exec(data.Serial, data_type, element, interp_time) // Insert data. This is buffered.
 		interp_time = interp_time.Add(data.Period)                       // Add data point time spacing for next data point
 		if err != nil {
@@ -88,7 +95,7 @@ closetrans:
 	log.Println("Transaction closed")
 }
 
-func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
+func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 	log.Println("Peliminary data processing...")
 
 	// Process data packet
@@ -115,7 +122,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 	// Select best data set
 	if len(packet.Data) == 0 {
 		log.Println("Error: No data in packet")
-		return
+		return NoData
 	}
 
 	data := &packet.Data[0]
@@ -126,9 +133,10 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		}
 	}
 
-	if len(data.Rows) < 2 {
+	// First and last rows don't contain data
+	if len(data.Rows) <= 2 {
 		log.Println("Error: Packet only contains summary.")
-		return
+		return NoData
 	}
 
 	// Get data set start time
@@ -155,24 +163,29 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) {
 		goto closetrans
 	}
 
-	// Skip first row because it is not a data point
-	for _, row := range data.Rows[1:] {
-		log.Println("Row:", row.Columns)
-		log.Println("Time:", interp_time)
+	// Skip first and last rows because it is not a data point
+	for _, row := range data.Rows[1 : len(data.Rows)-1] {
+		if constants.Verbose {
+			log.Println("Row:", row.Columns)
+			log.Println("Time:", interp_time)
+		}
+
 		if len(row.Columns) != len(*columns) {
 			log.Println("Error: Invalid row.")
 			continue
 		}
 
 		for i := 0; i < len(*columns); i++ {
-			log.Printf(
-				"%d, %s, %s, %d, %v\n",
-				serial,
-				(*columns)[i].Type,
-				(*columns)[i].Name,
-				row.Columns[i],
-				interp_time,
-			)
+			if constants.Verbose {
+				log.Printf(
+					"%d, %s, %s, %d, %v\n",
+					serial,
+					(*columns)[i].Type,
+					(*columns)[i].Name,
+					row.Columns[i],
+					interp_time,
+				)
+			}
 			_, err = stmt.Exec(
 				serial,
 				(*columns)[i].Type,
@@ -192,22 +205,24 @@ closetrans:
 	log.Println("Closing off transaction...")
 
 	// Flush buffer
-	_, err = stmt.Exec()
-	if err != nil {
-		log.Fatal(err)
+	_, ferr := stmt.Exec()
+	if ferr != nil {
+		log.Fatal(ferr)
 	}
 
 	// Close prepared statement
-	err = stmt.Close()
-	if err != nil {
-		log.Fatal(err)
+	ferr = stmt.Close()
+	if ferr != nil {
+		log.Fatal(ferr)
 	}
 
 	// Commit transaction
-	err = txn.Commit()
-	if err != nil {
-		log.Fatal(err)
+	ferr = txn.Commit()
+	if ferr != nil {
+		log.Fatal(ferr)
 	}
 
 	log.Println("Transaction closed")
+
+	return err
 }
