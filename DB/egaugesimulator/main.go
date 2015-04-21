@@ -18,7 +18,14 @@ func init() {
 	reportTemplate = template.Must(template.New("reportTemplate").Parse(reportTemplateText))
 }
 
-func transmit(url string, serial int, epoch int64) {
+// The maximum concurrent connections that the database is configured to handle.
+const MaxDBConns = 95
+
+func transmit(url string, serial int, epoch int64, timeout time.Duration) {
+	client := http.Client{
+		Timeout: timeout,
+	}
+
 	content := map[string]interface{}{}
 	content["epoch"] = epoch
 	content["serial"] = serial
@@ -35,7 +42,7 @@ func transmit(url string, serial int, epoch int64) {
 	buf := bytes.Buffer{}
 	reportTemplate.Execute(&buf, content)
 
-	resp, err := http.Post(url, "application/xml", &buf)
+	resp, err := client.Post(url, "application/xml", &buf)
 	if err != nil {
 		log.Println("Error:", err)
 		if len(buf.Bytes()) > 0 {
@@ -58,7 +65,7 @@ func transmit(url string, serial int, epoch int64) {
 	}
 }
 
-func simulate(url string, serial int) {
+func simulate(url string, serial int, timeout time.Duration) {
 	epoch := time.Now().Unix()
 
 	log.Printf("Starting eGauge simulator #%d with serial 0x%08x at time 0x%08x.\n", serial, serial, epoch)
@@ -67,7 +74,7 @@ func simulate(url string, serial int) {
 		// Data "gathering" time
 		time.Sleep(time.Minute)
 
-		go transmit(url, serial, epoch)
+		go transmit(url, serial, epoch, timeout)
 	}
 }
 
@@ -96,8 +103,10 @@ func main() {
 
 	url := flag.Arg(0)
 
+	timeout := time.Minute / time.Duration(*num) * time.Duration(MaxDBConns)
+
 	for i := 1; i <= *num; i++ {
-		go simulate(url, i)
+		go simulate(url, i, timeout)
 
 		// Spread out egauge reports
 		time.Sleep(time.Minute / time.Duration(*num))
