@@ -66,15 +66,15 @@ func transmit(url string, serial int, epoch int64, timeout time.Duration) {
 }
 
 func simulate(url string, serial int, timeout time.Duration) {
-	epoch := time.Now().Unix()
+	epoch := time.Now().Add(-time.Minute).Unix()
 
-	log.Printf("Starting eGauge simulator #%d with serial 0x%08x at time 0x%08x.\n", serial, serial, epoch)
+	//log.Printf("Starting eGauge simulator #%d with serial 0x%08x at time 0x%08x.\n", serial, serial, epoch)
 
 	for {
+		go transmit(url, serial, epoch, timeout)
+
 		// Data "gathering" time
 		time.Sleep(time.Minute)
-
-		go transmit(url, serial, epoch, timeout)
 	}
 }
 
@@ -112,7 +112,7 @@ func main() {
 		time.Sleep(time.Minute / time.Duration(*num))
 	}
 
-	log.Println("Finished starting eGauge simulators.")
+	//log.Println("Finished starting eGauge simulators.")
 
 	// Block forever as all processing is in other goroutines.
 	select {}
