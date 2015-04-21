@@ -28,7 +28,7 @@ const (
 	DB_USER      = "landingzone"
 	DB_NAME      = "seads"
 	DB_PASSWORD  = "" // Password unneeded for Postgres peer authentication.
-	DB_MAX_CONNS = 95 // Should be slightly smaller than the max number in PostgreSQL's postgresql.conf file.
+	DB_MAX_CONNS = 90 // Should be slightly smaller than the max number in PostgreSQL's postgresql.conf file.
 )
 
 var Verbose bool = false
