@@ -198,7 +198,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 				break
 			}
 		}
-		interp_time = interp_time.Add(time.Duration(data.Delta) / 2 * time.Second) // Add data point time spacing for next data point
+		interp_time = interp_time.Add(time.Duration(data.Delta) * (time.Second / 2)) // Add data point time spacing for next data point
 	}
 
 closetrans:
