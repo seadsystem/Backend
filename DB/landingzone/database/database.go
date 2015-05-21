@@ -163,8 +163,8 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		goto closetrans
 	}
 
-	// Skip first and last rows because it is not a data point
-	for _, row := range data.Rows[1 : len(data.Rows)-1] {
+	// Skip first row because it is not a data point
+	for _, row := range data.Rows[1:len(data.Rows)] {
 		if constants.Verbose {
 			log.Println("Row:", row.Columns)
 			log.Println("Time:", interp_time)
@@ -198,7 +198,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 				break
 			}
 		}
-		interp_time = interp_time.Add(time.Duration(data.Delta) * time.Second) // Add data point time spacing for next data point
+		interp_time = interp_time.Add(time.Duration(data.Delta) / 2 * time.Second) // Add data point time spacing for next data point
 	}
 
 closetrans:
