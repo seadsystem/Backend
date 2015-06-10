@@ -43,7 +43,7 @@ func (db DB) InsertSeadPacket(data seadPlugDecoders.SeadPacket) {
 		return
 	}
 
-	// Packet wide declerations
+	// Packet wide decelerations
 	data_type := string(data.Type)
 	interp_time := data.Timestamp // Set timestamp for first data point to time in packet
 
@@ -96,7 +96,7 @@ closetrans:
 }
 
 func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
-	log.Println("Peliminary data processing...")
+	log.Println("Preliminary data processing...")
 
 	// Process data packet
 	log.Println("Reading serial:", packet.Serial)
@@ -111,14 +111,6 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		return
 	}
 
-	log.Println("Beginning transaction...")
-	// Begin transaction. Required for bulk insert
-	txn, err := db.conn.Begin()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
 	// Select best data set
 	if len(packet.Data) == 0 {
 		log.Println("Error: No data in packet")
@@ -128,13 +120,13 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 	data := &packet.Data[0]
 	columns := &data.Cnames
 	for i := 1; i < len(packet.Data); i++ {
-		if packet.Data[i].Delta < data.Delta {
+		if packet.Data[i].TimeDelta < data.TimeDelta {
 			data = &packet.Data[i]
 		}
 	}
 
 	// First and last rows don't contain data
-	if len(data.Rows) <= 2 {
+	if len(data.Rows) < 1 {
 		log.Println("Error: Packet only contains summary.")
 		return NoData
 	}
@@ -153,8 +145,17 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 	}
 	startTime := time.Unix(startUnixTime, 0)
 
+	log.Println("Beginning transaction...")
+	// Begin transaction. Required for bulk insert
+	txn, err := db.conn.Begin()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	log.Println("Columns:", *columns)
 	interp_time := startTime // Set timestamp for first data point to time in packet
+	baseData := &data.Rows[0]
 
 	// Prepare bulk insert statement
 	stmt, err := txn.Prepare(pq.CopyIn("data_raw", "serial", "type", "device", "data", "time"))
@@ -163,8 +164,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		goto closetrans
 	}
 
-	// Skip first row because it is not a data point
-	for _, row := range data.Rows[1:len(data.Rows)] {
+	for rowNum, row := range data.Rows {
 		if constants.Verbose {
 			log.Println("Row:", row.Columns)
 			log.Println("Time:", interp_time)
@@ -176,6 +176,10 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		}
 
 		for i := 0; i < len(*columns); i++ {
+			fieldData := row.Columns[i]
+			if data.DataDelta && rowNum != 0 {
+				fieldData += baseData.Columns[i]
+			}
 			if constants.Verbose {
 				log.Printf(
 					"%d, %s, %s, %d, %v\n",
@@ -190,7 +194,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 				serial,
 				(*columns)[i].Type,
 				(*columns)[i].Name,
-				row.Columns[i],
+				fieldData,
 				interp_time,
 			) // Insert data. This is buffered.
 			if err != nil {
@@ -198,7 +202,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 				break
 			}
 		}
-		interp_time = interp_time.Add(time.Duration(data.Delta) * (time.Second / 2)) // Add data point time spacing for next data point
+		interp_time = interp_time.Add(time.Duration(data.TimeDelta) * time.Second * -1) // Add data point time spacing for next data point
 	}
 
 closetrans:
