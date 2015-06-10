@@ -176,7 +176,11 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		}
 
 		for i := 0; i < len(*columns); i++ {
-			currData[i] += row.Columns[i]
+			if data.DataDelta {
+				currData[i] += row.Columns[i]
+			} else {
+				currData[i] = row.Columns[i]
+			}
 			if constants.Verbose {
 				log.Printf(
 					"%d, %s, %s, %d, %d, %v\n",
