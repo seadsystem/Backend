@@ -155,7 +155,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 
 	log.Println("Columns:", *columns)
 	interp_time := startTime // Set timestamp for first data point to time in packet
-	baseData := &data.Rows[0]
+	var currData = make([]int64, len(*columns))
 
 	// Prepare bulk insert statement
 	stmt, err := txn.Prepare(pq.CopyIn("data_raw", "serial", "type", "device", "data", "time"))
@@ -164,7 +164,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		goto closetrans
 	}
 
-	for rowNum, row := range data.Rows {
+	for _, row := range data.Rows {
 		if constants.Verbose {
 			log.Println("Row:", row.Columns)
 			log.Println("Time:", interp_time)
@@ -176,17 +176,15 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 		}
 
 		for i := 0; i < len(*columns); i++ {
-			fieldData := row.Columns[i]
-			if data.DataDelta && rowNum != 0 {
-				fieldData += baseData.Columns[i]
-			}
+			currData[i] += row.Columns[i]
 			if constants.Verbose {
 				log.Printf(
-					"%d, %s, %s, %d, %v\n",
+					"%d, %s, %s, %d, %d, %v\n",
 					serial,
 					(*columns)[i].Type,
 					(*columns)[i].Name,
 					row.Columns[i],
+					currData[i],
 					interp_time,
 				)
 			}
@@ -194,7 +192,7 @@ func (db DB) InsertEGaugePacket(packet eGaugeDecoders.Packet) (err error) {
 				serial,
 				(*columns)[i].Type,
 				(*columns)[i].Name,
-				fieldData,
+				currData[i],
 				interp_time,
 			) // Insert data. This is buffered.
 			if err != nil {
