@@ -1,16 +1,17 @@
 /*
- * Package contains functions to decode raw packets.
+ * Package seadPlugDecoders contains functions to decode raw packets.
  */
 package seadPlugDecoders
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"regexp"
 	"strconv"
 	"time"
 
-	"github.com/seadsystem/Backend/DB/landingzone/constants"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 )
 
 type SeadPacket struct {
@@ -24,19 +25,29 @@ type SeadPacket struct {
 }
 
 // Header regex. Stored globally so it only needs to be compiled once in init.
-var headerRegex *regexp.Regexp
+var (
+	headerRegex       *regexp.Regexp
+	headerRegexString = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
+)
 
 // Errors
-var InvalidHeader = errors.New("Invalid header.")
-var InvalidPacket = errors.New("Invalid packet.")
-var InvalidTime = errors.New("Invalid time.")
+var (
+	InvalidHeader = errors.New("Invalid header.")
+	InvalidPacket = errors.New("Invalid packet.")
+)
 
 // init sets up stuff we need with proper error handling. If it isn't complicated or doesn't need error handling, it can probably just be assigned directly.
 func init() {
+	compileRegex()
+}
+
+// compileRegex compiles all regexs needed for decoding SeadPackets.
+// Panics on regex compile error.
+func compileRegex() {
 	var err error
-	headerRegex, err = regexp.Compile(constants.HEADER_REGEX)
+	headerRegex, err = regexp.Compile(headerRegexString)
 	if err != nil {
-		log.Panic("Regex compile error:", err)
+		log.Panic("regex compile error: ", err)
 	}
 }
 
@@ -141,56 +152,64 @@ func Binary2uint(data []byte) (total uint) {
 }
 
 // AsciiTimeToDuration converts plug time string to an integral duration type
-func AsciiTimeToDuration(ascii_time []byte) (duration time.Duration, err error) {
+func AsciiTimeToDuration(ascii_time []byte) (time.Duration, error) {
 	// Check time string format
 	if len(ascii_time) != 16 {
-		err = InvalidTime
+		return 0, fmt.Errorf("invalid ascii time: %s", string(ascii_time))
 	}
 
 	// Check that all characters are integers.
-	_, err = strconv.Atoi(string(ascii_time))
-	if err != nil {
-		return
+	for _, digit := range ascii_time {
+		if digit < '0' || digit > '9' {
+			return 0, fmt.Errorf("invalid ascii time: %s", ascii_time)
+		}
 	}
 
 	// Do the conversion now that we know it should work
-	var ptr int = 0
+	var ptr int
+	var duration time.Duration
 
-	days, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
+	days, _ := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
 	ptr += 3
 	duration += time.Hour * time.Duration(24*days)
-	hours, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
+	hours, _ := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	ptr += 2
 	duration += time.Hour * time.Duration(hours)
-	minutes, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
+	minutes, _ := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	ptr += 2
 	duration += time.Minute * time.Duration(minutes)
-	seconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
+	seconds, _ := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	ptr += 2
 	duration += time.Second * time.Duration(seconds)
-	milliseconds, err := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
-	if err != nil {
-		return
-	}
+	milliseconds, _ := strconv.Atoi(string(ascii_time[ptr : ptr+3]))
 	ptr += 3
 	duration += time.Millisecond * time.Duration(milliseconds)
-	clock, err := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
-	if err != nil {
-		return
-	}
+	clock, _ := strconv.Atoi(string(ascii_time[ptr : ptr+2]))
 	ptr += 2
 	duration += time.Millisecond * time.Duration(clock) / 12
-	return
+	return duration, nil
+}
+
+// NewIterator creates a closure over a SeadPacket.
+// Each time the returned function is called, it returns data and no error, no data and an error, or no data and no error to indicate that no more data is available.
+func NewIterator(packet SeadPacket) decoders.Iterator {
+	interpTime := packet.Timestamp // Set timestamp for first data point to time in packet
+	i := 0
+	return func() (*decoders.DataPoint, error) {
+		if i >= len(packet.Data) {
+			// No more data
+			return nil, nil
+		}
+
+		row := &decoders.DataPoint{
+			Serial: int64(packet.Serial),
+			Type:   rune(packet.Type),
+			Data:   int64(packet.Data[i]),
+			Time:   interpTime,
+		}
+
+		i++
+		interpTime = interpTime.Add(packet.Period) // Add data point time spacing for next data point
+		return row, nil
+	}
 }

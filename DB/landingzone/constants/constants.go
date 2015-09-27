@@ -20,8 +20,6 @@ const (
 	READ_TIME_LIMIT  = 10 // Measured in seconds
 	WRITE_TIME_LIMIT = 5  // Measured in seconds
 
-	HEADER_REGEX = "^(?:THS)(\\d+)(?:t)(\\d+)(?:X)$"
-
 	// Database
 	DB_SOCKET    = "/var/run/postgresql" // Use localhost or appropriate hostname for IP connection.
 	DB_PORT      = 5432

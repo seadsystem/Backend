@@ -29,7 +29,7 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 
 			packet, err := eGaugeDecoders.DecodePacket(buf.Bytes())
 			if err != nil {
-				log.Println("Error:", err)
+				log.Println("Error decoding packet:", err)
 				http.Error(res, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -38,8 +38,14 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 				log.Printf("Data:\n%#v\n", packet)
 			}
 
-			err = db.InsertEGaugePacket(packet)
+			iter, err := eGaugeDecoders.NewIterator(packet)
 			if err != nil {
+				log.Println("Error creating iterator from packet:", err)
+				http.Error(res, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if err := db.Insert(iter); err != nil {
 				log.Println("Error:", err)
 				http.Error(res, err.Error(), http.StatusInternalServerError)
 				return

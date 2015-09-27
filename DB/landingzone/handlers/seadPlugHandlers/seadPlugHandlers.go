@@ -37,7 +37,7 @@ func HandleRequest(conn net.Conn, db database.DB) {
 
 	// Main data receiving loop
 	for {
-		packet, err := readPacket(conn)
+		packetBytes, err := readPacket(conn)
 
 		if err != nil {
 			// Kill connection to allow plug to reestablish a new connection. It is important to do this every so often to resync the time.
@@ -45,16 +45,22 @@ func HandleRequest(conn net.Conn, db database.DB) {
 		}
 
 		log.Println("Parsing data...")
-		data, err := seadPlugDecoders.DecodePacket(packet, offset)
+		packet, err := seadPlugDecoders.DecodePacket(packetBytes, offset)
 		if err != nil {
 			readError(err)
 			break // Kill the connection. This will fix most problems including alignment issues.
 		}
-		data.Serial = serial
-		log.Printf("Data: %+v\n", data)
+		packet.Serial = serial
+		if constants.Verbose {
+			log.Printf("Data: %+v\n", packet)
+		}
 
 		log.Println("Sending to database...")
-		go db.InsertSeadPacket(data) // Inset data into database in a new go routine. Non-blocking.
+		go func() { // Inset data into database in a new go routine. Non-blocking.
+			if err := db.Insert(seadPlugDecoders.NewIterator(packet)); err != nil {
+				log.Printf("Error inserting packet into database: %v", err)
+			}
+		}()
 	}
 
 	log.Println("Closing connection...")
