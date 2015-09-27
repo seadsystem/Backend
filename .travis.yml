@@ -1,0 +1,16 @@
+language: go
+go:
+  - 1.5.1
+  - tip
+sudo: false
+install:
+  - go get github.com/olt/libpq
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+before_script:
+  - go vet ./DB/landingzone/...
+script:
+  - cd ./DB/landingzone; go install
+after_success:
+  - cd ./DB/landingzone; $GOBIN/goveralls -service=travis-ci
