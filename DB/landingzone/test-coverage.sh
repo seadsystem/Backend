@@ -23,7 +23,7 @@ done
 if [ -n "$COVERALLS" ]
 then
 	echo "COVERALLS: $COVERALLS"
-	$GOPATH/bin/goveralls -coverprofile=acc.out -service=travis-ci $COVERALLS
+	$GOPATH/bin/goveralls -coverprofile=acc.out -service=travis-ci -repotoken=$COVERALLS
 fi
 
 rm -rf ./profile.out
