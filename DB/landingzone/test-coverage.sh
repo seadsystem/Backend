@@ -2,7 +2,7 @@
 # Script from https://github.com/gopns/gopns
 
 echo "mode: set" > acc.out
-for Dir in $(find ./* -maxdepth 10 -type d ); 
+for Dir in $(find $1/* -maxdepth 10 -type d ); 
 do
 	if ls $Dir/*.go &> /dev/null;
 	then

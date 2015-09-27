@@ -1,6 +1,5 @@
 language: go
 go:
-  - 1.5.1
   - tip
 sudo: false
 install:
@@ -13,4 +12,4 @@ before_script:
 script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
 after_success:
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh
+  - cd $GOPATH/src/github.com/seadsystem/Backend; ./test-coverage.sh ./DB/landingzone
