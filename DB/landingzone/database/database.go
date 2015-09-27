@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
 
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
@@ -20,6 +21,11 @@ type DB struct {
 
 func New() (DB, error) {
 	conn, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s password=%s port=%d sslmode=disable", constants.DB_SOCKET, constants.DB_USER, constants.DB_NAME, constants.DB_PASSWORD, constants.DB_PORT))
+	return DB{conn}, err
+}
+
+func NewMock() (DB, error) {
+	conn, _, err := sqlmock.New()
 	return DB{conn}, err
 }
 
