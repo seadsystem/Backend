@@ -14,4 +14,4 @@ script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
 after_success:
   - cd $GOPATH/src/github.com/seadsystem/Backend; go test github.com/seadsystem/Backend/DB/landingzone/...
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./DB/landingzone/test-coverage.sh
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh
