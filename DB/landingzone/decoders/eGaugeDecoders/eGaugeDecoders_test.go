@@ -62,28 +62,28 @@ func TestNewIterator(t *testing.T) {
 			name: "delta data",
 			want: []*decoders.DataPoint{
 				// row 0
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   100,
 					Device: stringPtr("PowerS"),
 					Time:   time.Unix(0x555d5148, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'I',
 					Data:   200,
 					Device: stringPtr("I11"),
 					Time:   time.Unix(0x555d5148, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'F',
 					Data:   -300,
 					Device: stringPtr("F2"),
 					Time:   time.Unix(0x555d5148, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   -100,
@@ -92,28 +92,28 @@ func TestNewIterator(t *testing.T) {
 				},
 
 				// row 1
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   100 + 1,
 					Device: stringPtr("PowerS"),
 					Time:   time.Unix(0x555d5148-1, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'I',
 					Data:   200 + 0,
 					Device: stringPtr("I11"),
 					Time:   time.Unix(0x555d5148-1, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'F',
 					Data:   -300 - 3,
 					Device: stringPtr("F2"),
 					Time:   time.Unix(0x555d5148-1, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   -100 + 5,
@@ -122,28 +122,28 @@ func TestNewIterator(t *testing.T) {
 				},
 
 				// row 2
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   100 + 1 + 5,
 					Device: stringPtr("PowerS"),
 					Time:   time.Unix(0x555d5148-2, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'I',
 					Data:   200 + 0 + 11,
 					Device: stringPtr("I11"),
 					Time:   time.Unix(0x555d5148-2, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'F',
 					Data:   -300 - 3 + 7,
 					Device: stringPtr("F2"),
 					Time:   time.Unix(0x555d5148-2, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0068,
 					Type:   'P',
 					Data:   -100 + 5 + 100,
@@ -157,21 +157,21 @@ func TestNewIterator(t *testing.T) {
 			xml:  notDeltaData,
 			name: "not delta data",
 			want: []*decoders.DataPoint{
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0066,
 					Type:   'P',
 					Data:   100,
 					Device: stringPtr("Power"),
 					Time:   time.Unix(0x555d5148, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0066,
 					Type:   'P',
 					Data:   200,
 					Device: stringPtr("Power"),
 					Time:   time.Unix(0x555d5148-2, 0),
 				},
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0066,
 					Type:   'P',
 					Data:   300,
@@ -185,7 +185,7 @@ func TestNewIterator(t *testing.T) {
 			xml:  granularityData,
 			name: "granularity selection with delta data",
 			want: []*decoders.DataPoint{
-				&decoders.DataPoint{
+				{
 					Serial: 0x1bcd0067,
 					Type:   'P',
 					Data:   200,
