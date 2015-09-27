@@ -20,7 +20,11 @@ do
     fi
 done
 
-$GOPATH/bin/goveralls -coverprofile=acc.out -service=travis-ci
+if [ -n "$COVERALLS" ]
+then
+	echo "COVERALLS: $COVERALLS"
+	$GOPATH/bin/goveralls -coverprofile=acc.out -service=travis-ci $COVERALLS
+fi
 
 rm -rf ./profile.out
 rm -rf ./acc.out
