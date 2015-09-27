@@ -13,4 +13,4 @@ before_script:
 script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
 after_success:
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; $GOPATH/bin/goveralls -service=travis-ci
+  - cd; $GOPATH/bin/goveralls github.com/seadsystem/Backend/DB/landingzone/... -service=travis-ci
