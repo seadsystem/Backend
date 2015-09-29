@@ -25,7 +25,7 @@ func TestAsciiTimeToDuration(t *testing.T) {
 		err   error
 	}{
 		{
-			"1612822282800000",
+			"16128222828000",
 			14012548*time.Second + 280*time.Millisecond,
 			nil,
 		},
@@ -35,9 +35,9 @@ func TestAsciiTimeToDuration(t *testing.T) {
 			errors.New("invalid ascii time: 16128222828000000"),
 		},
 		{
-			"-161282228280000",
+			"-1612822282800",
 			0,
-			errors.New("invalid ascii time: -161282228280000"),
+			errors.New("invalid ascii time: -1612822282800"),
 		},
 	}
 	for _, test := range tests {

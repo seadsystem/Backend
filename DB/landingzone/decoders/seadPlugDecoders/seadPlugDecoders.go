@@ -154,14 +154,14 @@ func Binary2uint(data []byte) (total uint) {
 // AsciiTimeToDuration converts plug time string to an integral duration type
 func AsciiTimeToDuration(ascii_time []byte) (time.Duration, error) {
 	// Check time string format
-	if len(ascii_time) != 16 {
+	if len(ascii_time) != 14 {
 		return 0, fmt.Errorf("invalid ascii time: %s", string(ascii_time))
 	}
 
 	// Check that all characters are integers.
 	for _, digit := range ascii_time {
 		if digit < '0' || digit > '9' {
-			return 0, fmt.Errorf("invalid ascii time: %s", ascii_time)
+			return 0, fmt.Errorf("invalid ascii time: %s", string(ascii_time))
 		}
 	}
 
