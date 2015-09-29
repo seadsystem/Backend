@@ -150,6 +150,7 @@ func readPacket(conn net.Conn) (data []byte, err error) {
 	if constants.Verbose {
 		log.Println("Read data:")
 		log.Println(string(data))
+		log.Println(data)
 	}
 
 	log.Println("Sending ACK...")
