@@ -13,9 +13,15 @@ class go {
     require => User['landingzone'],
   }
 
-  # Install go pq bulk library
+  # Install go pq library
   exec {'go-pq':
-    command => 'env GOPATH=/home/landingzone/go go get github.com/olt/libpq',
+    command => 'env GOPATH=/home/landingzone/go go get -u github.com/lib/pq',
+    require => Package['golang'],
+  }
+
+  # Install go sqlmock library
+  exec {'go-sqlmock':
+    command => 'env GOPATH=/home/landingzone/go go get -u github.com/DATA-DOG/go-sqlmock',
     require => Package['golang'],
   }
 }
