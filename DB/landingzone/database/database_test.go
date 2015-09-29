@@ -105,8 +105,30 @@ func TestInsertPrepareErr(t *testing.T) {
 	mock.ExpectClose()
 	db := DB{conn}
 
-	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != `call to Prepare stetement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback` {
-		t.Errorf("got db.Insert() = %v, want = nil", err)
+	want := `call to Prepare stetement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
+	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
+		t.Errorf("got db.Insert() = %v, want = %s", err, want)
+	}
+
+	if err := db.Close(); err != nil {
+		t.Fatalf("got db.Close() = %v, want = nil", err)
+	}
+}
+
+func TestInsertFlushErr(t *testing.T) {
+	conn, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+	}
+	mock.ExpectBegin()
+	mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN")
+	mock.ExpectRollback()
+	mock.ExpectClose()
+	db := DB{conn}
+
+	want := `call to exec query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN' with args [], was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
+	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
+		t.Errorf("got db.Insert() = %v, want = %s", err, want)
 	}
 
 	if err := db.Close(); err != nil {
