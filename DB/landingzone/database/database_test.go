@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 )
 
@@ -39,6 +40,10 @@ func TestSetMaxOpenConns(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
+	oldVerbosity := constants.Verbose
+	constants.Verbose = true
+	defer func() { constants.Verbose = oldVerbosity }()
+
 	closureIndex := 0
 	var iter = func() (*decoders.DataPoint, error) {
 		if closureIndex >= 3 {
