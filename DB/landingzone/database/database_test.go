@@ -16,6 +16,12 @@ func TestNewMock(t *testing.T) {
 	}
 }
 
+func TestNew(t *testing.T) {
+	if _, err := New(); err != nil {
+		t.Fatalf("got New() = _, %v, want = _, nil", err)
+	}
+}
+
 func TestSetMaxOpenConns(t *testing.T) {
 	conn, mock, err := sqlmock.New()
 	if err != nil {
