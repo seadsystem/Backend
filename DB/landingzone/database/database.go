@@ -100,7 +100,7 @@ func (db DB) Insert(iter decoders.Iterator) (err error) {
 		}
 
 		// Insert data. This is buffered.
-		if _, err = stmt.Exec(row.Serial, row.Type, row.Data, row.Time, row.Device); err != nil {
+		if _, err = stmt.Exec(row.Serial, string(row.Type), row.Data, row.Time, row.Device); err != nil {
 			break
 		}
 	}
