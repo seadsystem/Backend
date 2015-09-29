@@ -154,6 +154,8 @@ func TestDecodeHeader(t *testing.T) {
 		err    error
 	}{
 		{[]byte("THS000001t00000132745009X"), 1, time.Now().Add(-func() time.Duration { d, _ := AsciiTimeToDuration([]byte("00000132745009")); return d }()), nil},
+		{[]byte{}, 0, time.Time{}, InvalidHeader},
+		{[]byte("THS000001t000000132745009X"), 0, time.Time{}, errors.New("invalid ascii time: 000000132745009")},
 	}
 	for _, test := range tests {
 		if serial, offset, err := DecodeHeader(test.packet); serial != test.serial || offset.Sub(test.offset) > time.Second/10 || offset.Sub(test.offset) < -time.Second/10 || !errorEqual(err, test.err) {
