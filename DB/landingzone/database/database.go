@@ -72,6 +72,7 @@ func (db DB) Insert(iter decoders.Iterator) (err error) {
 		// Rollback transaction on error
 		if err != nil {
 			txn.Rollback()
+			log.Println("Transaction rolled back")
 			return
 		}
 
