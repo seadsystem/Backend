@@ -129,14 +129,14 @@ func TestInsertCloseErr(t *testing.T) {
 	}
 	mock.ExpectBegin()
 	want := errors.New("STMT ERROR")
-	stmt := mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN").WillReturnCloseError(want)
+	stmt := mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN").WillReturnError(want) //.WillReturnCloseError(want)
 	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
 	db := DB{conn}
 
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want.Error() {
 		// TODO: Figure out why this test doesn't work.
-		//t.Errorf("got db.Insert() = %v, want = %v", err, want)
+		t.Errorf("got db.Insert() = %v, want = %v", err, want)
 	}
 }
 
