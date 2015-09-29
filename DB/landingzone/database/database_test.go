@@ -2,8 +2,10 @@ package database
 
 import (
 	"testing"
+	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 )
 
 func TestNewMock(t *testing.T) {
@@ -31,6 +33,46 @@ func TestSetMaxOpenConns(t *testing.T) {
 	db := DB{conn}
 
 	db.SetMaxOpenConns(5)
+	if err := db.Close(); err != nil {
+		t.Fatalf("got db.Close() = %v, want = nil", err)
+	}
+}
+
+func TestInsert(t *testing.T) {
+	closureIndex := 0
+	var iter = func() (*decoders.DataPoint, error) {
+		if closureIndex >= 3 {
+			return nil, nil
+		}
+		point := &decoders.DataPoint{
+			Serial: 64,
+			Type:   'T',
+			Data:   int64(closureIndex),
+			Time:   time.Unix(int64(500+closureIndex), 0),
+		}
+		closureIndex++
+		return point, nil
+	}
+
+	conn, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+	}
+	mock.ExpectBegin()
+	query := "COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN"
+	stmt := mock.ExpectPrepare(query)
+	stmt.ExpectExec().WithArgs(64, 'T', 0, time.Unix(500, 0), nil).WillReturnResult(sqlmock.NewResult(0, 1))
+	stmt.ExpectExec().WithArgs(64, 'T', 1, time.Unix(501, 0), nil).WillReturnResult(sqlmock.NewResult(0, 1))
+	stmt.ExpectExec().WithArgs(64, 'T', 2, time.Unix(502, 0), nil).WillReturnResult(sqlmock.NewResult(0, 1))
+	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectCommit()
+	mock.ExpectClose()
+	db := DB{conn}
+
+	if err := db.Insert(iter); err != nil {
+		t.Errorf("got db.Insert(iter) = %v, want = nil", err)
+	}
+
 	if err := db.Close(); err != nil {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}

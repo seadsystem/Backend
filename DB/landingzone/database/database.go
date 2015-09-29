@@ -53,17 +53,19 @@ func (db DB) Insert(iter decoders.Iterator) (err error) {
 	defer func() {
 		log.Println("Closing off transaction...")
 
-		// Flush buffer
-		if _, eerr := stmt.Exec(); eerr != nil {
-			if err == nil {
-				err = eerr
+		if stmt != nil {
+			// Flush buffer
+			if _, eerr := stmt.Exec(); eerr != nil {
+				if err == nil {
+					err = eerr
+				}
 			}
-		}
 
-		// Close prepared statement
-		if cerr := stmt.Close(); cerr != nil {
-			if err == nil {
-				err = cerr
+			// Close prepared statement
+			if cerr := stmt.Close(); cerr != nil {
+				if err == nil {
+					err = cerr
+				}
 			}
 		}
 
