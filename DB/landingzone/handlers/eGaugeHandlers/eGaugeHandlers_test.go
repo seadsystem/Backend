@@ -19,7 +19,7 @@ func TestHandle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Creating mock DB: %v", err)
 	}
-	defer db.Close()
+
 	oldVerbosity := constants.Verbose
 	constants.Verbose = true
 
@@ -32,7 +32,7 @@ func TestHandle(t *testing.T) {
 		{reqOnly(http.NewRequest("POST", "", nil)), "Request body must not be nil.\n", "nil body"},
 		{reqOnly(http.NewRequest("POST", "", bytes.NewBufferString("foo"))), "EOF\n", "invalid XML"},
 		{reqOnly(http.NewRequest("POST", "", bytes.NewBufferString(`<group serial="xxx"></group>`))), "reading serial: strconv.ParseInt: parsing \"xxx\": invalid syntax\n", "invalid serial"},
-		{reqOnly(http.NewRequest("POST", "", bytes.NewBufferString(`<group serial="5"><data time_stamp="5"></data></group>`))), "all expectations were already fulfilled, call to database transaction Begin was not expected\n", "a valid request"},
+		{reqOnly(http.NewRequest("POST", "", bytes.NewBufferString(`<group serial="5"><data time_stamp="5"></data></group>`))), "call to database transaction Begin, was not expected, next expectation is: ExpectedClose => expecting database Close\n", "a valid request"},
 	}
 	for _, test := range tests {
 		res := httptest.NewRecorder()
@@ -46,4 +46,8 @@ func TestHandle(t *testing.T) {
 	}
 
 	constants.Verbose = oldVerbosity
+
+	if err := db.Close(); err != nil {
+		t.Fatalf("got db.Close() = %v, want = nil", err)
+	}
 }
