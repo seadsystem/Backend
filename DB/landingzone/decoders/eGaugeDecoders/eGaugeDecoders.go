@@ -75,13 +75,13 @@ func NewIterator(packet Packet) (decoders.Iterator, error) {
 	startTime := time.Unix(startUnixTime, 0)
 
 	log.Println("Columns:", *columns)
-	columnTypes := make([]rune, len(*columns))
+	columnTypes := make([]byte, len(*columns))
 	for i, column := range *columns {
-		cr := []rune(column.Type)
-		if len(cr) != 1 {
+		b := []byte(column.Type)
+		if len(b) != 1 {
 			return decoders.NewEmptyIterator(), fmt.Errorf("invalid column: %s", column)
 		}
-		columnTypes[i] = cr[0]
+		columnTypes[i] = b[0]
 	}
 
 	interpTime := startTime // Set timestamp for first data point to time in packet

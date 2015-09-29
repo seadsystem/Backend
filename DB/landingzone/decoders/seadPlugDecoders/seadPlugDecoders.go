@@ -203,7 +203,7 @@ func NewIterator(packet SeadPacket) decoders.Iterator {
 
 		row := &decoders.DataPoint{
 			Serial: int64(packet.Serial),
-			Type:   rune(packet.Type),
+			Type:   packet.Type,
 			Data:   int64(packet.Data[i]),
 			Time:   interpTime,
 		}

@@ -7,7 +7,7 @@ import (
 
 type DataPoint struct {
 	Serial int64
-	Type   rune
+	Type   byte
 	Device *string
 	Data   int64
 	Time   time.Time
