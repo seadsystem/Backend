@@ -32,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.Close()
 
 	// Causes operations which require a new connection to block instead of failing.
 	db.SetMaxOpenConns(constants.DB_MAX_CONNS)

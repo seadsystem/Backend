@@ -19,6 +19,7 @@ func TestHandle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Creating mock DB: %v", err)
 	}
+	defer db.Close()
 	oldVerbosity := constants.Verbose
 	constants.Verbose = true
 

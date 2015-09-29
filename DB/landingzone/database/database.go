@@ -29,6 +29,10 @@ func NewMock() (DB, error) {
 	return DB{conn}, err
 }
 
+func (db DB) Close() error {
+	return db.conn.Close()
+}
+
 func (db DB) SetMaxOpenConns(n int) {
 	db.conn.SetMaxOpenConns(n)
 }
