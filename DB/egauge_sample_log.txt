@@ -1,0 +1,777 @@
+2015/03/13 15:52:04 Got request from: 128.114.59.169:56053
+2015/03/13 15:52:04 Request from (128.114.59.169:56053) is of type POST
+2015/03/13 15:52:04 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+1b7
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005d">
+<data columns="3" time_stamp="0x55036a10" time_delta="60" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-366147</c><c>1350255</c><c>2748</c></r>
+ <r><c>-362437</c><c>1350258</c><c>2748</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 15:53:04 Got request from: 128.114.59.169:56054
+2015/03/13 15:53:04 Request from (128.114.59.169:56054) is of type POST
+2015/03/13 15:53:04 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+187
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005d">
+<data columns="3" time_stamp="0x55036a4c" time_delta="60" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-369850</c><c>1350251</c><c>2748</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 15:54:04 Got request from: 128.114.59.169:56055
+2015/03/13 15:54:04 Request from (128.114.59.169:56055) is of type POST
+2015/03/13 15:54:04 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+187
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005d">
+<data columns="3" time_stamp="0x55036a88" time_delta="60" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-373553</c><c>1350248</c><c>2748</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 15:56:48 Got a connection.
+2015/03/13 15:56:48 Sending HEAD...
+2015/03/13 15:56:48 Reading header...
+2015/03/13 15:56:48 Reading length header...
+2015/03/13 15:56:48 Received length header: L
+2015/03/13 15:56:48 Length: 28
+2015/03/13 15:56:48 Read data:
+2015/03/13 15:56:48 THS100000t00000000000500X
+2015/03/13 15:56:48 Sending ACK...
+2015/03/13 15:56:48 Parsing header for serial...
+2015/03/13 15:56:48 Header serial string: 100000
+2015/03/13 15:56:48 Plug serial: 100000
+2015/03/13 15:56:48 Plug offset: 2015-03-13 15:56:48.822312235 -0700 PDT
+2015/03/13 15:56:48 Sending configuration...
+2015/03/13 15:56:48 Sending OKAY...
+2015/03/13 15:56:48 Reading length header...
+2015/03/13 15:56:48 Received length header: L,
+2015/03/13 15:56:48 Length: 44
+2015/03/13 15:56:48 Read data:
+2015/03/13 15:56:48 TWlIt00000000000000P00000005000000CD@�X
+2015/03/13 15:56:48 Sending ACK...
+2015/03/13 15:56:48 Parsing data...
+2015/03/13 15:56:48 Data: {Type:87 Location:73 Timestamp:2015-03-13 15:56:48.822312235 -0700 PDT Period:50s Count:1 Data:[-960] Serial:100000}
+2015/03/13 15:56:48 Sending to database...
+2015/03/13 15:56:48 Reading length header...
+2015/03/13 15:56:48 Closing connection...
+2015/03/13 15:56:48 Connection closed.
+2015/03/13 15:56:48 Beginning transaction...
+2015/03/13 15:56:48 Processing data...
+2015/03/13 15:56:48 Data: -960
+2015/03/13 15:56:48 Time: 2015-03-13 15:56:48.822312235 -0700 PDT
+2015/03/13 15:56:48 Closing off transaction...
+2015/03/13 15:56:48 Transaction closed
+2015/03/13 16:01:51 Got a connection.
+2015/03/13 16:01:51 Sending HEAD...
+2015/03/13 16:01:51 Reading header...
+2015/03/13 16:01:51 Reading length header...
+2015/03/13 16:01:51 Received length header: L
+2015/03/13 16:01:51 Length: 28
+2015/03/13 16:01:51 Read data:
+2015/03/13 16:01:51 THS100000t00000000000500X
+2015/03/13 16:01:51 Sending ACK...
+2015/03/13 16:01:51 Parsing header for serial...
+2015/03/13 16:01:51 Header serial string: 100000
+2015/03/13 16:01:51 Plug serial: 100000
+2015/03/13 16:01:51 Plug offset: 2015-03-13 16:01:51.285851559 -0700 PDT
+2015/03/13 16:01:51 Sending configuration...
+2015/03/13 16:01:51 Sending OKAY...
+2015/03/13 16:01:51 Reading length header...
+2015/03/13 16:01:51 Received length header: L,
+2015/03/13 16:01:51 Length: 44
+2015/03/13 16:01:51 Read data:
+2015/03/13 16:01:51 TWlIt00000000000000P00000005000000CD �X
+2015/03/13 16:01:51 Sending ACK...
+2015/03/13 16:01:51 Parsing data...
+2015/03/13 16:01:51 Data: {Type:87 Location:73 Timestamp:2015-03-13 16:01:51.285851559 -0700 PDT Period:50s Count:1 Data:[-480] Serial:100000}
+2015/03/13 16:01:51 Sending to database...
+2015/03/13 16:01:51 Reading length header...
+2015/03/13 16:01:51 Closing connection...
+2015/03/13 16:01:51 Connection closed.
+2015/03/13 16:01:51 Beginning transaction...
+2015/03/13 16:01:51 Processing data...
+2015/03/13 16:01:51 Data: -480
+2015/03/13 16:01:51 Time: 2015-03-13 16:01:51.285851559 -0700 PDT
+2015/03/13 16:01:51 Closing off transaction...
+2015/03/13 16:01:51 Transaction closed
+
+
+
+2015/03/13 16:02:55 Got request from: 128.114.59.169:55981
+2015/03/13 16:02:55 Request from (128.114.59.169:55981) is of type POST
+2015/03/13 16:02:55 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+b2a
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036c9e" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-379726</c><c>1346313</c><c>2748</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>188</c><c>188</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>204431</c><c>332</c><c>0</c></r>
+</data>
+<data time_stamp="0x55036c2c" time_delta="60">
+ <r><c>-204431</c><c>-332</c><c>0</c></r>
+ <r><c>568</c><c>29</c><c>0</c></r>
+ <r><c>296</c><c>14</c><c>0</c></r>
+ <r><c>296</c><c>14</c><c>0</c></r>
+ <r><c>296</c><c>14</c><c>0</c></r>
+ <r><c>296</c><c>14</c><c>0</c></r>
+ <r><c>296</c><c>14</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:03:55 Got request from: 128.114.59.169:55982
+2015/03/13 16:03:55 Request from (128.114.59.169:55982) is of type POST
+2015/03/13 16:03:55 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+9a4
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036cda" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-383433</c><c>1342614</c><c>2748</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:04:54 Got request from: 128.114.59.169:55983
+2015/03/13 16:04:54 Request from (128.114.59.169:55983) is of type POST
+2015/03/13 16:04:54 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+981
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036d15" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-387070</c><c>1338985</c><c>2748</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:05:54 Got request from: 128.114.59.169:55984
+2015/03/13 16:05:54 Request from (128.114.59.169:55984) is of type POST
+2015/03/13 16:05:54 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+9a4
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036d51" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-390769</c><c>1335294</c><c>2748</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:06:52 Got a connection.
+2015/03/13 16:06:52 Sending HEAD...
+2015/03/13 16:06:52 Reading header...
+2015/03/13 16:06:52 Reading length header...
+2015/03/13 16:06:52 Received length header: L
+2015/03/13 16:06:52 Length: 28
+2015/03/13 16:06:52 Read data:
+2015/03/13 16:06:52 THS100000t00000000000500X
+2015/03/13 16:06:52 Sending ACK...
+2015/03/13 16:06:52 Parsing header for serial...
+2015/03/13 16:06:52 Header serial string: 100000
+2015/03/13 16:06:52 Plug serial: 100000
+2015/03/13 16:06:52 Plug offset: 2015-03-13 16:06:52.701973067 -0700 PDT
+2015/03/13 16:06:52 Sending configuration...
+2015/03/13 16:06:52 Sending OKAY...
+2015/03/13 16:06:52 Reading length header...
+2015/03/13 16:06:52 Received length header: L,
+2015/03/13 16:06:52 Length: 44
+2015/03/13 16:06:52 Read data:
+2015/03/13 16:06:52 TWlIt00000000000000P00000005000000CD!�X
+2015/03/13 16:06:52 Sending ACK...
+2015/03/13 16:06:52 Parsing data...
+2015/03/13 16:06:52 Data: {Type:87 Location:73 Timestamp:2015-03-13 16:06:52.701973067 -0700 PDT Period:50s Count:1 Data:[-479] Serial:100000}
+2015/03/13 16:06:52 Sending to database...
+2015/03/13 16:06:52 Reading length header...
+2015/03/13 16:06:52 Closing connection...
+2015/03/13 16:06:52 Connection closed.
+2015/03/13 16:06:52 Beginning transaction...
+2015/03/13 16:06:52 Processing data...
+2015/03/13 16:06:52 Data: -479
+2015/03/13 16:06:52 Time: 2015-03-13 16:06:52.701973067 -0700 PDT
+2015/03/13 16:06:52 Closing off transaction...
+2015/03/13 16:06:52 Transaction closed
+2015/03/13 16:06:54 Got request from: 128.114.59.169:55985
+2015/03/13 16:06:54 Request from (128.114.59.169:55985) is of type POST
+2015/03/13 16:06:54 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+9a4
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036d8d" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-394468</c><c>1331602</c><c>2748</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:07:55 Got request from: 128.114.59.169:55986
+2015/03/13 16:07:55 Request from (128.114.59.169:55986) is of type POST
+2015/03/13 16:07:55 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+9c7
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036dca" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-398225</c><c>1327854</c><c>2748</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
+2015/03/13 16:08:55 Got request from: 128.114.59.169:55987
+2015/03/13 16:08:55 Request from (128.114.59.169:55987) is of type POST
+2015/03/13 16:08:55 POST / HTTP/1.1
+Host: db.sead.systems
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/xml
+User-Agent: egauge/pusher
+
+9a4
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group PUBLIC "-//ESL/DTD eGauge 1.0//EN" "http://www.egauge.net/DTD/egauge-hist.dtd">
+<group serial="0x1bcd005e">
+<data columns="3" time_stamp="0x55036e06" time_delta="1" delta="true" epoch="0x54914d54">
+ <cname t="P">heater</cname>
+ <cname t="P">lamp</cname>
+ <cname t="P">lamp+</cname>
+ <r><c>-401922</c><c>1324165</c><c>2748</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>61</c><c>62</c><c>0</c></r>
+ <r><c>62</c><c>61</c><c>0</c></r>
+ <r><c>62</c><c>62</c><c>0</c></r>
+ <r><c>61</c><c>61</c><c>0</c></r>
+</data>
+</group>
+
+0
+
+
