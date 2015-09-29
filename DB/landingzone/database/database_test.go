@@ -29,12 +29,11 @@ func TestNew(t *testing.T) {
 }
 
 func TestSetMaxOpenConns(t *testing.T) {
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectClose()
-	db := DB{conn}
 
 	db.SetMaxOpenConns(5)
 	if err := db.Close(); err != nil {
@@ -62,9 +61,9 @@ func TestInsert(t *testing.T) {
 		return point, nil
 	}
 
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectBegin()
 	query := "COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN"
@@ -74,7 +73,6 @@ func TestInsert(t *testing.T) {
 	stmt.ExpectExec().WithArgs(64, "T", 2, time.Unix(502, 0), nil).WillReturnResult(sqlmock.NewResult(0, 1))
 	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectCommit()
-	db := DB{conn}
 
 	if err := db.Insert(iter); err != nil {
 		t.Errorf("got db.Insert(iter) = %v, want = nil", err)
@@ -82,11 +80,10 @@ func TestInsert(t *testing.T) {
 }
 
 func TestInsertBeginErr(t *testing.T) {
-	conn, _, err := sqlmock.New()
+	db, _, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
-	db := DB{conn}
 
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != "all expectations were already fulfilled, call to database transaction Begin was not expected" {
 		t.Errorf("got db.Insert() = %v, want = nil", err)
@@ -94,13 +91,12 @@ func TestInsertBeginErr(t *testing.T) {
 }
 
 func TestInsertPrepareErr(t *testing.T) {
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectBegin()
 	mock.ExpectRollback()
-	db := DB{conn}
 
 	want := `call to Prepare stetement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
@@ -109,14 +105,13 @@ func TestInsertPrepareErr(t *testing.T) {
 }
 
 func TestInsertFlushErr(t *testing.T) {
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectBegin()
 	mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN")
 	mock.ExpectRollback()
-	db := DB{conn}
 
 	want := `call to exec query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN' with args [], was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
@@ -125,16 +120,15 @@ func TestInsertFlushErr(t *testing.T) {
 }
 
 func TestInsertCloseErr(t *testing.T) {
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectBegin()
 	want := errors.New("STMT ERROR")
 	stmt := mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN").WillReturnCloseError(want)
 	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
-	db := DB{conn}
 
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want.Error() {
 		// TODO: Figure out why this test doesn't work.
@@ -145,16 +139,15 @@ func TestInsertCloseErr(t *testing.T) {
 }
 
 func TestInsertErr(t *testing.T) {
-	conn, mock, err := sqlmock.New()
+	db, mock, err := NewMock()
 	if err != nil {
-		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+		t.Fatalf("got NewMock() = _, _, %v, want = _, _, nil", err)
 	}
 	mock.ExpectBegin()
 	query := "COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN"
 	stmt := mock.ExpectPrepare(query)
 	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
-	db := DB{conn}
 
 	want := "call to exec query 'COPY \"data_raw\" (\"serial\", \"type\", \"data\", \"time\", \"device\") FROM STDIN' with args [0 \x00 0 0001-01-01 00:00:00 +0000 UTC <nil>], was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback"
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return &decoders.DataPoint{}, nil }); err == nil || err.Error() != want {
