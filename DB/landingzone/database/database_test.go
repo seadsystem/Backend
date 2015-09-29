@@ -135,3 +135,20 @@ func TestInsertFlushErr(t *testing.T) {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}
 }
+
+func TestInsertCloseErr(t *testing.T) {
+	conn, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+	}
+	mock.ExpectBegin()
+	stmt := mock.ExpectPrepare("COPY \\\"data_raw\\\" \\(\\\"serial\\\", \\\"type\\\", \\\"data\\\", \\\"time\\\", \\\"device\\\"\\) FROM STDIN")
+	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectRollback()
+	db := DB{conn}
+
+	want := `call to commit transaction, was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
+	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
+		t.Errorf("got db.Insert() = %v, want = %s", err, want)
+	}
+}
