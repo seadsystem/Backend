@@ -6,12 +6,14 @@ import (
 	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/decoders"
 )
 
 func TestNewMock(t *testing.T) {
-	db, err := NewMock()
+	db, mock, err := NewMock()
+	mock.ExpectClose()
 	if err != nil {
 		t.Fatalf("got NewMock() = _, %v, want = _, nil", err)
 	}

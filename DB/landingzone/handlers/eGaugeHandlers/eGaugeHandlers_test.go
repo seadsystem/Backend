@@ -19,7 +19,8 @@ func TestHandle(t *testing.T) {
 	constants.Verbose = true
 	defer func() { constants.Verbose = oldVerbosity }()
 
-	db, err := database.NewMock()
+	db, mock, err := database.NewMock()
+	mock.ExpectClose()
 	if err != nil {
 		t.Fatalf("Creating mock DB: %v", err)
 	}

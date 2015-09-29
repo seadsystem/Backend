@@ -24,10 +24,9 @@ func New() (DB, error) {
 	return DB{conn}, err
 }
 
-func NewMock() (DB, error) {
+func NewMock() (DB, sqlmock.Sqlmock, error) {
 	conn, mock, err := sqlmock.New()
-	mock.ExpectClose()
-	return DB{conn}, err
+	return DB{conn}, mock, err
 }
 
 func (db DB) Close() error {
