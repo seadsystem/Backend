@@ -82,3 +82,15 @@ func TestInsert(t *testing.T) {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}
 }
+
+func TestInsertBeginErr(t *testing.T) {
+	conn, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+	}
+	db := DB{conn}
+
+	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != "all expectations were already fulfilled, call to database transaction Begin was not expected" {
+		t.Errorf("got db.Insert(iter) = %v, want = nil", err)
+	}
+}
