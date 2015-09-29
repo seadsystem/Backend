@@ -145,3 +145,19 @@ func TestCompileRegex(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestDecodeHeader(t *testing.T) {
+	tests := []struct {
+		packet []byte
+		serial int
+		offset time.Time
+		err    error
+	}{
+		{[]byte("THS000001t00000132745009X"), 1, time.Now().Add(-func() time.Duration { d, _ := AsciiTimeToDuration([]byte("00000132745009")); return d }()), nil},
+	}
+	for _, test := range tests {
+		if serial, offset, err := DecodeHeader(test.packet); serial != test.serial || offset.Sub(test.offset) > time.Second/10 || offset.Sub(test.offset) < -time.Second/10 || !errorEqual(err, test.err) {
+			t.Errorf("got DecodeHeader(%s) = %d, %v, %v, want = %d, %v, %v", string(test.packet), serial, offset, err, test.serial, test.offset, test.err)
+		}
+	}
+}

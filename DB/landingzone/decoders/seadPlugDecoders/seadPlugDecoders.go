@@ -65,6 +65,7 @@ func DecodeHeader(packet []byte) (serial int, offset time.Time, err error) {
 
 	var duration time.Duration
 	duration, err = AsciiTimeToDuration(headerStrings[2])
+	log.Printf("Duration: %v\n", duration)
 	if err != nil {
 		return
 	}
