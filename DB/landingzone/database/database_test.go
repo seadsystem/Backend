@@ -91,6 +91,25 @@ func TestInsertBeginErr(t *testing.T) {
 	db := DB{conn}
 
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != "all expectations were already fulfilled, call to database transaction Begin was not expected" {
-		t.Errorf("got db.Insert(iter) = %v, want = nil", err)
+		t.Errorf("got db.Insert() = %v, want = nil", err)
+	}
+}
+
+func TestInsertPrepareErr(t *testing.T) {
+	conn, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("got sqlmock.New() = _, _, %v, want = _, _, nil", err)
+	}
+	mock.ExpectBegin()
+	mock.ExpectRollback()
+	mock.ExpectClose()
+	db := DB{conn}
+
+	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != `call to Prepare stetement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback` {
+		t.Errorf("got db.Insert() = %v, want = nil", err)
+	}
+
+	if err := db.Close(); err != nil {
+		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}
 }
