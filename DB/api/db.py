@@ -19,7 +19,7 @@ def query(parsed_url):
 		raise Exception("Received malformed URL data")
 
 	header = ['time', 'I', 'W', 'V', 'T']
-	start_time = end_time = data_type = subset = limit = None
+	start_time = end_time = data_type = subset = limit = device = None
 	json = reverse = classify = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
@@ -38,6 +38,8 @@ def query(parsed_url):
 		reverse = parsed_url['reverse']
 	if 'classify' in parsed_url.keys():
 		classify = parsed_url['classify']
+	if 'device' in parsed_url.keys():
+		device = parsed_url['device']
 
 	results = retrieve_within_filters(
 		parsed_url['device_id'],
@@ -47,6 +49,7 @@ def query(parsed_url):
 		subset,
 		limit,
 		reverse,
+		device,
 	)
 
 	if classify:
@@ -59,7 +62,7 @@ def query(parsed_url):
 		return format_data(header, results, json)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -70,6 +73,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param subset: The size of the subset
 	:param limit: Truncate result to this many rows
 	:param reverse: Return results in reverse order
+	:param device: Device filter
 	:return: Generator of database row tuples
 	"""
 
@@ -98,6 +102,13 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		else:
 			where += " AND type = %s"
 		params.append(data_type)
+		if device == "seadplug":
+			where += " AND device IS NULL"
+		if device == "egauge":
+			where += " AND device IS NOT NULL"
+		elif device:
+			where += " AND device = %s"
+			params.append(device)
 		query = "SELECT time, data FROM " + TABLE + " as raw " + where
 		if subset:
 			query = write_subsample(query, False)
