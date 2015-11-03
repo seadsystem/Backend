@@ -135,7 +135,7 @@ def write_crosstab(where, data = TABLE):
 	query = "SELECT * FROM crosstab(" +\
 				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
 				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
-			"AS ct_result(time TIMESTAMP, I SMALLINT, W SMALLINT, V SMALLINT, T SMALLINT)"
+			"AS ct_result(time TIMESTAMP, I BIGINT, W BIGINT, V BIGINT, T BIGINT)"
 	return query
 
 
