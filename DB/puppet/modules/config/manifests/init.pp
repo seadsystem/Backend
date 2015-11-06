@@ -74,6 +74,10 @@ class config {
     before => Exec['psycopg2'],
   }
 
+  package {['python3-numpy', 'python3-matplotlib']:
+    ensure => present,
+  }
+
   exec {'psycopg2':
     command => 'pip3 install psycopg2',
   }
