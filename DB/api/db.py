@@ -113,7 +113,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			params.append(device)
 		query = "FROM " + TABLE + " as raw " + where
 		prefix = "SELECT time, data "
-		if diff:
+		if device and diff:
 			prefix = prefix + " - lag(data) OVER (ORDER BY time"
 			if reverse:
 				prefix += " ASC"
