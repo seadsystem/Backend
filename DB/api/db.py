@@ -4,8 +4,8 @@ import Analysis_3 as A
 
 # Database user credentials
 DATABASE = "seads"
-USER     = "seadapi"
-TABLE    = "data_raw"
+USER = "seadapi"
+TABLE = "data_raw"
 
 
 def query(parsed_url):
@@ -17,10 +17,11 @@ def query(parsed_url):
 	"""
 	if 'device_id' not in parsed_url.keys():
 		raise Exception("Received malformed URL data")
+	device_id = parsed_url['device_id']
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = device = None
-	json = reverse = classify = False
+	diff = json = reverse = classify = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -40,9 +41,11 @@ def query(parsed_url):
 		classify = parsed_url['classify']
 	if 'device' in parsed_url.keys():
 		device = parsed_url['device']
+	if 'diff' in parsed_url.keys():
+		diff = parsed_url['diff']
 
 	results = retrieve_within_filters(
-		parsed_url['device_id'],
+		device_id,
 		start_time,
 		end_time,
 		data_type,
@@ -50,10 +53,11 @@ def query(parsed_url):
 		limit,
 		reverse,
 		device,
+		diff,
 	)
 
 	if classify:
-		if serial and start_time and end_time:
+		if device_id and start_time and end_time:
 			classification = A.run(results)
 			return classification
 		else:
@@ -62,7 +66,7 @@ def query(parsed_url):
 		return format_data(header, results, json)
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -74,6 +78,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param limit: Truncate result to this many rows
 	:param reverse: Return results in reverse order
 	:param device: Device filter
+	:param diff: Give the differences between rows instead of the actual rows themselves
 	:return: Generator of database row tuples
 	"""
 
@@ -97,22 +102,27 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		where += " AND time <= to_timestamp(%s)"
 		params.append(end_time)
 	if data_type:
-		if where:
-			where += " AND type = %s"
-		else:
-			where += " AND type = %s"
+		where += " AND type = %s"
 		params.append(data_type)
 		if device == "seadplug":
 			where += " AND device IS NULL"
-		if device == "egauge":
+		elif device == "egauge":
 			where += " AND device IS NOT NULL"
 		elif device:
 			where += " AND device = %s"
 			params.append(device)
-		query = "SELECT time, data FROM " + TABLE + " as raw " + where
+		query = "FROM " + TABLE + " as raw " + where
+		prefix = "SELECT time, data "
+		if diff:
+			prefix = prefix + " - lag(data) OVER (ORDER BY time"
+			if reverse:
+				prefix += " ASC"
+			else:
+				prefix += " DESC"
+			prefix = prefix + ") as diff "
+		query = prefix + query
 		if subset:
 			query = write_subsample(query, False)
-
 	else:
 		# If no data type is set we return all data types
 		query = write_crosstab(where, TABLE)

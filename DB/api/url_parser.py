@@ -18,8 +18,10 @@ def parse(url):
 		'end_time': None,
 		'subset': None,
 		"limit": None,
-		"json": None,
-		"reverse": None,
+		"json": False,
+		"reverse": False,
+		"device": None,
+		"diff": False,
 		}
 
 	''' Extract device_id from URL '''
@@ -34,8 +36,10 @@ def parse(url):
 			query_options[param] = int(params[param][0])
 	if 'type' in params.keys():  # Set character parameter
 		query_options['type'] = params['type'][0]
+	if 'device' in params.keys():  # Set string parameter
+		query_options['device'] = params['device'][0]
 	# Set boolean parameters
-	for param in ['json', 'reverse', 'classify']:
+	for param in ['json', 'reverse', 'classify', 'diff']:
 		if param in params.keys():
 			query_options[param] = True
 
