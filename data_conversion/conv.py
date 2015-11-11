@@ -16,7 +16,7 @@
 #
 # To get data from server in this format use a command like:
 #
-# \copy data_raw TO '~/data_raw_dump_2014-10-28.csv' DELIMITER ',' CSV HEADER;
+# \copy data_raw TO '~/my-data.csv' DELIMITER ',' CSV HEADER;
 
 import csv, sys
 from decimal import *
