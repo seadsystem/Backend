@@ -1,2 +1,5 @@
+.gitignroe
+*~
+.vagrant
 .DS_Store
 *.out
