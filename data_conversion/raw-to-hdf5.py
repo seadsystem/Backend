@@ -1,24 +1,27 @@
+# DEPENDS ON:
+#   pandas
+#   sqlalchemy
+#   numpy?
+#   pytables
 import sys
-import psycopg2
-import psycopg2.extras
 import pandas
 from pandas.io import sql
+from sqlalchemy import create_engine
+from contextlib import closing
 
-DATABASE = "seads"
-# use api user or ask ian to make new user for converter?
+
+DATABASE = "jesse"
 USER = "jesse"
-TABLENAME = "data_raw"
+TABLE = "data_raw100k"
 
 # try connecting to the db
-def connect_to_db(database, user):
-    try:
-        return db_connection = psycopg2.connect("dbname='" + database +
-                                                "' user='" + user + "'")
-    finally:
-        if db_connection:
-            db_conenction.close()
+def make_engine(database, user, host='localhost', port='5432'):
+        url = ('postgresql://' + user + '@' + host + ':' + port + '/'
+            + database)
+        return create_engine(url)
 
+if __name__ == '__main__':
+    engine = make_engine(DATABASE, USER)
+    # generate dataframe from connection
+    dataframe = pandas.read_sql_table(TABLE, engine)
 
-connection = connect_to_db(DATABASE, USER)
-# generate dataframe from connection
-dataframe = pandas.read_sql_table()
