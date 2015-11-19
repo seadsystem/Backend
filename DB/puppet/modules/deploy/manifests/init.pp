@@ -11,6 +11,11 @@ CREATE TABLE data_raw (
   time TIMESTAMP NOT NULL
 );
 
+CREATE INDEX ON data_raw using hash(device);
+CREATE INDEX ON data_raw using hash(serial);
+CREATE INDEX ON data_raw using hash(type);
+CREATE INDEX ON data_raw(time);
+
 CREATE TABLE classifications (
   Serial BIGINT NOT NULL,
   StartTime TIMESTAMP NOT NULL,
