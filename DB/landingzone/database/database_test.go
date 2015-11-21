@@ -131,10 +131,7 @@ func TestInsertCloseErr(t *testing.T) {
 	mock.ExpectRollback()
 
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want.Error() {
-		// TODO: Figure out why this test doesn't work.
-		// Disabled until issue is fixed:
-		// https://github.com/DATA-DOG/go-sqlmock/issues/25
-		//t.Errorf("got db.Insert() = %v, want = %v", err, want)
+		t.Errorf("got db.Insert() = %v, want = %v", err, want)
 	}
 }
 
