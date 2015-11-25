@@ -15,13 +15,15 @@ def query(parsed_url):
 	:param parsed_url: Array of url parameters
 	:return: Generator of result strings
 	"""
+
 	if 'device_id' not in parsed_url.keys():
 		raise Exception("Received malformed URL data")
+
 	device_id = parsed_url['device_id']
 
 	header = ['time', 'I', 'W', 'V', 'T']
-	start_time = end_time = data_type = subset = limit = device = None
-	diff = json = reverse = classify = False
+	start_time = end_time = data_type = subset = limit = device = granularity = None
+	diff = json = reverse = classify = energy_list = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -43,27 +45,31 @@ def query(parsed_url):
 		device = parsed_url['device']
 	if 'diff' in parsed_url.keys():
 		diff = parsed_url['diff']
-	if parsed_url['granularity']:
+	if 'granularity' in parsed_url.keys():
 		granularity = parsed_url['granularity']
+	if 'energy_list' in parsed_url.keys():
+		energy_list = parsed_url['energy_list']
 
 	if parsed_url['total_energy']:
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
-	if parsed_url['energy_list']:
-		results = generate_energy_list(device_id, start_time, end_time, device, granularity)
-		return results
-	else:
-		results = retrieve_within_filters(
-			device_id,
-			start_time,
-			end_time,
-			data_type,
-			subset,
-			limit,
-			reverse,
-			device,
-			diff,
-		)
+
+	results = retrieve_within_filters(
+		device_id,
+		start_time,
+		end_time,
+		data_type,
+		subset,
+		limit,
+		reverse,
+		device,
+		diff,
+		granularity,
+		energy_list
+	)
+
+	if energy_list:
+		return format_energy_list(results)
 
 	if classify:
 		if device_id and start_time and end_time:
@@ -87,69 +93,28 @@ def generate_total_energy(device_id, start_time, end_time, channel):
 	"""
 
 	# Initialize parameter list and WHERE clause
-	params = [device_id]
-	query = "SELECT CAST(data as DECIMAL) / 36e5 FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
+	start_params = [device_id]
+	start_query = "SELECT data FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
+	end_params = [device_id]
+	end_query = "SELECT data FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
 
-	# Generate WHERE clause
-	if start_time and end_time and channel:
-		query += " AND device = %s AND (time = to_timestamp(%s) OR time = to_timestamp(%s));"
-		params.append(channel)
-		params.append(start_time)
-		params.append(end_time)
-		rows = perform_query(query, tuple(params))
-	else:
-		raise Exception("start_time, end_time, or device not provided")
+	# Generate WHERE clauses and execute queries
+	start_query += " AND device = %s AND time >= to_timestamp(%s) ORDER BY time DESC LIMIT 1;"
+	start_params.append(channel)
+	start_params.append(start_time)
+	start_row = perform_query(start_query, tuple(start_params))
+	end_query += " AND device = %s AND time <= to_timestamp(%s) ORDER BY time ASC LIMIT 1;"
+	end_params.append(channel)
+	end_params.append(end_time)
+	end_row = perform_query(end_query, tuple(end_params))
 
-	if len(rows) > 1:
-		total_energy = abs(abs(rows[0][0]) - abs(rows[1][0]))
-	else:
-		raise Exception("No power data for the timestamps specified")
+	# Calculate total energy
+	total_energy = (abs(start_row[0][0]) - abs(end_row[0][0])) / 36e6
 
-	result = '{ total_energy: ' + str(total_energy) + '}'
-	return result
-
-
-def generate_energy_list(device_id, start_time, end_time, channel, granularity):
-	"""Returns energy for a particular "channel" (device in table data_raw),
-	over a specified time period, split into time chucks specified by granularity
-
-	:param device_id: The serial number of the device in question
-	:param start_time: The start of the time range for which to query for data
-	:param end_time: The end of the time range for which to query for data
-	:param channel: channel filter
-	:param granularity: interval for list of values in minutes
-	"""
-
-	# Initialize parameter list and WHERE clause
-	params = [device_id]
-	query = "SELECT time, CAST(lag(data) OVER (ORDER BY time ASC) - data AS DECIMAL)/ 36e5 as delta FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
-
-	freq = granularity * 60
-	# Generate WHERE clause
-	if channel and granularity:
-		query += " AND device = %s AND time IN (to_timestamp(%s)"
-		params.append(channel)
-		params.append(start_time)
-		start_time += freq
-		while start_time <= end_time:
-			query += ", to_timestamp(%s)"
-			params.append(start_time)
-			start_time += freq
-		query += ") ORDER BY time ASC;"
-		rows = perform_query(query, tuple(params))
-	else:
-		raise Exception("granularity or device not provided")
-	result = "{ data: [ \n"
-	for i, row in enumerate(rows):
-		if i > 0 and i < (len(rows) - 1):
-			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
-		else:
-			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
-	result += "]}"
-	return result
+	return '{ total_energy: ' + str(total_energy) + '}'
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff, granularity, energy_list):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -162,6 +127,8 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param reverse: Return results in reverse order
 	:param device: Device filter
 	:param diff: Give the differences between rows instead of the actual rows themselves
+	:param granularity: Used to set the interval of an energy_list query
+	:param energy_list: controls if an energy_list query is preformed
 	:return: Generator of database row tuples
 	"""
 
@@ -184,6 +151,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	elif end_time:
 		where += " AND time <= to_timestamp(%s)"
 		params.append(end_time)
+
 	if data_type:
 		where += " AND type = %s"
 		params.append(data_type)
@@ -196,6 +164,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			params.append(device)
 		query = "FROM " + TABLE + " as raw " + where
 		prefix = "SELECT time, data "
+
 		if device and diff:
 			prefix = prefix + " - lag(data) OVER (ORDER BY time"
 			if reverse:
@@ -204,6 +173,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 				prefix += " DESC"
 			prefix = prefix + ") as diff "
 		query = prefix + query
+
 		if subset:
 			query = write_subsample(query, False)
 	else:
@@ -211,6 +181,12 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		query = write_crosstab(where, TABLE)
 		if subset:
 			query = write_subsample(query, True)
+
+	if energy_list and device:
+		prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) FROM " + TABLE + " "
+		query = prefix + where + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0 and device = %s"
+		params.append(granularity*60)
+		params.append(device)
 
 	# Required for LIMIT, analysis code assumes sorted data
 	query += " ORDER BY time"
@@ -267,6 +243,23 @@ def perform_query(query, params):
 	finally:
 		if con:
 			con.close()
+def format_energy_list(rows):
+	"""
+	Formats result set for energy_list query
+
+	:param results:
+	:return:
+	"""
+
+	result = "{ data: ["
+
+	for i, row in enumerate(rows):
+		if i > 0 and i < (len(rows) - 1):
+			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
+		else:
+			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
+	result += "]}"
+	return result
 
 
 def format_data_row(row):

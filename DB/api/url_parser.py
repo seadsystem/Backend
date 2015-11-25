@@ -38,13 +38,6 @@ def parse(url):
 		query_options['device_id'] = int(total_energy.group('device_id'))
 		query_options['total_energy'] = True
 
-	'''Extract energy_list from URL'''
-	energy_list = re.match('^/(?P<device_id>\d+)/energy_list$', path)
-	if energy_list:
-		print('HEREERE')
-		query_options['device_id'] = int(energy_list.group('device_id'))
-		query_options['energy_list'] = True
-
 	''' Iterate over possible parameters and set query options accordingly '''
 	for param in ['start_time', 'end_time', 'subset', 'limit', 'granularity']:  # Cast integer parameters
 		if param in params.keys():
@@ -54,7 +47,7 @@ def parse(url):
 	if 'device' in params.keys():  # Set string parameter
 		query_options['device'] = params['device'][0]
 	# Set boolean parameters
-	for param in ['json', 'reverse', 'classify', 'diff']:
+	for param in ['json', 'reverse', 'classify', 'diff', 'energy_list']:
 		if param in params.keys():
 			query_options[param] = True
 
@@ -62,4 +55,5 @@ def parse(url):
 	if not query_options['device_id']:
 		raise Exception("Not Found")
 
+	print(query_options)
 	return query_options
