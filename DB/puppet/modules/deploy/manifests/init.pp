@@ -6,9 +6,9 @@ class deploy {
 CREATE TABLE data_raw (
   serial BIGINT NOT NULL,
   type CHAR(1) NOT NULL,
-  device TEXT NULL,
   data BIGINT NOT NULL,
-  time TIMESTAMP NOT NULL
+  time TIMESTAMP NOT NULL,
+  device TEXT NULL
 );
 
 CREATE INDEX ON data_raw using hash(device);
@@ -52,7 +52,7 @@ CREATE TABLE classifications (
   }
 
   exec {'deploy.sh':
-    command   => '/etc/puppet/modules/deploy/files/deploy.sh',
+    command   => '/home/vagrant/Backend/DB/puppet/modules/deploy/files/deploy.sh',
     #cwd       => '/vagrant',
     require   => Exec['create-table'],
   }

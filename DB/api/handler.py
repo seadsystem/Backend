@@ -8,42 +8,39 @@ USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_
 
 class ApiHandler(http.server.SimpleHTTPRequestHandler):
 
-	def __init__(self, req, client_addr,server):
-		http.server.SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
+    def __init__(self, req, client_addr,server):
+        http.server.SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
 
-	def do_GET(self):
-		try:
-			parsed = url_parser.parse(self.path)
-		except Exception as inst:
-			if self.path == '/':
-				self.send_response(200)
-				self.send_header("Content-type", "text/plain")
-				self.end_headers()
-				self.wfile.write(USAGE.encode("utf-8"))
-				self.wfile.flush()
-			else:
-				print(type(inst))
-				print(inst.args)
-				print(inst)
+    def do_GET(self):
+        try:
+            parsed = url_parser.parse(self.path)
+        except Exception as inst:
+            if self.path == '/':
+                self.send_response(200)
+                self.send_header("Content-type", "text/plain")
+                self.end_headers()
+                self.wfile.write(USAGE.encode("utf-8"))
+                self.wfile.flush()
+            else:
+                print(type(inst))
+                print(inst.args)
+                print(inst)
+                self.send_error(404)
+            return
 
-				self.send_error(404)
-			return
+        try:
+            r = db.query(parsed)
+            self.send_response(200)
+            self.send_header("Content-type", "application/json;charset=utf-8")  # Not actually using JSON format. Causes errors in Chrome when it tries to validate
+            self.end_headers()
+            for line in r:
+                self.wfile.write(line.encode("utf-8"))
 
-		try:
-			r = db.query(parsed)
+        except Exception as inst:
+            self.send_error(500)
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            return
+        self.wfile.flush()
 
-			self.send_response(200)
-			self.send_header("Content-type", "application/json;charset=utf-8")  # Not actually using JSON format. Causes errors in Chrome when it tries to validate
-
-			self.end_headers()
-			for line in r:
-				self.wfile.write(line.encode("utf-8"))
-		except Exception as inst:
-			self.send_error(500)
-			print(type(inst))
-			print(inst.args)
-			print(inst)
-
-			return
-
-		self.wfile.flush()

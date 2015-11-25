@@ -1,3 +1,4 @@
+import datetime
 import psycopg2
 import psycopg2.extras
 import Analysis_3 as A
@@ -9,230 +10,318 @@ TABLE = "data_raw"
 
 
 def query(parsed_url):
-	"""
-	Handle parsed URL data and query the database as appropriate
+    """
+    Handle parsed URL data and query the database as appropriate
 
-	:param parsed_url: Array of url parameters
-	:return: Generator of result strings
-	"""
-	if 'device_id' not in parsed_url.keys():
-		raise Exception("Received malformed URL data")
-	device_id = parsed_url['device_id']
+    :param parsed_url: Array of url parameters
+    :return: Generator of result strings
+    """
+    if 'device_id' not in parsed_url.keys():
+        raise Exception("Received malformed URL data")
+    device_id = parsed_url['device_id']
 
-	header = ['time', 'I', 'W', 'V', 'T']
-	start_time = end_time = data_type = subset = limit = device = None
-	diff = json = reverse = classify = False
-	if 'type' in parsed_url.keys():
-		data_type = parsed_url['type']
-		header = ['time', parsed_url['type']]
-	if 'start_time' in parsed_url.keys():
-		start_time = parsed_url['start_time']
-	if 'end_time' in parsed_url.keys():
-		end_time = parsed_url['end_time']
-	if 'subset' in parsed_url.keys():
-		subset = parsed_url['subset']
-	if 'limit' in parsed_url.keys():
-		limit = parsed_url['limit']
-	if 'json' in parsed_url.keys():
-		json = parsed_url['json']
-	if 'reverse' in parsed_url.keys():
-		reverse = parsed_url['reverse']
-	if 'classify' in parsed_url.keys():
-		classify = parsed_url['classify']
-	if 'device' in parsed_url.keys():
-		device = parsed_url['device']
-	if 'diff' in parsed_url.keys():
-		diff = parsed_url['diff']
+    header = ['time', 'I', 'W', 'V', 'T']
+    start_time = end_time = data_type = subset = limit = device = None
+    diff = json = reverse = classify = False
+    if 'type' in parsed_url.keys():
+        data_type = parsed_url['type']
+        header = ['time', parsed_url['type']]
+    if 'start_time' in parsed_url.keys():
+        start_time = parsed_url['start_time']
+    if 'end_time' in parsed_url.keys():
+        end_time = parsed_url['end_time']
+    if 'subset' in parsed_url.keys():
+        subset = parsed_url['subset']
+    if 'limit' in parsed_url.keys():
+        limit = parsed_url['limit']
+    if 'json' in parsed_url.keys():
+        json = parsed_url['json']
+    if 'reverse' in parsed_url.keys():
+        reverse = parsed_url['reverse']
+    if 'classify' in parsed_url.keys():
+        classify = parsed_url['classify']
+    if 'device' in parsed_url.keys():
+        device = parsed_url['device']
+    if 'diff' in parsed_url.keys():
+        diff = parsed_url['diff']
+    if parsed_url['granularity']:
+        granularity = parsed_url['granularity']
 
-	results = retrieve_within_filters(
-		device_id,
-		start_time,
-		end_time,
-		data_type,
-		subset,
-		limit,
-		reverse,
-		device,
-		diff,
-	)
+    if parsed_url['total_energy']:
+        results = generate_total_energy(device_id, start_time, end_time, device)
+        return results
+    if parsed_url['energy_list']:
+        results = generate_energy_list(device_id, start_time, end_time, device, granularity)
+        return results
+    else:
+        results = retrieve_within_filters(
+            device_id,
+            start_time,
+            end_time,
+            data_type,
+            subset,
+            limit,
+            reverse,
+            device,
+            diff,
+        )
+    if classify:
+        if device_id and start_time and end_time:
+            classification = A.run(results)
+            return classification
+        else:
+            raise Exception("Received malformed URL data")
+    else:
+        return format_data(header, results, json)
 
-	if classify:
-		if device_id and start_time and end_time:
-			classification = A.run(results)
-			return classification
-		else:
-			raise Exception("Received malformed URL data")
-	else:
-		return format_data(header, results, json)
+
+def generate_total_energy(device_id, start_time, end_time, channel):
+    """
+    Returns total energy for a particular "channel" (device in table data_raw),
+    over a specified time period
+
+    :param device_id: The serial number of the device in question
+    :param start_time: The start of the time range for which to query for data
+    :param end_time: The end of the time range for which to query for data
+    :param channel: channel filter
+    """
+
+    # Initialize parameter list and WHERE clause
+    params = [device_id]
+    query = "SELECT CAST(data as DECIMAL) / 36e5 FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
+
+
+    # Generate WHERE clause
+    if start_time and end_time and channel:
+        query += " AND device = %s AND (time = to_timestamp(%s) OR time = to_timestamp(%s));"
+        params.append(channel)
+        params.append(start_time)
+        params.append(end_time)
+        rows = perform_query(query, tuple(params))
+    else:
+        raise Exception("start_time, end_time, or device not provided")
+
+    if len(rows) > 1:
+        total_energy = abs(abs(rows[0][0]) - abs(rows[1][0]))
+    else:
+        raise Exception("No power data for the timestamps specified")
+
+    result = '{ total_energy: ' + str(total_energy) + '}'
+    return result
+
+
+def generate_energy_list(device_id, start_time, end_time, channel, granularity):
+    """
+    Returns energy for a particular "channel" (device in table data_raw),
+    over a specified time period, split into time chucks specified by granularity
+
+    :param device_id: The serial number of the device in question
+    :param start_time: The start of the time range for which to query for data
+    :param end_time: The end of the time range for which to query for data
+    :param channel: channel filter
+    :param granularity: interval for list of values in minutes
+    """
+    # Initialize parameter list and WHERE clause
+    params = [device_id]
+    query = "SELECT time, CAST(lag(data) OVER (ORDER BY time ASC) - data AS DECIMAL)/ 36e5 as delta FROM " + TABLE + " as raw WHERE serial = %s AND type = 'P'"
+
+    freq = int(granularity) * 60
+    #one_granularity_before = start_date_time - datetime.timedelta(minutes=int(granularity))
+
+    # Generate WHERE clause
+    if channel and granularity:
+        query += " AND device = %s AND time IN (to_timestamp(%s)"
+        params.append(channel)
+        params.append(start_time)
+        start_time += freq
+        while start_time <= end_time:
+            query += ", to_timestamp(%s)"
+            params.append(start_time)
+            start_time += freq
+        query += ") ORDER BY time ASC;"
+        rows = perform_query(query, tuple(params))
+    else:
+        raise Exception("granularity or device not provided")
+    result = "{ data: [ \n"
+    for i, row in enumerate(rows):
+        if i > 0 and i < (len(rows) - 1):
+            result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
+        else:
+            result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
+    result += "]}"
+
+    print(result)
+    return result
 
 
 def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff):
-	"""
-	Return sensor data for a device within a specified timeframe
+    """
+    Return sensor data for a device within a specified timeframe
 
-	:param device_id: The serial number of the device in question
-	:param start_time: The start of the time range for which to query for data
-	:param end_time: The end of the time range for which to query for data
-	:param data_type: The type of data to query for
-	:param subset: The size of the subset
-	:param limit: Truncate result to this many rows
-	:param reverse: Return results in reverse order
-	:param device: Device filter
-	:param diff: Give the differences between rows instead of the actual rows themselves
-	:return: Generator of database row tuples
-	"""
+    :param device_id: The serial number of the device in question
+    :param start_time: The start of the time range for which to query for data
+    :param end_time: The end of the time range for which to query for data
+    :param data_type: The type of data to query for
+    :param subset: The size of the subset
+    :param limit: Truncate result to this many rows
+    :param reverse: Return results in reverse order
+    :param device: Device filter
+    :param diff: Give the differences between rows instead of the actual rows themselves
+    :return: Generator of database row tuples
+    """
 
-	# Initialize parameter list and WHERE clause
-	params = [device_id]
-	where = "WHERE serial = %s"
+    # Initialize parameter list and WHERE clause
+    params = [device_id]
+    where = "WHERE serial = %s"
 
-	# Add subset size parameter if set
-	if subset:
-		params.insert(0, float(subset) + 1.0)
+    # Add subset size parameter if set
+    if subset:
+        params.insert(0, float(subset) + 1.0)
 
-	# Generate WHERE clause
-	if start_time and end_time:
-		where += " AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
-		params.append(start_time)
-		params.append(end_time)
-	elif start_time:
-		where += " AND time >= to_timestamp(%s)"
-		params.append(start_time)
-	elif end_time:
-		where += " AND time <= to_timestamp(%s)"
-		params.append(end_time)
-	if data_type:
-		where += " AND type = %s"
-		params.append(data_type)
-		if device == "seadplug":
-			where += " AND device IS NULL"
-		elif device == "egauge":
-			where += " AND device IS NOT NULL"
-		elif device:
-			where += " AND device = %s"
-			params.append(device)
-		query = "FROM " + TABLE + " as raw " + where
-		prefix = "SELECT time, data "
-		if device and diff:
-			prefix = prefix + " - lag(data) OVER (ORDER BY time"
-			if reverse:
-				prefix += " ASC"
-			else:
-				prefix += " DESC"
-			prefix = prefix + ") as diff "
-		query = prefix + query
-		if subset:
-			query = write_subsample(query, False)
-	else:
-		# If no data type is set we return all data types
-		query = write_crosstab(where, TABLE)
-		if subset:
-			query = write_subsample(query, True)
+    # Generate WHERE clause
+    if start_time and end_time:
+        where += " AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
+        params.append(start_time)
+        params.append(end_time)
+    elif start_time:
+        where += " AND time >= to_timestamp(%s)"
+        params.append(start_time)
+    elif end_time:
+        where += " AND time <= to_timestamp(%s)"
+        params.append(end_time)
+    if data_type:
+        where += " AND type = %s"
+        params.append(data_type)
+        if device == "seadplug":
+            where += " AND device IS NULL"
+        elif device == "egauge":
+            where += " AND device IS NOT NULL"
+        elif device:
+            where += " AND device = %s"
+            params.append(device)
+        query = "FROM " + TABLE + " as raw " + where
+        prefix = "SELECT time, data "
+        if device and diff:
+            prefix = prefix + " - lag(data) OVER (ORDER BY time"
+            if reverse:
+                prefix += " ASC"
+            else:
+                prefix += " DESC"
+            prefix = prefix + ") as diff "
+        query = prefix + query
+        if subset:
+            query = write_subsample(query, False)
+    else:
+        # If no data type is set we return all data types
+        query = write_crosstab(where, TABLE)
+        if subset:
+            query = write_subsample(query, True)
 
-	# Required for LIMIT, analysis code assumes sorted data
-	query += " ORDER BY time"
+    # Required for LIMIT, analysis code assumes sorted data
+    query += " ORDER BY time"
 
-	if reverse:
-		query += " ASC"
-	else:
-		query += " DESC"
+    if reverse:
+        query += " ASC"
+    else:
+        query += " DESC"
 
-	if limit:
-		query += " LIMIT %s"
-		params.append(limit)
+    if limit:
+        query += " LIMIT %s"
+        params.append(limit)
 
-	query += ";"
-	rows = perform_query(query, tuple(params))
-	return rows
+    query += ";"
+    rows = perform_query(query, tuple(params))
+    return rows
+
 
 def write_crosstab(where, data = TABLE):
-	"""
-	Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
+    """
+    Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
 
-	:param where: WHERE clause for SQL query
-	:param data: Table or subquery from which to get the data
-	:return: Complete SQL query
-	"""
-	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
-				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
-			"AS ct_result(time TIMESTAMP, I BIGINT, W BIGINT, V BIGINT, T BIGINT)"
-	return query
+    :param where: WHERE clause for SQL query
+    :param data: Table or subquery from which to get the data
+    :return: Complete SQL query
+    """
+    query = "SELECT * FROM crosstab(" +\
+                "'SELECT time, type, data from " + data + " as raw " + where + "'," +\
+                " 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
+            "AS ct_result(time TIMESTAMP, I BIGINT, W BIGINT, V BIGINT, T BIGINT)"
+    return query
 
 
 def perform_query(query, params):
-	"""
-	Initiate a connection to the database and return a cursor to return db rows a dictionaries
+    """
+    Initiate a connection to the database and return a cursor to return db rows a dictionaries
 
-	:param query: SQL query string
-	:param params: List of SQL query parameters
-	:return: Result cursor
-	"""
-	con = None
-	try:
-		con = psycopg2.connect("dbname='" + DATABASE +
-				"' user='" + USER + "'")
-		cursor = con.cursor()
-		print("Query:", query)
-		print("Parameters:", params)
-		cursor.execute(query, params)
-		return cursor.fetchall()
+    :param query: SQL query string
+    :param params: List of SQL query parameters
+    :return: Result cursor
+    """
+    con = None
+    try:
+        con = psycopg2.connect("dbname='" + DATABASE +
+                "' user='" + USER + "'")
+        cursor = con.cursor()
+        print("Query:", query)
+        print("Parameters:", params)
+        cursor.execute(query, params)
+        return cursor.fetchall()
 
-	except psycopg2.DatabaseError as e:
-		print('Database error: %s' % e)
+    except psycopg2.DatabaseError as e:
+        print('Database error: %s' % e)
 
-	finally:
-		if con:
-			con.close()
+    finally:
+        if con:
+            con.close()
 
 
 def format_data_row(row):
-	"""
-	Formats result row into result row string
-	:param row: Result row
-	:return: Result row string
-	"""
-	return '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
+    """
+    Formats result row into result row string
+    :param row: Result row
+    :return: Result row string
+    """
+    return '[' + ", ".join(map(lambda x: '"' + str(x) + '"', row)) + ']'
 
 
 def format_data(header, data, json=False):
-	"""
-	Process rows of data returned by the db and format them appropriately
+    """
+    Process rows of data returned by the db and format them appropriately
 
-	:param header: The first row of the result
-	:param data: Result cursor
-	:param json: Whether or not to use JSON format.
-	:return: Generator of result strings
-	"""
-	if json:
-		yield '{\n"data": '
-	yield "[\n" + format_data_row(header)  # No comma before header
-	for row in data:
-		yield ',\n' + format_data_row(row)
-	yield "\n]\n"
-	if json:
-		yield "}\n"
+    :param header: The first row of the result
+    :param data: Result cursor
+    :param json: Whether or not to use JSON format.
+    :return: Generator of result strings
+    """
+    if json:
+        yield '{\n"data": '
+    yield "[\n" + format_data_row(header)  # No comma before header
+    for row in data:
+        yield ',\n' + format_data_row(row)
+    yield "\n]\n"
+    if json:
+        yield "}\n"
 
 
 def write_subsample(query, crosstab=False):
-	"""
-	Adds subsampling to a query. This should be the absolute last step in query building. This function call should be immediately proceeded with params.insert(0, subset).
+    """
+    Adds subsampling to a query. This should be the absolute last step in query building. This function call should be immediately proceeded with params.insert(0, subset).
 
-	:param query: The exiting query to subsample
-	:param crosstab: Whether or not the query is a crosstab
-	:return: Query with subsampling enabled.
-	"""
-	new_query = "SELECT "
-	if crosstab:
-		new_query += "time, I, W, V, T"  # SELECT all data type columns
-	else:
-		new_query += "time, data"  # Single data type query
-	new_query += ''' FROM (
-	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		%% ceil(count(*) OVER () / %s)::int) AS rn
-	FROM ('''
-	new_query += query
-	new_query += ''') AS subquery
-	) sub
+    :param query: The exiting query to subsample
+    :param crosstab: Whether or not the query is a crosstab
+    :return: Query with subsampling enabled.
+    """
+    new_query = "SELECT "
+    if crosstab:
+        new_query += "time, I, W, V, T"  # SELECT all data type columns
+    else:
+        new_query += "time, data"  # Single data type query
+    new_query += ''' FROM (
+    SELECT *, ((row_number() OVER (ORDER BY "time"))
+        %% ceil(count(*) OVER () / %s)::int) AS rn
+    FROM ('''
+    new_query += query
+    new_query += ''') AS subquery
+    ) sub
 WHERE sub.rn = 0'''
-	return new_query
+    return new_query
