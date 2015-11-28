@@ -6,7 +6,7 @@ import threading
 
 import handler
 
-PORT = 8040
+PORT = 8080
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 	''' Handle requests in a separate thread '''
