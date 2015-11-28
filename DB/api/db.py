@@ -68,6 +68,7 @@ def query(parsed_url):
 		energy_list
 	)
 
+	# TODO: make this a generic formatting option
 	if energy_list:
 		return format_energy_list(results)
 
@@ -182,6 +183,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		if subset:
 			query = write_subsample(query, True)
 
+	# TODO: add this to the diff logic
 	if energy_list and device:
 		prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) FROM " + TABLE + " "
 		query = prefix + where + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0 and device = %s"
@@ -203,6 +205,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	query += ";"
 	rows = perform_query(query, tuple(params))
 	return rows
+
 
 def write_crosstab(where, data = TABLE):
 	"""
@@ -243,6 +246,8 @@ def perform_query(query, params):
 	finally:
 		if con:
 			con.close()
+
+
 def format_energy_list(rows):
 	"""
 	Formats result set for energy_list query
@@ -251,15 +256,14 @@ def format_energy_list(rows):
 	:return:
 	"""
 
-	result = "{ data: ["
+	yield "{ data: ["
 
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
-			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
-		else:
-			result += "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
-	result += "]}"
-	return result
+			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
+		elif i < (len(rows) - 1):
+			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
+	yield "]}"
 
 
 def format_data_row(row):

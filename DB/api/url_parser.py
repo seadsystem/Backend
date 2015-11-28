@@ -55,5 +55,4 @@ def parse(url):
 	if not query_options['device_id']:
 		raise Exception("Not Found")
 
-	print(query_options)
 	return query_options
