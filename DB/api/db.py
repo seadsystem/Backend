@@ -177,18 +177,19 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
 		if subset:
 			query = write_subsample(query, False)
+	# TODO: add this to the diff logic
+	elif energy_list and device:
+		prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) FROM " + TABLE + " "
+		query = prefix + where + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0 and device = %s"
+		params.append(granularity*60)
+		params.append(device)
 	else:
 		# If no data type is set we return all data types
 		query = write_crosstab(where, TABLE)
 		if subset:
 			query = write_subsample(query, True)
 
-	# TODO: add this to the diff logic
-	if energy_list and device:
-		prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) FROM " + TABLE + " "
-		query = prefix + where + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0 and device = %s"
-		params.append(granularity*60)
-		params.append(device)
+
 
 	# Required for LIMIT, analysis code assumes sorted data
 	query += " ORDER BY time"
@@ -261,7 +262,7 @@ def format_energy_list(rows):
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
 			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
-		elif i < (len(rows) - 1):
+		elif i > (len(rows) - 1):
 			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
 	yield "]}"
 
