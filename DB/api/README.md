@@ -13,8 +13,8 @@ Filters can be applied using the following GET parameters:
   - **json:** Format result as JSON
   - **reverse:** Return the result in reverse order
   - **diff** Retrieve values as delta data
-  - **energy_list** Returns a list of energy usage or consumption values, and timestamp pairs, up to a granularity of 1 min. Requires start_time, end_time, device, and granularity.
-  - **granularity** Used to dictate the granularity or length of time interval between values in the energy list
+  - **list_format** formats the result as a json list of {timestamp: < time >,  < list_format >: < data > } pairs 
+  - **granularity** Used to dictate the granularity or length of time interval between values in an energy query, requires list_format=energy and type=P and device to be a device with a power type
 
 Example API calls with parameters:
 
