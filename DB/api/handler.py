@@ -3,8 +3,8 @@ import http.server
 import url_parser
 import db
 
-USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)]\n" \
-		", [end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
+USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \
+		"[end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
 		"egauge or channel name for eGauge), granularity=(interval between data points in seconds of an energy list\n" \
 		"query, must also include list_format=energy and type=P), diff=(1 get the data differences instead of the data)]]],\n" \
 		" [subset=(subsample result down to this many rows)], [list_format=(string representing what the json list entries\n" \
