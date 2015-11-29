@@ -23,7 +23,7 @@ def query(parsed_url):
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = device = granularity = None
-	diff = json = reverse = classify = energy_list = False
+	diff = json = reverse = classify = list_format = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -47,10 +47,10 @@ def query(parsed_url):
 		diff = parsed_url['diff']
 	if 'granularity' in parsed_url.keys():
 		granularity = parsed_url['granularity']
-	if 'energy_list' in parsed_url.keys():
-		energy_list = parsed_url['energy_list']
+	if 'list_format' in parsed_url.keys():
+		list_format = parsed_url['list_format']
 
-	if parsed_url['total_energy']:
+	if 'total_energy' in parsed_url.keys():
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
 
@@ -65,12 +65,11 @@ def query(parsed_url):
 		device,
 		diff,
 		granularity,
-		energy_list
+		list_format
 	)
 
-	# TODO: make this a generic formatting option
-	if energy_list:
-		return format_energy_list(results)
+	if list_format:
+		return format_list(results, list_format)
 
 	if classify:
 		if device_id and start_time and end_time:
@@ -115,7 +114,7 @@ def generate_total_energy(device_id, start_time, end_time, channel):
 	return '{ total_energy: ' + str(total_energy) + '}'
 
 
-def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff, granularity, energy_list):
+def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, limit, reverse, device, diff, granularity, list_format):
 	"""
 	Return sensor data for a device within a specified timeframe
 
@@ -173,16 +172,16 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			else:
 				prefix += " DESC"
 			prefix = prefix + ") as diff "
-		query = prefix + query
 
+		# TODO: add this to the diff logic
+		if device and list_format and granularity:
+			prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) "
+			query = query + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0"
+			params.append(granularity*60)
+
+		query = prefix + query
 		if subset:
 			query = write_subsample(query, False)
-	# TODO: add this to the diff logic
-	elif energy_list and device:
-		prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) FROM " + TABLE + " "
-		query = prefix + where + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0 and device = %s"
-		params.append(granularity*60)
-		params.append(device)
 	else:
 		# If no data type is set we return all data types
 		query = write_crosstab(where, TABLE)
@@ -249,7 +248,7 @@ def perform_query(query, params):
 			con.close()
 
 
-def format_energy_list(rows):
+def format_list(rows, name):
 	"""
 	Formats result set for energy_list query
 
@@ -261,9 +260,9 @@ def format_energy_list(rows):
 
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " },"
-		elif i > (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + ", energy: " + str(row[1]) + " }"
+			yield "{ time: " + str(row[0]) + ", " + name + ": " + str(row[1]) + " },"
+		elif i == (len(rows) - 1):
+			yield "{ time: " + str(row[0]) + "," + name + ": " + str(row[1]) + " }"
 	yield "]}"
 
 

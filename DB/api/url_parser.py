@@ -23,7 +23,7 @@ def parse(url):
 		"device": None,
 		"diff": False,
 		"total_energy": False,
-		"energy_list": False,
+		"list_format": None,
 		"granularity": None
 	}
 
@@ -42,12 +42,14 @@ def parse(url):
 	for param in ['start_time', 'end_time', 'subset', 'limit', 'granularity']:  # Cast integer parameters
 		if param in params.keys():
 			query_options[param] = int(params[param][0])
-	if 'type' in params.keys():  # Set character parameter
-		query_options['type'] = params['type'][0]
-	if 'device' in params.keys():  # Set string parameter
-		query_options['device'] = params['device'][0]
+
+	# Set string parameters
+	for param in ['type', 'device', 'list_format']:
+		if param in params.keys():
+			query_options[param] = params[param][0]
+
 	# Set boolean parameters
-	for param in ['json', 'reverse', 'classify', 'diff', 'energy_list']:
+	for param in ['json', 'reverse', 'classify', 'diff']:
 		if param in params.keys():
 			query_options[param] = True
 
