@@ -1,4 +1,5 @@
-.gitignroe
+.gitignore
+*.swp
 *~
 .vagrant
 .DS_Store
