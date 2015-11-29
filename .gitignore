@@ -2,3 +2,5 @@
 *.out
 .idea
 *.iml
+.vagrant
+data_raw.csv
