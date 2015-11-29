@@ -166,18 +166,18 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		prefix = "SELECT time, data "
 
 		if device and diff:
-			prefix = prefix + " - lag(data) OVER (ORDER BY time"
+			prefix += " - lag(data) OVER (ORDER BY time"
 			if reverse:
 				prefix += " ASC"
 			else:
 				prefix += " DESC"
-			prefix = prefix + ") as diff "
+			prefix += ") as diff "
 
 		# TODO: add this to the diff logic
-		if device and list_format and granularity:
+		if device and granularity and data_type == "P" and list_format == "energy":
 			prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) "
-			query = query + " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0"
-			params.append(granularity*60)
+			query += " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0"
+			params.append(granularity)
 
 		query = prefix + query
 		if subset:
