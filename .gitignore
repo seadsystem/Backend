@@ -4,3 +4,7 @@
 .vagrant
 .DS_Store
 *.out
+.idea
+*.iml
+.vagrant
+data_raw.csv

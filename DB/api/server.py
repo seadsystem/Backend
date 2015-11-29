@@ -9,7 +9,7 @@ import handler
 PORT = 8080
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    ''' Handle requests in a separate thread '''
+	''' Handle requests in a separate thread '''
 
 Handler = handler.ApiHandler
 

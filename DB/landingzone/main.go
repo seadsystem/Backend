@@ -40,7 +40,6 @@ func main() {
 	log.Println("Listening for connections...")
 
 	go httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db)
-	go listener(seadPlugHandlers.HandleRequest, constants.RPI_1_PORT, db)
 	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
 }
 

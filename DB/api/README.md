@@ -1,7 +1,8 @@
 # Python API
 
-The Python API is used to query the raw data contained in the database. It listens for HTTP GET requests on port 8080. When a request comes in to the URI “/” it returns a usage message, in Python style. Data can be requested of the API for devices by serial number by using the URI “/serial”. For example, to qeury the API running locally for data from serial 7, you would execute a GET request to 127.0.0.1:8080/7. The official server is db.sead.systems. 
+The Python API is used to query the raw data contained in the database. It listens for HTTP GET requests on port 8080. When a request comes in to the URI “/” it returns a usage message, in Python style. Data can be requested of the API for devices by serial number by using the URI “/< serial >”. For example, to qeury the API running locally for data from serial 7, you would execute a GET request to 127.0.0.1:8080/7. The official server is db.sead.systems.
 
+You can also request data from the API at the URI /< serial >/total_energy . It returns the total energy consumed or generated for a specific device.
 Filters can be applied using the following GET parameters:
 
   - **start_time:** The earliest data point to include in the query. Specified as a UTC Unix timestamp.
@@ -11,6 +12,9 @@ Filters can be applied using the following GET parameters:
   - **limit:** Retrieve only the first x rows
   - **json:** Format result as JSON
   - **reverse:** Return the result in reverse order
+  - **diff** Retrieve values as delta data
+  - **list_format** formats the result as a json list of {timestamp: < time >,  < list_format >: < data > } pairs 
+  - **granularity** Used to dictate the granularity or length of time interval between values in an energy query, requires list_format=energy and type=P and device to be a device with a power type
 
 Example API calls with parameters:
 
