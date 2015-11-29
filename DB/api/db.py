@@ -50,7 +50,7 @@ def query(parsed_url):
 	if 'list_format' in parsed_url.keys():
 		list_format = parsed_url['list_format']
 
-	if 'total_energy' in parsed_url.keys():
+	if parsed_url['total_energy']:
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
 
