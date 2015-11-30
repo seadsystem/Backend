@@ -20,6 +20,7 @@ def detect(time_series, threshold):
 	t5 = time_series[5]
 	t6 = time_series[6]
 
+
 	prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
 	curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
 
