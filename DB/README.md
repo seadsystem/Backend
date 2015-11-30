@@ -26,4 +26,14 @@ Database Team's repo
    after boot
  * See the Vagrant docs for more information on using the
    cli: https://docs.vagrantup.com/v2/cli/index.html
-   
+
+## Deplopying to a Server
+ * On a clean Ubuntu Server 14.04 x64 install, run:
+```sh
+sudo apt-get update && sudo apt-get dist-upgrade && sudo apt-get install git puppet
+git clone https://github.com/seadsystem/Backend.git
+cd Backend/DB
+sudo puppet apply --modulepath=puppet/modules puppet/manifests/site.pp
+./deploy.sh
+```
+ * Optionally, install the latest version of Go with [godeb](http://blog.labix.org/2013/06/15/in-flight-deb-packages-of-go).
