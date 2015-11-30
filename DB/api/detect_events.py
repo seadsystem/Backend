@@ -39,3 +39,4 @@ def detect(time_series, threshold):
 		curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
 
 	return event_list
+	
