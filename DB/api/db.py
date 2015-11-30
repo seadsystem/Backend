@@ -128,7 +128,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param device: Device filter
 	:param diff: Give the differences between rows instead of the actual rows themselves
 	:param granularity: Used to set the interval of an energy_list query
-	:param energy_list: controls if an energy_list query is preformed
+	:param list_format: controls if an energy_list query is preformed
 	:return: Generator of database row tuples
 	"""
 
@@ -256,14 +256,14 @@ def format_list(rows, name):
 	:return:
 	"""
 
-	yield "{ data: ["
+	yield '{ "data": ['
 
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + ", " + name + ": " + str(row[1]) + " },"
+			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" },'
 		elif i == (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + "," + name + ": " + str(row[1]) + " }"
-	yield "]}"
+			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" }'
+	yield ']}'
 
 
 def format_data_row(row):

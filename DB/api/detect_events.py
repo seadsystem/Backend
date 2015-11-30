@@ -12,10 +12,10 @@ def detect(time_series):
     #tx:           iteration counter
     #center:       contains location of center of scope (relative to head)
 
-    avrgCurrent  = []
+    avrgCurrent = []
     deltaCurrent = []
-    eventList    = []
-    times        = []
+    eventList = []
+    times = []
     avrg   = 0
     delta  = 0
     event  = 0
