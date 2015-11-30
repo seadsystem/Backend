@@ -256,14 +256,14 @@ def format_list(rows, name):
 	:return:
 	"""
 
-	yield "{ data: ["
+	yield '{ "data": ['
 
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + ", " + name + ": " + str(row[1]) + " },"
+			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" },'
 		elif i == (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + "," + name + ": " + str(row[1]) + " }"
-	yield "]}"
+			yield '{ "time": "' + str(row[0]) + '" ,"' + name + '": "' + str(row[1]) + '" }'
+	yield ']}'
 
 
 def format_data_row(row):
