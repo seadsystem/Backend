@@ -12,23 +12,25 @@ def detect(time_series, threshold):
 		raise Exception("Threshold cannot be 0, try another value.")
 
 	def convert_to_float(data_point):
-		data_point[1] = float(data_point[1])
+		data = list(data_point)
+		data[1] = float(data[1])
+		return data
 
-	response_list = list(map(time_series[1:], convert_to_float))
+	response_list = list(map(convert_to_float, time_series[1:]))
 
 	event_list = []
 
-	t1 = response_list[1]
-	t2 = response_list[2]
-	t3 = response_list[3]
-	t4 = response_list[4]
-	t5 = response_list[5]
-	t6 = response_list[6]
+	t1 = response_list[0]
+	t2 = response_list[1]
+	t3 = response_list[2]
+	t4 = response_list[3]
+	t5 = response_list[4]
+	t6 = response_list[5]
 
 	prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
 	curr_avg = (t2[1] + t3[1] + t4[1] + t5[1] + t6[1]) / 5
 
-	for i, data in enumerate(response_list[7:], start=7):
+	for i, data in enumerate(response_list[7:], start=6):
 
 		if (curr_avg / prev_avg) > threshold:
 			event_list.append(tuple([t4[0], "rising"]))
