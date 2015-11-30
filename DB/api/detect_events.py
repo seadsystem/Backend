@@ -1,6 +1,7 @@
 def detect(time_series, threshold):
 	"""
-	take in a series of time and power readings and return a list of events
+	Detects a list of events events in a result set returned from the db. An event is defined
+	as a increase or descrease in power that is above some threshold.
 
 	:param time_series: a generator created by the retrieve_within_filters function
 						contains dates and power readings
@@ -19,7 +20,7 @@ def detect(time_series, threshold):
 	t5 = time_series[5]
 	t6 = time_series[6]
 
-	prev_avg = (float(t1[1]) + float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1])) / 5
+	prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
 	curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
 
 	for i, data in enumerate(time_series[7:], start=7):
