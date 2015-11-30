@@ -15,7 +15,7 @@ Filters can be applied using the following GET parameters:
   - **diff** Retrieve values as delta data
   - **list_format** formats the result as a json list of {timestamp: < time >,  < list_format >: < data > } pairs 
   - **granularity** Used to dictate the granularity or length of time interval between values in an energy query, requires list_format=energy and type=P and device to be a device with a power type
-
+  - **events** Used as the threshold for event detection. Must also include diff=1, type=P, list_format=event, and device. 
 Example API calls with parameters:
 
   - http://db.sead.systems:8080/000002?type=T  
