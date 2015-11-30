@@ -1,10 +1,14 @@
 def detect(time_series):
+
     """
     take in a series of time and power readings and return a list of events
 
     :param time_series: a generator created by the retrieve_within_filters function
                         contains dates and power readings
+
+    :return eventList: a python matrix containing a list of times for detected events
     """
+
     #avrgCurrent:  array containing moving avrg values
     #deltaCurrent: array containing delta values (from moving average)
     #eventList:    array to be passed back, list of detected events
@@ -44,7 +48,7 @@ def detect(time_series):
         tx = tx + 1
         center = center + 1
         times.append(value[0])
-    
+
     #reset itor
     tx = 0
     center = -2
@@ -54,16 +58,16 @@ def detect(time_series):
 
         #calculate delta once buffer is loaded
         if (tx >= 5):
-            delta = ((t1+t2+t3+t4+t5)/5) - t3
- 
+            delta = value - t3
+
             if (delta > .001):
                 event = [times[center], delta]
                 eventList.append(event)
 
             elif (delta < -.001):
                 event = [times[center], delta]
-                eventList.append(turnon)
-               
+                eventList.append(event)
+
         t5 = t4
         t4 = t3
         t3 = t2
