@@ -11,20 +11,24 @@ def detect(time_series, threshold):
 	if threshold == 0:
 		raise Exception("Threshold cannot be 0, try another value.")
 
+	def convert_to_float(data_point):
+		data_point[1] = float(data_point[1])
+
+	response_list = list(map(time_series[1:], convert_to_float))
+
 	event_list = []
 
-	t1 = time_series[1]
-	t2 = time_series[2]
-	t3 = time_series[3]
-	t4 = time_series[4]
-	t5 = time_series[5]
-	t6 = time_series[6]
-
+	t1 = response_list[1]
+	t2 = response_list[2]
+	t3 = response_list[3]
+	t4 = response_list[4]
+	t5 = response_list[5]
+	t6 = response_list[6]
 
 	prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
-	curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
+	curr_avg = (t2[1] + t3[1] + t4[1] + t5[1] + t6[1]) / 5
 
-	for i, data in enumerate(time_series[7:], start=7):
+	for i, data in enumerate(response_list[7:], start=7):
 
 		if (curr_avg / prev_avg) > threshold:
 			event_list.append(tuple([t4[0], "rising"]))
@@ -36,9 +40,9 @@ def detect(time_series, threshold):
 		t3 = t4
 		t4 = t5
 		t5 = t6
-		t6 = time_series[i]
-		prev_avg = (float(t1[1]) + float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1])) / 5
-		curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
+		t6 = response_list[i]
+		prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
+		curr_avg = (t2[1] + t3[1] + t4[1] + t5[1] + t6[1]) / 5
 
 	return event_list
-	
+
