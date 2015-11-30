@@ -25,16 +25,18 @@ def detect(time_series, threshold):
 	prev_avg = (float(t1[1]) + float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1])) / 5
 	curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
 
-	print(time_series[7:8])
-
-	for i, data in enumerate(time_series[7:]):
+	for i, data in enumerate(time_series[7:], start=7):
 
 		if (curr_avg / prev_avg) > threshold:
 			event_list.append(tuple([t4[0], "rising"]))
 		if (curr_avg / prev_avg) < (1 / threshold):
 			event_list.append(tuple([t4[0], "falling"]))
 
-		t1, t2, t3, t4, t5 = t2, t3, t4, t5, t6
+		t1 = t2
+		t2 = t3
+		t3 = t4
+		t4 = t5
+		t5 = t6
 		t6 = time_series[i]
 		prev_avg = (float(t1[1]) + float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1])) / 5
 		curr_avg = (float(t2[1]) + float(t3[1]) + float(t4[1]) + float(t5[1]) + float(t6[1])) / 5
