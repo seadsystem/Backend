@@ -272,7 +272,7 @@ def format_list(rows, name):
 		if i > 0 and i < (len(rows) - 1):
 			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" },'
 		elif i == (len(rows) - 1):
-			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" }'
+			yield '{ "time": "' + str(row[0]) + '" ,"' + name + '": "' + str(row[1]) + '" }'
 	yield ']}'
 
 
