@@ -24,7 +24,8 @@ def parse(url):
 		"diff": False,
 		"total_energy": False,
 		"list_format": None,
-		"granularity": None
+		"granularity": None,
+		"events": False
 	}
 
 	''' Extract device_id from URL '''
@@ -49,7 +50,7 @@ def parse(url):
 			query_options[param] = params[param][0]
 
 	# Set boolean parameters
-	for param in ['json', 'reverse', 'classify', 'diff']:
+	for param in ['json', 'reverse', 'classify', 'diff', 'events']:
 		if param in params.keys():
 			query_options[param] = True
 

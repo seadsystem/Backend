@@ -1,7 +1,7 @@
 import psycopg2
 import psycopg2.extras
 import Analysis_3 as A
-
+import detect_events as D
 # Database user credentials
 DATABASE = "seads"
 USER = "seadapi"
@@ -49,6 +49,8 @@ def query(parsed_url):
 		granularity = parsed_url['granularity']
 	if 'list_format' in parsed_url.keys():
 		list_format = parsed_url['list_format']
+	if 'events' in parsed_url.keys():
+		events = parsed_url['list_format']
 
 	if parsed_url['total_energy']:
 		results = generate_total_energy(device_id, start_time, end_time, device)
@@ -68,17 +70,23 @@ def query(parsed_url):
 		list_format
 	)
 
-	if list_format:
-		return format_list(results, list_format)
-
 	if classify:
 		if device_id and start_time and end_time:
 			classification = A.run(results)
 			return classification
 		else:
 			raise Exception("Received malformed URL data")
+	elif events:
+		print("HERERE")
+		if device and start_time and end_time and data_type == 'P' and list_format == 'event':
+			return format_list(D.detect(results), list_format)
+		else:
+			raise Exception("Event detection requires start_time, end_time, data_type=P, and list_format=event")
 	else:
-		return format_data(header, results, json)
+		if list_format:
+			return format_list(results, list_format)
+		else:
+			return format_data(header, results, json)
 
 
 def generate_total_energy(device_id, start_time, end_time, channel):

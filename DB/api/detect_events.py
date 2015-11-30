@@ -9,6 +9,8 @@ def detect(time_series):
     :return eventList: a python matrix containing a list of times for detected events
     """
 
+    return eventList
+'''
     #avrgCurrent:  array containing moving avrg values
     #deltaCurrent: array containing delta values (from moving average)
     #eventList:    array to be passed back, list of detected events
@@ -28,14 +30,13 @@ def detect(time_series):
     t3     = 0
     t4     = 0
     t5     = 0
-    tx     = 0
     center = -2
 
     #Caluclate moving average first
-    for value in time_series:
+    for i, value in enumerate(time_series):
 
         #calculate average once buffer is loaded
-        if (tx >= 5):
+        if (i >= 4):
             avrg = (t1+t2+t3+t4+t5)/5
             avrgCurrent.append(avrg)
 
@@ -45,7 +46,6 @@ def detect(time_series):
         t3 = t2
         t2 = t1
         t1 = float(value[1])
-        tx = tx + 1
         center = center + 1
         times.append(value[0])
 
@@ -57,15 +57,15 @@ def detect(time_series):
     for value in avrgCurrent:
 
         #calculate delta once buffer is loaded
-        if (tx >= 5):
+        if tx >= 5:
             delta = value - t3
 
-            if (delta > .001):
-                event = [times[center], delta]
+            if delta > .01:
+                event = (times[center], delta)
                 eventList.append(event)
 
-            elif (delta < -.001):
-                event = [times[center], delta]
+            elif delta < -.01:
+                event = (times[center], delta)
                 eventList.append(event)
 
         t5 = t4
@@ -75,5 +75,4 @@ def detect(time_series):
         t1 = float(value)
         tx = tx + 1
         center = center + 1
-
-    return eventList
+'''
