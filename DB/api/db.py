@@ -50,11 +50,14 @@ def query(parsed_url):
 	if 'list_format' in parsed_url.keys():
 		list_format = parsed_url['list_format']
 	if 'events' in parsed_url.keys():
-		events = parsed_url['list_format']
+		events = parsed_url['events']
 
 	if parsed_url['total_energy']:
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
+
+	print('event: ' + str(events))
+	print('diff: ' + str(diff))
 
 	results = retrieve_within_filters(
 		device_id,
@@ -76,10 +79,9 @@ def query(parsed_url):
 			return classification
 		else:
 			raise Exception("Received malformed URL data")
-	elif events:
-		print("HERERE")
+	elif events and diff:
 		if device and start_time and end_time and data_type == 'P' and list_format == 'event':
-			return format_list(D.detect(results), list_format)
+			return format_list(D.detect(results, events), list_format)
 		else:
 			raise Exception("Event detection requires start_time, end_time, data_type=P, and list_format=event")
 	else:

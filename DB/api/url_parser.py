@@ -25,7 +25,7 @@ def parse(url):
 		"total_energy": False,
 		"list_format": None,
 		"granularity": None,
-		"events": False
+		"events": None
 	}
 
 	''' Extract device_id from URL '''
@@ -39,6 +39,10 @@ def parse(url):
 		query_options['device_id'] = int(total_energy.group('device_id'))
 		query_options['total_energy'] = True
 
+	if 'events' in params.keys():  # Cast float parameters
+		print(params['events'])
+		query_options['events'] = float(params['events'][0])
+
 	''' Iterate over possible parameters and set query options accordingly '''
 	for param in ['start_time', 'end_time', 'subset', 'limit', 'granularity']:  # Cast integer parameters
 		if param in params.keys():
@@ -50,7 +54,7 @@ def parse(url):
 			query_options[param] = params[param][0]
 
 	# Set boolean parameters
-	for param in ['json', 'reverse', 'classify', 'diff', 'events']:
+	for param in ['json', 'reverse', 'classify', 'diff']:
 		if param in params.keys():
 			query_options[param] = True
 
