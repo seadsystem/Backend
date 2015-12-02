@@ -1,7 +1,7 @@
 import psycopg2
 import psycopg2.extras
 import Analysis_3 as A
-
+import detect_events as D
 # Database user credentials
 DATABASE = "seads"
 USER = "seadapi"
@@ -49,10 +49,15 @@ def query(parsed_url):
 		granularity = parsed_url['granularity']
 	if 'list_format' in parsed_url.keys():
 		list_format = parsed_url['list_format']
+	if 'events' in parsed_url.keys():
+		events = parsed_url['events']
 
 	if parsed_url['total_energy']:
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
+
+	print('event: ' + str(events))
+	print('diff: ' + str(diff))
 
 	results = retrieve_within_filters(
 		device_id,
@@ -68,17 +73,22 @@ def query(parsed_url):
 		list_format
 	)
 
-	if list_format:
-		return format_list(results, list_format)
-
 	if classify:
 		if device_id and start_time and end_time:
 			classification = A.run(results)
 			return classification
 		else:
 			raise Exception("Received malformed URL data")
+	elif events and diff:
+		if device and start_time and end_time and data_type == 'P' and list_format == 'event':
+			return format_list(D.detect(results, events), list_format)
+		else:
+			raise Exception("Event detection requires start_time, end_time, data_type=P, and list_format=event")
 	else:
-		return format_data(header, results, json)
+		if list_format:
+			return format_list(results, list_format)
+		else:
+			return format_data(header, results, json)
 
 
 def generate_total_energy(device_id, start_time, end_time, channel):
@@ -128,7 +138,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	:param device: Device filter
 	:param diff: Give the differences between rows instead of the actual rows themselves
 	:param granularity: Used to set the interval of an energy_list query
-	:param energy_list: controls if an energy_list query is preformed
+	:param list_format: controls if an energy_list query is preformed
 	:return: Generator of database row tuples
 	"""
 
@@ -256,14 +266,14 @@ def format_list(rows, name):
 	:return:
 	"""
 
-	yield "{ data: ["
+	yield '{ "data": ['
 
 	for i, row in enumerate(rows):
 		if i > 0 and i < (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + ", " + name + ": " + str(row[1]) + " },"
+			yield '{ "time": "' + str(row[0]) + '", "' + name + '": "' + str(row[1]) + '" },'
 		elif i == (len(rows) - 1):
-			yield "{ time: " + str(row[0]) + "," + name + ": " + str(row[1]) + " }"
-	yield "]}"
+			yield '{ "time": "' + str(row[0]) + '" ,"' + name + '": "' + str(row[1]) + '" }'
+	yield ']}'
 
 
 def format_data_row(row):

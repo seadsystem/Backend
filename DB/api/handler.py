@@ -6,8 +6,9 @@ import db
 USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \
 		"[end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
 		"egauge or channel name for eGauge), granularity=(interval between data points in seconds of an energy list\n" \
-		"query, must also include list_format=energy and type=P), diff=(1 get the data differences instead of the data)]]],\n" \
-		" [subset=(subsample result down to this many rows)], [list_format=(string representing what the json list entries\n" \
+		"query, must also include list_format=energy and type=P), [diff=(1 get the data differences instead of the data),\n" \
+		"event=(threshold of event detection, must also include device and type=P and list_format=event)]]]],\n" \
+		"[subset=(subsample result down to this many rows)], [list_format=(string representing what the json list entries\n" \
 		"will look like)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]\n"
 
 
