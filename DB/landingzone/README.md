@@ -45,3 +45,11 @@ After Puppet has executed the modules correctly, the server should be listening 
 ```sh
 $ netstat -tln | egrep ':(8080|9000)'
 ```
+
+--------
+Adding a device:
+
+Handler: talks to the device and convinces the device to give data 
+         Tell go what port to open in main.go and which handler to use for that port
+         The handler use a decoder to send the data to the database module in a common format
+
