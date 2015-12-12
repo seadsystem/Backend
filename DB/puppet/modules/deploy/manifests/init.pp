@@ -11,7 +11,7 @@ CREATE TABLE data_raw (
   device TEXT NULL
 );
 
-CREATE INDEX ON data_raw(serial, time, type, device);
+CREATE INDEX data_raw_serial_time_type_device_idx ON data_raw(serial, time, type, device);
 CLUSTER data_raw USING data_raw_serial_time_type_device_idx;
 
 CREATE TABLE classifications (
