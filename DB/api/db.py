@@ -242,7 +242,7 @@ def perform_query(query, params):
 	"""
 	con = None
 	try:
-		con = psycopg2.connect(database = DATABASE, user = USER, host = '/tmp/')
+		con = psycopg2.connect(database = DATABASE, user = USER)
 		cursor = con.cursor()
 		print("Query:", query)
 		print("Parameters:", params)
