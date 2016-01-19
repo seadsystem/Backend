@@ -1,4 +1,4 @@
-def newdetect(time_series, threshold, windowSize=5):
+def detect(time_series, threshold, windowSize=5):
     """
     Detects a list of events events in a result set returned from the db. An event is defined
     as a increase or descrease in power that is above some threshold.
