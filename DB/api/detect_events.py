@@ -1,50 +1,48 @@
-def detect(time_series, threshold):
-	"""
-	Detects a list of events events in a result set returned from the db. An event is defined
-	as a increase or descrease in power that is above some threshold.
+def newdetect(time_series, threshold, windowSize=5):
+    """
+    Detects a list of events events in a result set returned from the db. An event is defined
+    as a increase or descrease in power that is above some threshold.
 
-	:param time_series: a generator created by the retrieve_within_filters function
-						contains dates and power readings
-	:param threshold: the threshold value for event detection
-	:return eventList: a python matrix containing a list of times for detected events
-	"""
-	if threshold == 0:
-		raise Exception("Threshold cannot be 0, try another value.")
+    :param time_series: a generator created by the retrieve_within_filters function
+                        contains dates and power readings
+    :param threshold: the threshold value for event detection
+    :param windowSize(default=5): window size of sliding window
+    :return eventList: a python matrix containing a list of times for detected events
+    """
+    if threshold == 0:
+        raise Exception("Threshold cannot be 0, try another value.")
 
-	def convert_to_float(data_point):
-		data = list(data_point)
-		data[1] = float(data[1])
-		return data
+    if windowSize < 2:
+        raise Exception("Window must have a value of at least 2.")
 
-	response_list = list(map(convert_to_float, time_series[1:]))
+    def convert_to_float(data_point):
+        data = list(data_point)
+        data[1] = float(data[1])
+        return data
 
-	event_list = []
+    response_list = list(map(convert_to_float, time_series[1:]))
 
-	t1 = response_list[0]
-	t2 = response_list[1]
-	t3 = response_list[2]
-	t4 = response_list[3]
-	t5 = response_list[4]
-	t6 = response_list[5]
+    window_list = response_list[:windowSize]
+    prev_avg = sum(item[1] for item in window_list)/windowSize
 
-	prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
-	curr_avg = (t2[1] + t3[1] + t4[1] + t5[1] + t6[1]) / 5
+    window_list = response_list[1:windowSize+1]
+    curr_avg = sum(item[1] for item in window_list)/windowSize
 
-	for i, data in enumerate(response_list[7:], start=6):
+    event_list = []
 
-		if (curr_avg / prev_avg) > threshold:
-			event_list.append(tuple([t4[0], "rising"]))
-		if (curr_avg / prev_avg) < (1 / threshold):
-			event_list.append(tuple([t4[0], "falling"]))
+    counter = 2
+    center = windowSize/2
+    for i, data in enumerate(response_list[7:], start=6):
 
-		t1 = t2
-		t2 = t3
-		t3 = t4
-		t4 = t5
-		t5 = t6
-		t6 = response_list[i]
-		prev_avg = (t1[1] + t2[1] + t3[1] + t4[1] + t5[1]) / 5
-		curr_avg = (t2[1] + t3[1] + t4[1] + t5[1] + t6[1]) / 5
+        if (curr_avg / prev_avg) > threshold:
+            event_list.append(tuple([window_list[center][0], "rising"]))
+        if (curr_avg / prev_avg) < (1 / threshold):
+            event_list.append(tuple([window_list[center][0], "falling"]))
 
-	return event_list
+        window_list = response_list[counter:counter+windowSize]
+        prev_avg = curr_avg
+        curr_avg = sum(item[1] for item in window_list)/windowSize
 
+        counter += 1
+
+    return event_list
