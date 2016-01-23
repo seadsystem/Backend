@@ -15,10 +15,6 @@ cursor.execute(" select serial, type, data - lag(data, 14) over \
                  != 'PowerG' limit 56 ;")
 records = cursor.fetchall()
 
-for row in records:
-    print(str(row) + '\n')
-
-
 #collect all entries with matching deviceID and timestamp together
 results = []
 for record in records[14:]:
@@ -55,30 +51,3 @@ for row in results:
 dfs = DataFrame(values, index=indexes)
 store['dfs'] = dfs
 print(str(store['dfs']))
-
-"""
-hdf5 = []
-for row in result:
-    temp = {}
-    for i, element in enumerate(row[1:], start=1):
-        if element[0] in temp:
-            temp[element[0]] += element[1]
-        else:
-            temp[element[0]] = element[1]
-    hdf5.append(temp)
-
-values = []
-index = []
-columns = []
-for row in hdf5:
-    values.append([value for key, value in row.items() if key != 'time'])
-    index.append([value for key, value in row.items() if key == 'time'])
-    columns += [key for key, value in row.items() if key not in columns]
-    #print(str(row) + "\n")
-columns.remove('time');
-#print(str(values))
-#print(str(index))
-#print(str(columns))
-#dfs =
-#print(str(dfs))
-"""
