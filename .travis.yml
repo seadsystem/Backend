@@ -17,7 +17,7 @@ install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-  - sudo apt-get install python3-pip
+  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install python3-pip
   - pip3 install psycopg2
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
