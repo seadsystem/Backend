@@ -6,16 +6,16 @@ addons:
   apt:
     packages:
     - python3
-    - python-coverage
     - python3-psycopg2
     - python3-numpy
-    - python-matplotlib
 install:
   - go get github.com/olt/libpq
   - go get github.com/DATA-DOG/go-sqlmock
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
+  - pip3 install coverage
+  - pip3 install matplotlib
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
