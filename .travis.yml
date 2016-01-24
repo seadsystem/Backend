@@ -8,6 +8,7 @@ addons:
     packages:
     - python3
     - python3-coverage
+    - libpq-dev
     - python3-psycopg2
     - python3-numpy
     - python3-matplotlib
