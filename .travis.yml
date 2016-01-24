@@ -10,6 +10,7 @@ addons:
     - python3-coverage
     - libpq-dev
     - python3-numpy
+    - python3-psycopg2
     - python3-matplotlib
 install:
   - go get github.com/olt/libpq
@@ -18,7 +19,7 @@ install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
   - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install python3-pip
-  - sudo -E pip3 install psycopg2
+  - easy_install3 psycopg2
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
