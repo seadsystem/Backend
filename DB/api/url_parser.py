@@ -40,7 +40,6 @@ def parse(url):
 		query_options['total_energy'] = True
 
 	if 'events' in params.keys():  # Cast float parameters
-		print(params['events'])
 		query_options['events'] = float(params['events'][0])
 
 	''' Iterate over possible parameters and set query options accordingly '''

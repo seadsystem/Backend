@@ -2,6 +2,14 @@ language: go
 go:
   - tip
 sudo: false
+addons:
+  apt:
+    packages:
+    - python3
+    - python3-coverage
+    - python3-psycopg2
+    - python3-numpy
+    - python3-matplotlib
 install:
   - go get github.com/olt/libpq
   - go get github.com/DATA-DOG/go-sqlmock
@@ -12,6 +20,8 @@ before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; ./test_url_parser.py
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; ./test_db.py
 after_success:
   - cd $GOPATH/src/github.com/seadsystem/Backend; go test github.com/seadsystem/Backend/DB/landingzone/...
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh

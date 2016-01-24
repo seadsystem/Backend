@@ -17,13 +17,13 @@ def query(parsed_url):
 	"""
 
 	if 'device_id' not in parsed_url.keys():
-		raise Exception("Received malformed URL data")
+		raise Exception('Received malformed URL data: missing device_id')
 
 	device_id = parsed_url['device_id']
 
 	header = ['time', 'I', 'W', 'V', 'T']
 	start_time = end_time = data_type = subset = limit = device = granularity = None
-	diff = json = reverse = classify = list_format = False
+	diff = json = reverse = classify = list_format = events = False
 	if 'type' in parsed_url.keys():
 		data_type = parsed_url['type']
 		header = ['time', parsed_url['type']]
@@ -56,9 +56,6 @@ def query(parsed_url):
 		results = generate_total_energy(device_id, start_time, end_time, device)
 		return results
 
-	print('event: ' + str(events))
-	print('diff: ' + str(diff))
-
 	results = retrieve_within_filters(
 		device_id,
 		start_time,
@@ -74,21 +71,18 @@ def query(parsed_url):
 	)
 
 	if classify:
-		if device_id and start_time and end_time:
+		if start_time and end_time:
 			classification = A.run(results)
 			return classification
-		else:
-			raise Exception("Received malformed URL data")
+		raise Exception('Received malformed URL data: missing start_time and end_time')
 	elif events and diff:
 		if device and start_time and end_time and data_type == 'P' and list_format == 'event':
 			return format_list(D.detect(results, events), list_format)
-		else:
-			raise Exception("Event detection requires start_time, end_time, data_type=P, and list_format=event")
+		raise Exception('Event detection requires device, start_time, end_time, data_type=P, and list_format=event')
 	else:
 		if list_format:
 			return format_list(results, list_format)
-		else:
-			return format_data(header, results, json)
+		return format_data(header, results, json)
 
 
 def generate_total_energy(device_id, start_time, end_time, channel):
@@ -151,14 +145,10 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 		params.insert(0, float(subset) + 1.0)
 
 	# Generate WHERE clause
-	if start_time and end_time:
-		where += " AND time BETWEEN to_timestamp(%s) AND to_timestamp(%s)"
-		params.append(start_time)
-		params.append(end_time)
-	elif start_time:
+	if start_time:
 		where += " AND time >= to_timestamp(%s)"
 		params.append(start_time)
-	elif end_time:
+	if end_time:
 		where += " AND time <= to_timestamp(%s)"
 		params.append(end_time)
 
@@ -194,11 +184,9 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 			query = write_subsample(query, False)
 	else:
 		# If no data type is set we return all data types
-		query = write_crosstab(where, TABLE)
+		query = write_crosstab(where)
 		if subset:
 			query = write_subsample(query, True)
-
-
 
 	# Required for LIMIT, analysis code assumes sorted data
 	query += " ORDER BY time"
@@ -217,7 +205,7 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 	return rows
 
 
-def write_crosstab(where, data = TABLE):
+def write_crosstab(where, data=TABLE):
 	"""
 	Write a PostgreSQL crosstab() query to create a pivot table and rearrange the data into a more useful form
 
@@ -225,10 +213,10 @@ def write_crosstab(where, data = TABLE):
 	:param data: Table or subquery from which to get the data
 	:return: Complete SQL query
 	"""
-	query = "SELECT * FROM crosstab(" +\
-				"'SELECT time, type, data from " + data + " as raw " + where + "'," +\
-				" 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') " + \
-			"AS ct_result(time TIMESTAMP, I BIGINT, W BIGINT, V BIGINT, T BIGINT)"
+	query = "SELECT * FROM crosstab("\
+	        "'SELECT time, type, data from " + data + " as raw " + where + "',"\
+	        " 'SELECT unnest(ARRAY[''I'', ''W'', ''V'', ''T''])') "\
+	        "AS ct_result(time TIMESTAMP, I BIGINT, W BIGINT, V BIGINT, T BIGINT)"
 	return query
 
 
@@ -244,8 +232,6 @@ def perform_query(query, params):
 	try:
 		con = psycopg2.connect(database = DATABASE, user = USER)
 		cursor = con.cursor()
-		print("Query:", query)
-		print("Parameters:", params)
 		cursor.execute(query, params)
 		return cursor.fetchall()
 
