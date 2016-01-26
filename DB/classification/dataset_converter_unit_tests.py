@@ -1,6 +1,7 @@
 import dataset_converter as conv
 import psycopg2
 import unittest
+import pickle
 
 DATABASE = "seads"
 USER = "ianlofgren"
@@ -10,13 +11,7 @@ class TestHDF5Conversion(unittest.TestCase):
 
     def test_malformed_record(self):
         try:
-            con = psycopg2.connect(database = DATABASE, user = USER)
-            cursor = con.cursor()
-            cursor.execute(" select serial, type, data - lag(data, 14) over \
-                             (order by time), time, device from data_raw where \
-                             serial = 466419818 and device != 'PowerS' and device \
-                             != 'PowerG' limit 141;")
-            records = cursor.fetchall()
+            file_to_write = open("test_data_incorrect.test", "wb")
             [indexes, values] = conv.convert_to_hdf5(records)
             self.assertFail()
         except Exception as e:
