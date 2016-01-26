@@ -19,7 +19,7 @@ install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
   - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install python3-pip
-  - easy_install3 psycopg2
+  - sudo easy_install3 psycopg2
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
