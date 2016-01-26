@@ -4,7 +4,7 @@ import Analysis_3 as A
 import detect_events as D
 # Database user credentials
 DATABASE = "seads"
-USER = "seadapi"
+USER = "ianlofgren"
 TABLE = "data_raw"
 
 
