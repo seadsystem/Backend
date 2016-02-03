@@ -1,6 +1,6 @@
 import http.server
 
-import url_parser
+from . import url_parser
 import db
 
 USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \

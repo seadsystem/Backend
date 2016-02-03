@@ -1,5 +1,5 @@
 import re
-import urllib.parse
+from urllib.parse import urlparse, parse_qs
 
 
 def parse(url):
@@ -9,9 +9,9 @@ def parse(url):
     :param url: The path from the request
     :return: Array of URL parameters
     """
-    url_components = urllib.parse.urlparse(url)
+    url_components = urlparse(url)
     path = url_components.path
-    params = urllib.parse.parse_qs(url_components.query)
+    params = parse_qs(url_components.query)
     query_options = {
         'device_id': None,
         'start_time': None,
