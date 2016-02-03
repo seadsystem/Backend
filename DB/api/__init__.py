@@ -1,1 +1,1 @@
-__all__ = ["Analysis_3", "db", "detect_events", "handler", "server", "url_parser"]
+__all__ = ["Analysis_3", "query_db", "insert_db","detect_events", "handler", "server", "url_parser"]

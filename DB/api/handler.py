@@ -1,7 +1,8 @@
 import http.server
-
-from . import url_parser
-import db
+import url_parser
+import query_db
+import insert_db
+import json
 
 USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \
         "[end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
@@ -12,13 +13,13 @@ USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_
         "will look like)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]\n"
 
 
-class ApiHandler(http.server.SimpleHTTPRequestHandler):
+class ApiHandler(http.server.CGIHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
-        http.server.SimpleHTTPRequestHandler.__init__(self, req, client_addr, server)
+        http.server.CGIHTTPRequestHandler.__init__(self, req, client_addr, server)
 
     def do_GET(self):
         try:
-            parsed = url_parser.parse(self.path)
+            parsed = url_parser.get_parse(self.path)
         except Exception as inst:
             if self.path == '/':
                 self.send_response(200)
@@ -35,7 +36,7 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         try:
-            r = db.query(parsed)
+            r = query_db.query(parsed)
 
             self.send_response(200)
             self.send_header("Content-type",
@@ -45,11 +46,26 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
             for line in r:
                 self.wfile.write(line.encode("utf-8"))
         except Exception as inst:
+
             self.send_error(500)
             print(type(inst))
             print(inst.args)
-            print(inst)
+            print(str(inst))
 
             return
 
         self.wfile.flush()
+
+    def do_POST(self):
+        try:
+            parsed =  url_parser.post_parse(self.path)
+            content_len = int(self.headers.get('Content-Length', ''))
+            post_body = self.rfile.read(content_len).decode('utf-8')
+            print(str(json.loads(post_body)))
+        except Exception as e:
+            self.send_error(500)
+            print(type(e))
+            print(e.args)
+            print(e)
+
+

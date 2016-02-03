@@ -1,13 +1,12 @@
 import psycopg2
 import psycopg2.extras
-from . import Analysis_3 as A
-from . import detect_events as D
+import Analysis_3 as A
+import detect_events as D
 
 # Database user credentials
 DATABASE = "seads"
-USER = "seadapi"
+USER = "ianlofgren"
 TABLE = "data_raw"
-
 
 def query(parsed_url):
     """
@@ -84,8 +83,8 @@ def query(parsed_url):
         if device and start_time and end_time and data_type == 'P' and list_format == 'event':
             return format_list(D.detect(results, events), list_format)
         else:
-            raise Exception(
-                "Event detection requires start_time, end_time, data_type=P, and list_format=event")
+            raise Exception("Event detection requires start_time, end_time, data_type=P, and \
+                            list_format=event")
     else:
         if list_format:
             return format_list(results, list_format)
@@ -188,7 +187,8 @@ def retrieve_within_filters(device_id, start_time, end_time, data_type, subset, 
 
         # TODO: add this to the diff logic
         if device and granularity and data_type == "P" and list_format == "energy":
-            prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) / 36e5) "
+            prefix = "SELECT time, abs(CAST(lag(data) OVER (ORDER BY time DESC) - data AS DECIMAL) \
+                     / 36e5) "
             query += " AND CAST(extract(epoch from time) as INTEGER) %% %s = 0"
             params.append(granularity)
 
@@ -312,17 +312,14 @@ def write_subsample(query, crosstab=False):
     :param crosstab: Whether or not the query is a crosstab
     :return: Query with subsampling enabled.
     """
-    new_query = "SELECT "
+    new_query = '''SELECT '''
     if crosstab:
-        new_query += "time, I, W, V, T"  # SELECT all data type columns
+        new_query += '''time, I, W, V, T'''  # SELECT all data type columns
     else:
         new_query += "time, data"  # Single data type query
-    new_query += ''' FROM (
-	SELECT *, ((row_number() OVER (ORDER BY "time"))
-		%% ceil(count(*) OVER () / %s)::int) AS rn
-	FROM ('''
+    new_query += ''' FROM ( SELECT *, ((row_number() OVER (ORDER BY "time"))
+                 %% ceil(count(*) OVER () / %s)::int) AS rn
+                 FROM ('''
     new_query += query
-    new_query += ''') AS subquery
-	) sub
-WHERE sub.rn = 0'''
+    new_query += ") AS subquery ) sub WHERE sub.rn = 0"
     return new_query

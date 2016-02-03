@@ -2,9 +2,9 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 
-def parse(url):
+def get_parse(url):
     """
-    Match the URL against a set of routing rules
+    Match the GET_URL against a set of routing rules
 
     :param url: The path from the request
     :return: Array of URL parameters
@@ -23,7 +23,6 @@ def parse(url):
         "device": None,
         "diff": False,
         "total_energy": False,
-        "label"
         "list_format": None,
         "granularity": None,
         "events": None
@@ -63,5 +62,38 @@ def parse(url):
     # Serial number required
     if not query_options['device_id']:
         raise Exception("Not Found")
+
+    return query_options
+
+def post_parse(url):
+    """
+    Match the POST_URL against a set of routing rules
+
+    :param url: The path from the request
+    :return: Array of URL parameters
+    """
+    url_components = urlparse(url)
+    path = url_components.path
+    params = parse_qs(url_components.query)
+
+    # query options, as more post requests are created the
+    # different query_options for them will go here
+    query_options = {
+        "label": None
+    }
+
+    ''' Extract device_id from URL '''
+    device_id_only = re.match('^/(?P<device_id>\d+$)', path)
+    if device_id_only:
+        query_options['device_id'] = int(device_id_only.group('device_id'))
+
+    '''Extract label from URL'''
+    label = re.match('^/(?P<device_id>\d+)/label$', path)
+    if label:
+        query_options['label'] = True
+
+    # Serial number required
+    if not query_options['device_id']:
+        raise Exception("Device id not found")
 
     return query_options

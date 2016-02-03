@@ -3,8 +3,7 @@
 import http.server
 import socketserver
 import threading
-
-from . import handler
+import handler
 
 PORT = 8080
 
