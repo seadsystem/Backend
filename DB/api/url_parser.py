@@ -74,22 +74,25 @@ def post_parse(url):
     """
     url_components = urlparse(url)
     path = url_components.path
+    print(path)
     params = parse_qs(url_components.query)
 
     # query options, as more post requests are created the
     # different query_options for them will go here
     query_options = {
+        "device_id": None,
         "label": None
     }
 
     ''' Extract device_id from URL '''
-    device_id_only = re.match('^/(?P<device_id>\d+$)', path)
-    if device_id_only:
-        query_options['device_id'] = int(device_id_only.group('device_id'))
+    device_id = re.match('^/(?P<device_id>\d+$)', path)
+    if device_id:
+        query_options['device_id'] = int(device_id.group('device_id'))
 
     '''Extract label from URL'''
     label = re.match('^/(?P<device_id>\d+)/label$', path)
     if label:
+        query_options['device_id'] = int(label.group('device_id'))
         query_options['label'] = True
 
     # Serial number required

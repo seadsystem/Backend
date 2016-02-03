@@ -12,7 +12,6 @@ USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_
         "[subset=(subsample result down to this many rows)], [list_format=(string representing what the json list entries\n" \
         "will look like)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]\n"
 
-
 class ApiHandler(http.server.CGIHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
         http.server.CGIHTTPRequestHandler.__init__(self, req, client_addr, server)
@@ -25,7 +24,7 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
                 self.end_headers()
-                self.wfile.write(USAGE.encode("utf-8"))
+                self.wfile.write(GET_USAGE.encode("utf-8"))
                 self.wfile.flush()
             else:
                 print(type(inst))
@@ -58,10 +57,10 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            parsed =  url_parser.post_parse(self.path)
+            parsed = url_parser.post_parse(self.path)
             content_len = int(self.headers.get('Content-Length', ''))
             post_body = self.rfile.read(content_len).decode('utf-8')
-            print(str(json.loads(post_body)))
+            insert_db.insert(parsed, post_body)
         except Exception as e:
             self.send_error(500)
             print(type(e))
