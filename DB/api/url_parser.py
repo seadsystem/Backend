@@ -74,7 +74,6 @@ def post_parse(url):
     """
     url_components = urlparse(url)
     path = url_components.path
-    print(path)
     params = parse_qs(url_components.query)
 
     # query options, as more post requests are created the

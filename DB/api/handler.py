@@ -2,7 +2,6 @@ import http.server
 import url_parser
 import query_db
 import insert_db
-import json
 
 USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \
         "[end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
@@ -24,7 +23,7 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
                 self.end_headers()
-                self.wfile.write(GET_USAGE.encode("utf-8"))
+                self.wfile.write(USAGE.encode("utf-8"))
                 self.wfile.flush()
             else:
                 print(type(inst))
@@ -58,13 +57,27 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
     def do_POST(self):
         try:
             parsed = url_parser.post_parse(self.path)
+        except Exception as e:
+            self.send_error(400)
+            print(type(e))
+            print(e.args)
+            print(e)
+
+        try:
             content_len = int(self.headers.get('Content-Length', ''))
             post_body = self.rfile.read(content_len).decode('utf-8')
-            insert_db.insert(parsed, post_body)
+            result = insert_db.insert(parsed, post_body)
+            content = bytes(result, "utf-8")
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.send_header("Content-Length", len(content))
+            self.end_headers()
+            self.wfile.write(content)
         except Exception as e:
             self.send_error(500)
             print(type(e))
             print(e.args)
             print(e)
+
 
 

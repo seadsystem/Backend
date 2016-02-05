@@ -14,12 +14,16 @@ CREATE TABLE data_raw (
 CREATE INDEX data_raw_serial_time_type_device_idx ON data_raw(serial, time, type, device);
 CLUSTER data_raw USING data_raw_serial_time_type_device_idx;
 
-CREATE TABLE classifications (
-  Serial BIGINT NOT NULL,
-  StartTime TIMESTAMP NOT NULL,
-  EndTime TIMESTAMP NOT NULL,
-  Classification TEXT NOT NULL
+CREATE TABLE data_label (
+  serial BIGINT NOT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  label TEXT NOT NULL
 );
+
+CREATE INDEX data_label_serial_time_device_idx ON data_raw(serial, start_time, end_time, label);
+CLUSTER data_label USING data_label_serial_time_device_idx;
+
   '
 
   exec {'seads-db':

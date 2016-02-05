@@ -5,7 +5,7 @@ import detect_events as D
 
 # Database user credentials
 DATABASE = "seads"
-USER = "ianlofgren"
+USER = "seadapi"
 TABLE = "data_raw"
 
 def query(parsed_url):
