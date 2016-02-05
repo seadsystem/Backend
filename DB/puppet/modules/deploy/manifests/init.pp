@@ -20,11 +20,7 @@ CREATE TABLE data_label (
   end_time TIMESTAMP NOT NULL,
   label TEXT NOT NULL
 );
-
-CREATE INDEX data_label_serial_time_device_idx ON data_raw(serial, start_time, end_time, label);
-CLUSTER data_label USING data_label_serial_time_device_idx;
-
-  '
+'
 
   exec {'seads-db':
     command => "sudo -u postgres psql -c 'CREATE DATABASE seads;'",
