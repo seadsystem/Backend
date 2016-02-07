@@ -17,6 +17,7 @@ install:
   - go get golang.org/x/tools/cmd/cover
   - sudo apt-get install -y python3-setuptools
   - sudo easy_install3 psycopg2
+  - sudo easy_install3 -U distribute
   - sudo easy_install3 matplotlib
   - sudo easy_install3 coverage
 before_script:
