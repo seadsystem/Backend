@@ -23,6 +23,7 @@ install:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install --upgrade pip
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install psycopg2
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install numpy
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install matplotlib
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
