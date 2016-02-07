@@ -2,12 +2,15 @@ language: go
 go:
   - tip
 sudo: required
+distro: trusty
 addons:
   apt:
     packages:
     - python3
     - libpq-dev
     - python3-numpy
+    - python3-matplotlib
+    - python3-coverage
 
 install:
   - go get github.com/olt/libpq
@@ -15,11 +18,9 @@ install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-  - sudo apt-get install -y python3-setuptools
-  - sudo easy_install3 psycopg2
-  - sudo easy_install3 -U distribute
-  - sudo easy_install3 matplotlib
-  - sudo easy_install3 coverage
+  - sudo apt-get install -y python3-pip
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; virtualenv venv
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; pip3 install psycopg2
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
