@@ -51,8 +51,13 @@ CREATE TABLE data_label (
 
   exec {'deploy.sh':
     command   => '/etc/puppet/modules/deploy/files/deploy.sh',
-    #cwd       => '/vagrant',
-    require   => Exec['create-table'],
+    cwd       => '/vagrant',
+    logoutput => true,
+    require   => [
+      Exec['create-table'],
+      Db_user['landingzone'],
+      Db_user['seadapi']
+    ],
   }
 }
 
