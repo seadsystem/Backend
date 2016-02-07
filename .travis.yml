@@ -2,7 +2,7 @@ language: go
 go:
   - tip
 sudo: required
-distro: trusty
+dist: trusty
 addons:
   apt:
     packages:
@@ -20,13 +20,13 @@ install:
   - go get golang.org/x/tools/cmd/cover
   - sudo apt-get install -y python3-pip
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; virtualenv venv
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; pip3 install psycopg2
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install psycopg2
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; ./test_url_parser.py
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; ./test_db.py
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && ./test_url_parser.py
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && ./test_db.py
 after_success:
   - cd $GOPATH/src/github.com/seadsystem/Backend; go test github.com/seadsystem/Backend/DB/landingzone/...
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh
