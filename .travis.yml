@@ -15,10 +15,10 @@ install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-  - sudo apt-get install -y python3-pip
-  - sudo pip3 install psycopg2
-  - sudo pip3 install matplotlib
-  - sudo pip3 install coverage
+  - sudo apt-get install -y python3-setuptools
+  - sudo easy_install3 install psycopg2
+  - sudo easy_install3 install matplotlib
+  - sudo easy_install3 install coverage
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
