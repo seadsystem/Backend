@@ -14,13 +14,13 @@ CREATE TABLE data_raw (
 CREATE INDEX data_raw_serial_time_type_device_idx ON data_raw(serial, time, type, device);
 CLUSTER data_raw USING data_raw_serial_time_type_device_idx;
 
-CREATE TABLE classifications (
-  Serial BIGINT NOT NULL,
-  StartTime TIMESTAMP NOT NULL,
-  EndTime TIMESTAMP NOT NULL,
-  Classification TEXT NOT NULL
+CREATE TABLE data_label (
+  serial BIGINT NOT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  label TEXT NOT NULL
 );
-  '
+'
 
   exec {'seads-db':
     command => "sudo -u postgres psql -c 'CREATE DATABASE seads;'",
@@ -51,8 +51,13 @@ CREATE TABLE classifications (
 
   exec {'deploy.sh':
     command   => '/etc/puppet/modules/deploy/files/deploy.sh',
-    #cwd       => '/vagrant',
-    require   => Exec['create-table'],
+    cwd       => '/vagrant',
+    logoutput => true,
+    require   => [
+      Exec['create-table'],
+      Db_user['landingzone'],
+      Db_user['seadapi']
+    ],
   }
 }
 
