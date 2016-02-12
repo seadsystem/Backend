@@ -60,5 +60,6 @@ def perform_insert(query, params):
         print('Database error: %s' % e)
     finally:
         if con:
+            con.commit()
             con.close()
 
