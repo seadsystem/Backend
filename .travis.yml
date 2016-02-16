@@ -3,6 +3,11 @@ go:
   - tip
 sudo: required
 dist: trusty
+env:
+  - BACKEND="$GOPATH/src/github.com/seadsystem/Backend"
+  - API="$BACKEND/DB/api"
+  - LZONE="$BACKEND/DB/landingzone"
+  - ACTIVATE="venv/bin/activate"
 addons:
   apt:
     packages:
@@ -19,18 +24,18 @@ install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
   - sudo apt-get install -y python3-pip
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; virtualenv -p python3 venv
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install --upgrade pip
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install psycopg2
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install numpy
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install matplotlib
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install coveralls
+  - cd "$API"; virtualenv -p python3 venv
+  - cd "$API"; source $ACTIVATE && pip3 install --upgrade pip
+  - cd "$API"; source $ACTIVATE && pip3 install psycopg2
+  - cd "$API"; source $ACTIVATE && pip3 install numpy
+  - cd "$API"; source $ACTIVATE && pip3 install matplotlib
+  - cd "$API"; source $ACTIVATE && pip3 install codecov
 before_script:
-  - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
+  - go vet "$LZONE/..."
 script:
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && coverage run -m unittest discover
+  - cd "$LZONE"; go install
+  - cd "$API"; source $ACTIVATE && coverage run -m unittest discover
 after_success:
-  - cd $GOPATH/src/github.com/seadsystem/Backend; go test github.com/seadsystem/Backend/DB/landingzone/...
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh
-  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && coveralls
+  - cd "$BACKEND"; go test "$LZONE/..."
+  - cd "$LZONE"; ./test-coverage.sh
+  - cd "$API"; source $ACTIVATE && codecov
