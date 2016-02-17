@@ -35,7 +35,8 @@ before_script:
   - go vet "$LZONE/..."
 script:
   - cd "$LZONE"; go install
-  - cd "$API"; source $ACTIVATE && coverage run -m unittest discover
+  - cd "$API"; source $ACTIVATE && coverage run test_query_db.py
+  - cd "$API"; source $ACTIVATE && coverage run -a test_url_parser.py
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
   - cd "$LZONE"; ./test-coverage.sh
