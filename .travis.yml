@@ -4,10 +4,11 @@ go:
 sudo: required
 dist: trusty
 env:
-  - BACKEND="$GOPATH/src/github.com/seadsystem/Backend"
-  - API="$BACKEND/DB/api"
-  - LZONE="$BACKEND/DB/landingzone"
-  - ACTIVATE="venv/bin/activate"
+  global:
+    - BACKEND="$GOPATH/src/github.com/seadsystem/Backend"
+    - API="$BACKEND/DB/api"
+    - LZONE="$BACKEND/DB/landingzone"
+    - ACTIVATE="venv/bin/activate"
 addons:
   apt:
     packages:
