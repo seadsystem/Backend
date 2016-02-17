@@ -5,7 +5,7 @@ sudo: required
 dist: trusty
 env:
   global:
-    - BACKEND="$GOPATH/src/github.com/seadsystem/Backend"
+    - BACKEND="$HOME/gopath/src/github.com/seadsystem/Backend"
     - API="$BACKEND/DB/api"
     - LZONE="$BACKEND/DB/landingzone"
     - ACTIVATE="venv/bin/activate"
