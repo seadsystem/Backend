@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/seadsystem/Backend.svg)](https://travis-ci.org/seadsystem/Backend) [![codecov.io](https://codecov.io/github/seadsystem/Backend/coverage.svg?branch=master)](https://codecov.io/github/seadsystem/Backend?branch=master)
+[![Build Status](https://travis-ci.org/seadsystem/Backend.svg?branch=master)](https://travis-ci.org/seadsystem/Backend?branch=master) [![codecov.io](https://codecov.io/github/seadsystem/Backend/coverage.svg?branch=master)](https://codecov.io/github/seadsystem/Backend?branch=master)
 
 # Python API
 
