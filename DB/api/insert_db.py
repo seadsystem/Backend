@@ -6,7 +6,9 @@ import datetime
 # Database user credentials
 DATABASE = "seads"
 USER = "seadapi"
+
 TABLE = "data_label"
+
 
 def insert(parsed_url, data):
     """
