@@ -20,10 +20,6 @@ def insert_query_builder(table=None, to_insert=None):
     return result
 
 
-def post_query_builder():
-    raise NotImplementedError
-
-
 class BaseClassifier(object):
     """
     :summary: Base class that all other classifiers will inherit from
@@ -76,13 +72,24 @@ class BaseClassifier(object):
             con.close()
 
     def train(self):
+        """
+        :summary: override this method in your derived classifier class to train your model
+        """
         raise NotImplementedError
 
     def classify(self):
+        """
+        :summary: override this method in your derived classifier class to return a vector of labels
+        """
         raise NotImplementedError
 
     @staticmethod
     def training_data(panel="Panel1"):
+        """
+        :summary: grabs power data in data_raw that corresponds to the labels in data_label
+        :param panel: which panel to fetch power data from, for all three call three times
+        :return:
+        """
         try:
             con = psycopg2.connect(database="seads", user="ianlofgren")
         except psycopg2.Error() as e:
@@ -104,5 +111,6 @@ class BaseClassifier(object):
         finally:
             if con:
                 con.close()
+
 
 print(str(BaseClassifier.training_data(panel="Panel3")))
