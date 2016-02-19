@@ -36,7 +36,7 @@ class ClassifierModel(object):
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
                  model=None):
         """
-        :summary: Classirfier Model constructo
+        :summary: Classifier Model constructor
         :param date_time (optional): timestamp, defaults to utcnow(), named parameter
         :param model_type (optional): string, defaults to 'default',  named parameter
         """
