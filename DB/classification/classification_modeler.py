@@ -1,5 +1,6 @@
 import math
 import datetime
+import pickle
 from sklearn.ensemble import RandomForestClassifier
 
 hour = 3600
@@ -7,7 +8,7 @@ fiveMinutes = 300
 fridge = 5
 microwave = 11
 stove = 14
-clf = RandomForestClassifier(n_estimators=1000, max_depth=None,min_samples_split=1, max_features=3)
+classifier = RandomForestClassifier(n_estimators=1000, max_depth=None,min_samples_split=1, max_features=3)
 
 
 def readInput(channel, house):
@@ -137,7 +138,7 @@ def getInputs(l,h,house):
     return inputs
 
 
-def performTests(aggregate, inputs, low, high):
+def performTests(aggregate, inputs, low, high, clr):
     testCases = getInstances(aggregate, low, high)
     actualResults = getRunningLabels(inputs, low, high)
     numberOfTests = len(testCases)
@@ -146,8 +147,8 @@ def performTests(aggregate, inputs, low, high):
         testCase = testCases[i]
         actual = actualResults[i]
         # print("Actual: %s" %(actual))
-        # print("Predicted: %s" %(clf.predict([testCase])))
-        if actual == clf.predict([testCase])[0]:
+        # print("Predicted: %s" %(classifier.predict([testCase])))
+        if actual == clr.predict([testCase])[0]:
             successful += 1
     print("Score: %f%%" % (successful/numberOfTests))
 
@@ -158,7 +159,8 @@ aggregate = combineInputs(inputs)
 instances = getInstances(aggregate,0,hour*30)
 runningLabels = getRunningLabels(inputs,0,hour*30)
 
+classifier.fit(instances, runningLabels)
+blob = pickle.dumps(classifier)
+clr = pickle.loads(blob)
 
-clf.fit(instances,runningLabels)
-
-performTests(aggregate,inputs,hour*30,hour*60)
+performTests(aggregate, inputs, hour*30, hour*60, clr)

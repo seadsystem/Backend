@@ -20,6 +20,13 @@ CREATE TABLE data_label (
   end_time TIMESTAMP NOT NULL,
   label TEXT NOT NULL
 );
+
+CREATE TABLE classifier_model (
+  id UUID NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  type TEXT NOT NULL,
+  model TEXT NOT NULL,
+);
 '
 
   exec {'seads-db':
