@@ -95,7 +95,7 @@ class BaseClassifier(object):
                     "FROM data_raw, data_label " + \
                     "WHERE data_raw.serial=data_label.serial " + \
                     "AND data_raw.type='P' " + \
-                    "AND data_raw.device=" + panel + " " + \
+                    "AND data_raw.device='" + panel + "' " + \
                     "AND time BETWEEN data_label.start_time AND data_label.end_time;"
             cursor.execute(query)
             return cursor.fetchall()
@@ -105,5 +105,4 @@ class BaseClassifier(object):
             if con:
                 con.close()
 
-clr = BaseClassifier()
-clr.store()
+print(str(BaseClassifier.training_data(panel="Panel3")))
