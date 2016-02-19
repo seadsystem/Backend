@@ -24,7 +24,7 @@ def post_query_builder():
     raise NotImplementedError
 
 
-class ClassifierModel(object):
+class BaseClassifier(object):
     """
     :summary: Base class that all other classifiers will inherit from
     """
@@ -50,10 +50,14 @@ class ClassifierModel(object):
         :summary: stores *trained* model to db
         """
         try:
+            if self.model is None:
+                raise AttributeError("Model not instantiated")
             blob = pickle.dumps(self.model)
             self.model = blob
         except pickle.PickleError as e:
             raise ValueError("Model pickling failed", e)
+        except AttributeError as e:
+            raise AttributeError(e)
 
         try:
             con = psycopg2.connect(database="seads", user="ianlofgren")
@@ -63,9 +67,7 @@ class ClassifierModel(object):
         try:
             cursor = con.cursor()
             self.id = str(self.id)
-            print(self.__dict__)
             query = insert_query_builder("classifier_model", self.__dict__)
-            print(query)
             cursor.execute(query, self.__dict__)
         except psycopg2.Error as e:
             raise IOError("Model insert failed", e)
@@ -76,6 +78,32 @@ class ClassifierModel(object):
     def train(self):
         raise NotImplementedError
 
+    def classify(self):
+        raise NotImplementedError
 
-clr = ClassifierModel()
+    @staticmethod
+    def training_data(panel="Panel1"):
+        try:
+            con = psycopg2.connect(database="seads", user="ianlofgren")
+        except psycopg2.Error() as e:
+            raise ConnectionError("Database connection on training data fetch failed", e)
+
+        try:
+            cursor = con.cursor()
+            query = "SELECT data_raw.time, data_raw.data- lag(data_raw.data) OVER " + \
+                    "(ORDER BY data_raw.time), data_label.label " + \
+                    "FROM data_raw, data_label " + \
+                    "WHERE data_raw.serial=data_label.serial " + \
+                    "AND data_raw.type='P' " + \
+                    "AND data_raw.device=" + panel + " " + \
+                    "AND time BETWEEN data_label.start_time AND data_label.end_time;"
+            cursor.execute(query)
+            return cursor.fetchall()
+        except psycopg2.Error() as e:
+            raise IOError("Training data fetch failed", e)
+        finally:
+            if con:
+                con.close()
+
+clr = BaseClassifier()
 clr.store()
