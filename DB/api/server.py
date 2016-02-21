@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-
-import http.server
 import socketserver
-import threading
-import handler
-
+import DB.api.handler as handler
 PORT = 8080
 
 
@@ -18,3 +13,4 @@ httpd = ThreadedTCPServer(("", PORT), Handler)
 
 print("serving at port", PORT)
 httpd.serve_forever()
+

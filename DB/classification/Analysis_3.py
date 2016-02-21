@@ -16,7 +16,7 @@ import numpy as np
 import math
 
 # For visualization
-import matplotlib.pyplot as pyp
+#import matplotlib.pyplot as pyp
 
 # For manipulating command-line arguments
 import sys
@@ -171,7 +171,7 @@ def produce_mean_normalized_power_spectrum(blocklist):
 
     return mean_normalized_spectrum
 
-
+'''
 def display(spectrum):
     template = np.ones(len(spectrum))
 
@@ -199,7 +199,7 @@ def display(spectrum):
                 print("Plot not written.")
         else:
             pyp.savefig(filename)
-
+'''
 
 def write_output():
     tokens = sys.argv[-1].split('.')

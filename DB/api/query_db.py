@@ -1,7 +1,8 @@
 import psycopg2
 import psycopg2.extras
-import Analysis_3 as A
-import detect_events as D
+
+import DB.classification.Analysis_3 as A
+import DB.classification.detect_events as D
 
 # Database user credentials
 DATABASE = "seads"

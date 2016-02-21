@@ -1,7 +1,7 @@
 import http.server
-import url_parser
-import query_db
-import insert_db
+from DB.api import url_parser
+from DB.api import query_db
+from DB.api import insert_db
 
 USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_time=(start time as UTC unix timestamp)],\n" \
         "[end_time=(end time as UTC unix timestamp)], [type=(Sensor type code),[device=(seadplug for SEAD plug,\n" \
@@ -10,6 +10,7 @@ USAGE = "Usage: http://db.sead.systems:8080/(device id)['?' + '&'.join(.[[start_
         "event=(threshold of event detection, must also include device and type=P and list_format=event)]]]],\n" \
         "[subset=(subsample result down to this many rows)], [list_format=(string representing what the json list entries\n" \
         "will look like)], [limit=(truncate result to this many rows)], [json=(1 get the result in pseudo JSON format)]]\n"
+
 
 class ApiHandler(http.server.CGIHTTPRequestHandler):
     def __init__(self, req, client_addr, server):
