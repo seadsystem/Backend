@@ -9,6 +9,7 @@ DATABASE = "seads"
 USER = "seadapi"
 TABLE = "data_raw"
 
+
 def query(parsed_url):
     """
     Handle parsed URL data and query the database as appropriate
