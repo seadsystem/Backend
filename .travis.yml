@@ -1,17 +1,35 @@
 language: go
 go:
   - tip
-sudo: false
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+    - python3
+    - libpq-dev
+    - python3-numpy
+    - python3-matplotlib
+    - python3-coverage
+
 install:
   - go get github.com/olt/libpq
   - go get github.com/DATA-DOG/go-sqlmock
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
+  - sudo apt-get install -y python3-pip
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; virtualenv -p python3 venv
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install --upgrade pip
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install psycopg2
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install numpy
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && pip3 install matplotlib
 before_script:
   - go vet $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone/...
 script:
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; go install
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && ./test_url_parser.py
+  - cd $GOPATH/src/github.com/seadsystem/Backend/DB/api; source venv/bin/activate && ./test_query_db.py
 after_success:
   - cd $GOPATH/src/github.com/seadsystem/Backend; go test github.com/seadsystem/Backend/DB/landingzone/...
   - cd $GOPATH/src/github.com/seadsystem/Backend/DB/landingzone; ./test-coverage.sh
