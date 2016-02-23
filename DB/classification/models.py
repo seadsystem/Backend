@@ -113,4 +113,4 @@ class BaseClassifier(object):
                 con.close()
 
 
-print(str(BaseClassifier.training_data(panel="Panel3")))
+#print(str(BaseClassifier.training_data(panel="Panel3")))
