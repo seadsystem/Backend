@@ -27,6 +27,7 @@ class RandomForestModel(models.BaseClassifier):
                  date_time=datetime.datetime.utcnow().timestamp(),
                  n_estimators=1000,
                  max_depth=None,
+
                  min_samples_split=1,
                  max_features=2):
         model = RandomForestClassifier(n_estimators=n_estimators,
@@ -204,6 +205,7 @@ def getInputs(l,h,house):
 #    for i in range(l,h):
     inputs.append(readInput())
     return inputs
+
 
 
 ourmodel = RandomForestModel()
