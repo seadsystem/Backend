@@ -114,9 +114,9 @@ def extractRunningLabels(input, low, high):
 
 def combineLabels(labels):
     running = []
-    for i in range(0,len(labels[0])):
+    for i in range(0, len(labels[0])):
         total = 0
-        for j in range(0,len(labels)):
+        for j in range(0, len(labels)):
             label = labels[j]
             total += label[i] << j
         running.append(total)
