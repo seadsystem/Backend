@@ -25,7 +25,7 @@ CREATE TABLE classifier_model (
   id UUID NOT NULL,
   created_at TIMESTAMP NOT NULL,
   model_type TEXT NOT NULL,
-  model TEXT NOT NULL
+  model bytea NOT NULL
 );
 '
 

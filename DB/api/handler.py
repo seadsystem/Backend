@@ -70,6 +70,7 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
             result = insert_db.insert(parsed, post_body)
             content = bytes(result, "utf-8")
             self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Content-type", "text/plain")
             self.send_header("Content-Length", len(content))
             self.end_headers()
