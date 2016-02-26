@@ -1,7 +1,7 @@
 import datetime
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
-from sklearn.datasets import load_boston
+import math
 
 testdata = [[datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
         [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater'],
@@ -42,23 +42,11 @@ class RandomForestModel(models.BaseClassifier):
     def classify(self, data):
         toFit = self.createSamples(data)
         print(self.model.predict(toFit))
-    def train(self):
-#        inputs = getInputs(3,20,1)
-        #
-        inputs = testdata
-        # boston = load_boston()
-        # print(boston.data[20:])
 
-        # aggregate = combineInputs(inputs)
+    def train(self, data):
+        inputs = testdata
         samples = self.createSamples(inputs)
         features = self.createFeatures(inputs)
-        # for i in samples:
-        #     print(i)
-        # for i in features:
-        #     print(i)
-        # instances = getInstances(aggregate,0,hour*30)
-        # runningLabels = getRunningLabels(inputs,0,hour*30)
-
         self.model.fit(samples, features)
 
     def createSamples(self,inputs):
@@ -66,6 +54,7 @@ class RandomForestModel(models.BaseClassifier):
         for i in range(len(inputs)-1):
             result.append([inputs[i][1], inputs[i+1][1]])
         return result
+
     def createFeatures(self,inputs):
         result = []
         for i in inputs[:-1]:
@@ -74,10 +63,10 @@ class RandomForestModel(models.BaseClassifier):
 
 
     hour = 3600
-    fiveMinutes = 300
     fridge = 5
     microwave = 11
     stove = 14
+fiveMinutes = 300
 
 
 def readInput():
@@ -89,14 +78,6 @@ def readInput():
     return input
 
 
-def getDayOfTheWeek(timestamp):
-    d = datetime.datetime.fromtimestamp(timestamp)
-    return d.weekday()
-
-
-def getTimeOfTheDay(timestamp):
-    d = datetime.datetime.fromtimestamp(timestamp)
-    return d.hour
 
 
 def printFeatureInstance(feature):
@@ -108,7 +89,7 @@ def printFeatureInstance(feature):
     print("Day of the week: %d" %(feature[5]))
 
 
-def getStandartDeviation(points, mean):
+def getStandardDeviation(points, mean):
     total = 0
     for point in points:
         delta = (point - mean)
@@ -132,7 +113,7 @@ def form5MinuteInstance(input, low, high):
         total += data
 
     mean = total / fiveMinutes
-    standartDeviation = getStandartDeviation(window,mean)
+    standartDeviation = getStandardDeviation(window,mean)
     dayOfTheWeek = getDayOfTheWeek(timestamp)
     timeOfTheDay = getTimeOfTheDay(timestamp)
     peak = max(window)
@@ -140,14 +121,6 @@ def form5MinuteInstance(input, low, high):
     featureInstance = [mean,standartDeviation,timeOfTheDay,peak,total,dayOfTheWeek]
 
     return featureInstance
-
-
-def getInstances(input,low,high):
-    instances = []
-    for index in range(low,high,fiveMinutes):
-        instance = form5MinuteInstance(input,index,index + fiveMinutes)
-        instances.append(instance)
-    return instances
 
 
 def isRunning(input,low,high,deviceId):
@@ -192,19 +165,6 @@ def combineLabels(labels):
     return running
 
 
-def getRunningLabels(inputs, low, high):
-    labels = []
-    for input in inputs:
-        label = extractRunningLabels(input, low, high)
-        labels.append(label)
-    return combineLabels(labels)
-
-
-def getInputs(l,h,house):
-    inputs = []
-#    for i in range(l,h):
-    inputs.append(readInput())
-    return inputs
 
 
 
