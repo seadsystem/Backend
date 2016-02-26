@@ -64,6 +64,7 @@ def get_parse(url):
 
     return query_options
 
+
 def post_parse(url):
     """
     Match the POST_URL against a set of routing rules

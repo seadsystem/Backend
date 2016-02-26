@@ -1,6 +1,6 @@
 *.sw[po]
 *~
-api/__pycache__
+__pycache__
 tags
 .idea
 .DS_Store

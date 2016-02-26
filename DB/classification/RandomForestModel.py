@@ -1,9 +1,14 @@
 import datetime
+import math
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
 import math
 
-testdata = [[datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
+USER = "seadapi"
+DATABASE = "seads"
+
+testdata = [
+        [datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
         [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater'],
         [datetime.datetime(2015, 12, 18, 0, 1, 34), -6377, 'heater'],
         [datetime.datetime(2015, 12, 18, 0, 1, 35), -6381, 'heater'],
@@ -19,34 +24,62 @@ testdata = [[datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
         [datetime.datetime(2015, 12, 16, 0, 0, 11), -125, 'fridge'],
         [datetime.datetime(2015, 12, 16, 0, 0, 12), -126, 'fridge'],
         [datetime.datetime(2015, 12, 16, 0, 0, 13), -127, 'fridge'],
-        [datetime.datetime(2015, 12, 16, 0, 0, 14), -127, 'fridge']]
+        [datetime.datetime(2015, 12, 16, 0, 0, 14), -127, 'fridge']
+]
+
 
 class RandomForestModel(models.BaseClassifier):
 
-    def __init__(self,
-                 date_time=datetime.datetime.utcnow().timestamp(),
-                 n_estimators=1000,
-                 max_depth=None,
-
-                 min_samples_split=1,
-                 max_features=2):
-        model = RandomForestClassifier(n_estimators=n_estimators,
-                                       max_depth=max_depth,
-                                       min_samples_split=min_samples_split,
-                                       max_features=max_features)
-
-        super(RandomForestModel, self).__init__(model_type="RandomForestClassifier", created_at=date_time, model=model)
+    def __init__(self, date_time=datetime.datetime.utcnow().timestamp(), model_field=None,
+                 n_estimators=1000, max_depth=None, _id=None, min_samples_split=1, max_features=2):
+        if model_field is None:
+            model = RandomForestClassifier(n_estimators=n_estimators,
+                                           max_depth=max_depth,
+                                           min_samples_split=min_samples_split,
+                                           max_features=max_features)
+        else:
+            model = model_field
+        super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
+                                                created_at=date_time, model=model, _id=_id)
     runlength = 3
-    
+
+    def create_samples(self, inputs):
+        result = []
+        for i in range(len(inputs)-1):
+            result.append([inputs[i][1], inputs[i+1][1]])
+        return result
+
+    def create_features(self, inputs):
+        result = []
+        for i in inputs[:-1]:
+            result.append(ord(i[2][0]))
+        return result
 
     def classify(self, data):
         toFit = self.createSamples(data)
         print(self.model.predict(toFit))
 
     def train(self, data):
+        to_fit = self.create_samples(data)
+        return self.model.predict(to_fit)
+
+    def train(self):
         inputs = testdata
         samples = self.createSamples(inputs)
         features = self.createFeatures(inputs)
+        # boston = load_boston()
+        # print(boston.data[20:])
+
+        # aggregate = combineInputs(inputs)
+        samples = self.create_samples(inputs)
+        features = self.create_features(inputs)
+        # for i in samples:
+        #     print(i)
+        # for i in features:
+        #     print(i)
+        # instances = getInstances(aggregate,0,hour*30)
+        # runningLabels = getRunningLabels(inputs,0,hour*30)
+
         self.model.fit(samples, features)
 
     def createSamples(self,inputs):
@@ -60,13 +93,25 @@ class RandomForestModel(models.BaseClassifier):
         for i in inputs[:-1]:
             result.append(ord(i[2][0]))
         return result
+    @staticmethod
+    def get_model(_id):
+        model_row = super(RandomForestModel, RandomForestModel).get_model(_id)
+        model = RandomForestModel(date_time=model_row.created_at, _id=model_row.id,
+                                  model_field=model_row.model)
+        return model
 
+'''model = RandomForestModel()
+model.store()
+modelDict = RandomForestModel.get_model(model.id)
+print(str(modelDict))
+'''
 
-    hour = 3600
-    fridge = 5
-    microwave = 11
-    stove = 14
+hour = 3600
 fiveMinutes = 300
+fridge = 5
+microwave = 11
+stove = 14
+
 
 
 def readInput():
@@ -166,8 +211,6 @@ def combineLabels(labels):
 
 
 
-
-
 ourmodel = RandomForestModel()
 ourmodel.train()
-ourmodel.classify(testdata)
+print(ourmodel.classify(testdata))
