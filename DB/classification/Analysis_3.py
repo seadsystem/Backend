@@ -9,7 +9,7 @@
 # data, normalized by total current.
 # Outputs to spectrum in a numpy array to stdout or a text 
 # file, each array element on a line.
-##  
+##
 
 # For numerical analysis
 import numpy as np

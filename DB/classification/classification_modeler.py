@@ -160,7 +160,5 @@ instances = getInstances(aggregate,0,hour*30)
 runningLabels = getRunningLabels(inputs,0,hour*30)
 
 classifier.fit(instances, runningLabels)
-blob = pickle.dumps(classifier)
-clr = pickle.loads(blob)
-
+clr = classifier
 performTests(aggregate, inputs, hour*30, hour*60, clr)

@@ -46,7 +46,7 @@ class BaseClassifier(object):
     model = None
 
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
-                 model=None, _id=None):
+                 model=None, _id=str(uuid.uuid4())):
         """
         :summary: BaseClassifier constructor
         :param date_time (optional): timestamp, defaults to utcnow(), named parameter
@@ -55,10 +55,7 @@ class BaseClassifier(object):
         self.model_type = model_type
         self.created_at = created_at
         self.model = model
-        if _id is none:
-            self.id = str(uuid.uuid4())
-        else:
-            self.id = _id
+        self.id = _id
 
     def store(self):
         """
@@ -95,9 +92,10 @@ class BaseClassifier(object):
         """
         raise NotImplementedError
 
-    def classify(self):
+    def classify(self, data):
         """
         :summary: override this method in your derived classifier class to return a vector of labels
+        :param data: data to train with
         """
         raise NotImplementedError
 
