@@ -31,7 +31,6 @@ install:
   - cd "$API"; source $ACTIVATE && pip3 install psycopg2
   - cd "$API"; source $ACTIVATE && pip3 install numpy
   - cd "$API"; source $ACTIVATE && pip3 install matplotlib
-  - cd "$API"; source $ACTIVATE && pip3 install codecov
 before_script:
   - go vet "$LZONE/..."
 script:
@@ -40,4 +39,4 @@ script:
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
   - cd "$LZONE"; ./test-coverage.sh
-  - cd "$API"; source $ACTIVATE && codecov
+  - cd "$API"; source $ACTIVATE && bash <(curl -s https://codecov.io/bash)
