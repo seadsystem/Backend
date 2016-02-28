@@ -1,19 +1,25 @@
+sudo: required
+dist: trusty
+
 language: go
+
 go:
   - 1.6
   - tip
-sudo: required
-dist: trusty
+
+python:
+  - "3.4"
+  - "3.5"
+
 env:
   global:
     - BACKEND="$HOME/gopath/src/github.com/seadsystem/Backend"
     - API="$BACKEND/DB/api"
     - LZONE="$BACKEND/DB/landingzone"
-    - ACTIVATE="venv/bin/activate"
+
 addons:
   apt:
     packages:
-    - python3
     - libpq-dev
     - python3-numpy
     - python3-matplotlib
@@ -26,17 +32,19 @@ install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
   - sudo apt-get install -y python3-pip
-  - cd "$API"; virtualenv -p python3 venv
-  - cd "$API"; source $ACTIVATE && pip3 install --upgrade pip
-  - cd "$API"; source $ACTIVATE && pip3 install psycopg2
-  - cd "$API"; source $ACTIVATE && pip3 install numpy
-  - cd "$API"; source $ACTIVATE && pip3 install matplotlib
+  - sudo pip3 install -U pip
+  - sudo pip3 install -U psycopg2
+  - sudo pip3 install -U numpy
+  - sudo pip3 install -U matplotlib
+
 before_script:
   - go vet "$LZONE/..."
+
 script:
   - cd "$LZONE"; go install
-  - cd "$API"; source $ACTIVATE && coverage run -m unittest discover
+  - cd "$API"; coverage run -m unittest discover
+
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
   - cd "$LZONE"; ./test-coverage.sh
-  - cd "$API"; source $ACTIVATE && bash <(curl -s https://codecov.io/bash)
+  - cd "$API"; bash <(curl -s https://codecov.io/bash)
