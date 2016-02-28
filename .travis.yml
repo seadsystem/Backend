@@ -20,6 +20,7 @@ addons:
     - python3-numpy
     - python3-matplotlib
     - python3-coverage
+    - python3-psycopg2
 
 install:
   - go get github.com/olt/libpq
@@ -27,9 +28,9 @@ install:
   - go get github.com/axw/gocov/gocov
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/codecov/example-go
+  - pyenv global 3.4
   - python3 -V
   - sudo apt-get install -y python3-pip
-  - sudo -H pip3 install -U psycopg2
   - pip3 install --user coveralls
 
 before_script:
