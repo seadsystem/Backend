@@ -45,4 +45,4 @@ script:
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
   - cd "$LZONE"; ./test-coverage.sh
-  - cd bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
