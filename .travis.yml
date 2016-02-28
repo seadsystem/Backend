@@ -24,25 +24,25 @@ addons:
 install:
   - go get github.com/olt/libpq
   - go get github.com/DATA-DOG/go-sqlmock
-  - go get github.com/axw/gocov/gocov
-  - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
+  - go get github.com/codecov/example-go
   - python3 -V
   - sudo apt-get install -y python3-pip
   - sudo -H pip3 install -U pip
   - sudo -H pip3 install -U psycopg2
   - sudo -H pip3 install -U numpy
   - sudo -H pip3 install -U matplotlib
-  - pip3 install --user codecov
+  - pip3 install --user coveralls
 
 before_script:
-  - go vet "$LZONE/..."
+  - cd "$LZONE"; go install
 
 script:
-  - cd "$LZONE"; go install
-  - cd "$API"; /usr/bin/python3-coverage run --include="$(pwd)/*.py" -m unittest discover
+  - go vet "$LZONE/..."
+  - cd "$BACKEND"; go test "$LZONE/..."
+  - cd "$API"; python3-coverage run --include="$API/*.py" -m unittest discover
 
 after_success:
-  - cd "$BACKEND"; go test "$LZONE/..."
-  - cd "$LZONE"; ./test-coverage.sh
-  - cd "$API"; codecov
+  - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
+  - bash <(curl -s https://codecov.io/bash)
+  - coveralls

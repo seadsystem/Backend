@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/seadsystem/Backend.svg?branch=master)](https://travis-ci.org/seadsystem/Backend) [![Coverage Status](https://coveralls.io/repos/seadsystem/Backend/badge.svg?branch=master&service=github)](https://coveralls.io/github/seadsystem/Backend?branch=master)
+[![Build Status](https://travis-ci.org/seadsystem/Backend.svg?branch=master)](https://travis-ci.org/seadsystem/Backend) [![codecov.io](https://codecov.io/github/seadsystem/Backend/coverage.svg?branch=master)](https://codecov.io/github/seadsystem/Backend?branch=master)
 
 #Go Landing Zone
 The Go Landing Zone is a high speed, concurrent TCP server which listens for connections from SEAD plugs on port 9000. The plug requests its configuration from the server before beginning to send the buffered data it collects. This stream of packets is decoded, and the data is bulk inserted into the Postgres database in the background to be later queried by the API.
