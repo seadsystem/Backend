@@ -33,6 +33,7 @@ install:
   - sudo -H pip3 install -U psycopg2
   - sudo -H pip3 install -U numpy
   - sudo -H pip3 install -U matplotlib
+  - sudo -H pip3 install -U codecov
 
 before_script:
   - go vet "$LZONE/..."
@@ -40,9 +41,8 @@ before_script:
 script:
   - cd "$LZONE"; go install
   - cd "$API"; python3-coverage run --include="$(pwd)/*.py" -m unittest discover
-  - cd "$BACKEND"; mv "$API/.coverage" .
 
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
   - cd "$LZONE"; ./test-coverage.sh
-  - bash <(curl -s https://codecov.io/bash)
+  - cd "$API"; codecov
