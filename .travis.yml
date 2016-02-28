@@ -18,7 +18,6 @@ addons:
     packages:
     - libpq-dev
     - python3-numpy
-    - python3-coverage
     - python3-psycopg2
 
 install:
@@ -29,7 +28,7 @@ install:
   - python3 -V
   - sudo apt-get install -y python3-pip
   - sudo -H pip3 install -U matplotlib
-  - pip3 install --user coveralls
+  - sudo -H pip3 install coveralls
 
 before_script:
   - cd "$LZONE"; go install
@@ -37,7 +36,7 @@ before_script:
 script:
   - go vet "$LZONE/..."
   - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
-  - cd "$API"; python3-coverage run --include="$API/*.py" -m unittest discover
+  - cd "$API"; coverage run --include="$API/*.py" -m unittest discover
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
