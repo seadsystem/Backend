@@ -39,5 +39,6 @@ script:
   - cd "$API"; coverage run --include="$API/*.py" -m unittest discover
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
   - coveralls
+  - rm "$API/.coverage"
+  - bash <(curl -s https://codecov.io/bash)
