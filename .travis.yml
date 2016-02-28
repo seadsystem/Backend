@@ -25,10 +25,9 @@ addons:
 install:
   - go get github.com/olt/libpq
   - go get github.com/DATA-DOG/go-sqlmock
-  - go get github.com/axw/gocov/gocov
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/codecov/example-go
-  - pyenv global 3.4
+  - pyenv global 3.4.3
   - python3 -V
   - sudo apt-get install -y python3-pip
   - pip3 install --user coveralls
@@ -38,10 +37,9 @@ before_script:
 
 script:
   - go vet "$LZONE/..."
-  - cd "$BACKEND"; go test "$LZONE/..."
+  - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
   - cd "$API"; python3-coverage run --include="$API/*.py" -m unittest discover
 
 after_success:
-  - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
   - bash <(curl -s https://codecov.io/bash)
   - coveralls
