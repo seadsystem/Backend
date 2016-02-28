@@ -38,11 +38,13 @@ install:
   - sudo pip3 install -U matplotlib
 
 before_script:
+  - python3 -V
+  - go version
   - go vet "$LZONE/..."
 
 script:
   - cd "$LZONE"; go install
-  - cd "$API"; coverage run -m unittest discover
+  - cd "$API"; python3-coverage run -m unittest discover
 
 after_success:
   - cd "$BACKEND"; go test "$LZONE/..."
