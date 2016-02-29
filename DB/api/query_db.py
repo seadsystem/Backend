@@ -6,6 +6,7 @@ import detect_events as D
 # Database user credentials
 DATABASE = "seads"
 USER = "seadapi"
+
 TABLE = "data_raw"
 
 
