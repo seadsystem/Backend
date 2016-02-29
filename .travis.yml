@@ -10,7 +10,7 @@ go:
 env:
   global:
     - BACKEND="$HOME/gopath/src/github.com/seadsystem/Backend"
-    - API="$BACKEND/DB/api"
+    - API="$TRAVIS_BUILD_DIR/DB/api"
     - LZONE="$BACKEND/DB/landingzone"
 
 addons:
@@ -39,6 +39,6 @@ script:
   - cd "$API"; coverage run --include="$API/*.py" -m unittest discover
 
 after_success:
-  - coveralls
+  - cd "$API"; coveralls
   - rm "$API/.coverage"
   - bash <(curl -s https://codecov.io/bash)
