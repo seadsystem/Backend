@@ -3,6 +3,7 @@ import math
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
 import math
+import statistics
 
 USER = "seadapi"
 DATABASE = "seads"
@@ -31,76 +32,90 @@ testdata = [
 class RandomForestModel(models.BaseClassifier):
 
     def __init__(self, date_time=datetime.datetime.utcnow().timestamp(), model_field=None,
-                 n_estimators=1000, max_depth=None, _id=None, min_samples_split=1, max_features=2):
+                 n_estimators=1000, max_depth=None, _id=None, min_samples_split=1, max_features=2,
+                 window_size=2):
+        """
+
+        :param date_time:
+        :param model_field:
+        :param n_estimators:
+        :param max_depth:
+        :param _id:
+        :param min_samples_split:
+        :param max_features:
+        :param window_size:
+        :return:
+        """
         if model_field is None:
             model = RandomForestClassifier(n_estimators=n_estimators,
                                            max_depth=max_depth,
                                            min_samples_split=min_samples_split,
-                                           max_features=max_features)
+                                           max_features=max_features,)
         else:
             model = model_field
+        self.window_size = window_size
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
-    runlength = 3
 
     def create_samples(self, inputs):
+        # result = []
+        # for i in range(len(inputs)-1):
+        #     result.append([inputs[i][1], inputs[i+1][1]])
+        #
+        variable_increments = self.input_slice(inputs)
+
+        return variable_increments
+
+    def input_slice(self, inputs):
         result = []
-        for i in range(len(inputs)-1):
-            result.append([inputs[i][1], inputs[i+1][1]])
+        print(self.window_size)
+        print(int(len(inputs)/self.window_size))
+        for i in range(int(len(inputs)/self.window_size)):
+            result.append(inputs[i*self.window_size:(i+1)*self.window_size])
+            print(result[i])
         return result
 
-    def create_features(self, inputs):
+    @staticmethod
+    def create_labels(inputs):
         result = []
         for i in inputs[:-1]:
             result.append(ord(i[2][0]))
         return result
 
     def classify(self, data):
-        toFit = self.createSamples(data)
-        print(self.model.predict(toFit))
+        toFit = self.create_labels(data)
+        return self.model.predict(toFit)
 
     def train(self, data):
-        to_fit = self.create_samples(data)
-        return self.model.predict(to_fit)
+        samples = self.create_samples(data)
+        features = self.create_labels(data)
+        # self.model.fit(samples, features)
 
     def train(self):
-        inputs = testdata
-        samples = self.createSamples(inputs)
-        features = self.createFeatures(inputs)
-        # boston = load_boston()
-        # print(boston.data[20:])
+        self.train(testdata)
 
-        # aggregate = combineInputs(inputs)
-        samples = self.create_samples(inputs)
-        features = self.create_features(inputs)
-        # for i in samples:
-        #     print(i)
-        # for i in features:
-        #     print(i)
-        # instances = getInstances(aggregate,0,hour*30)
-        # runningLabels = getRunningLabels(inputs,0,hour*30)
 
-        self.model.fit(samples, features)
+    def get_std_dev(self, data):
+        """
+        Gets standard deviation. Data is assumed to be [[something, datapoint, ...],[something, datapoint]...].
+        Extracts just datapoint from each array for stdev purposes.
+        :param data:
+        :return:
+        """
+        mean = 0
+        data_arr = []
+        for i in data:
+            data_arr.append(i[1])
+        return statistics.stdev(data_arr)
 
-    def createSamples(self,inputs):
-        result = []
-        for i in range(len(inputs)-1):
-            result.append([inputs[i][1], inputs[i+1][1]])
-        return result
-
-    def createFeatures(self,inputs):
-        result = []
-        for i in inputs[:-1]:
-            result.append(ord(i[2][0]))
-        return result
     @staticmethod
     def get_model(_id):
         model_row = super(RandomForestModel, RandomForestModel).get_model(_id)
         model = RandomForestModel(date_time=model_row.created_at, _id=model_row.id,
                                   model_field=model_row.model)
         return model
-
-'''model = RandomForestModel()
+'''
+model = RandomForestModel()
 model.store()
 modelDict = RandomForestModel.get_model(model.id)
 print(str(modelDict))
@@ -123,6 +138,14 @@ def readInput():
     return input
 
 
+def getStandardDeviation(points, mean):
+    total = 0
+    for point in points:
+        delta = (point - mean)
+        deviation = delta*delta
+        total += deviation
+    mean = total / fiveMinutes
+    return math.sqrt(mean)
 
 
 def printFeatureInstance(feature):
@@ -134,14 +157,6 @@ def printFeatureInstance(feature):
     print("Day of the week: %d" %(feature[5]))
 
 
-def getStandardDeviation(points, mean):
-    total = 0
-    for point in points:
-        delta = (point - mean)
-        deviation = delta*delta
-        total += deviation
-    mean = total / fiveMinutes
-    return math.sqrt(mean)
 
 
 def form5MinuteInstance(input, low, high):
@@ -159,9 +174,9 @@ def form5MinuteInstance(input, low, high):
 
     mean = total / fiveMinutes
     standartDeviation = getStandardDeviation(window,mean)
-    dayOfTheWeek = getDayOfTheWeek(timestamp)
-    timeOfTheDay = getTimeOfTheDay(timestamp)
-    peak = max(window)
+    # dayOfTheWeek = getDayOfTheWeek(timestamp)
+    # timeOfTheDay = getTimeOfTheDay(timestamp)
+    # peak = max(window)
 
     featureInstance = [mean,standartDeviation,timeOfTheDay,peak,total,dayOfTheWeek]
 
@@ -213,4 +228,4 @@ def combineLabels(labels):
 
 ourmodel = RandomForestModel()
 ourmodel.train()
-print(ourmodel.classify(testdata))
+# print(ourmodel.classify(testdata))
