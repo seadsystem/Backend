@@ -24,8 +24,7 @@ testdata = [
         [datetime.datetime(2015, 12, 16, 0, 0, 10), -126, 'fridge'],
         [datetime.datetime(2015, 12, 16, 0, 0, 11), -125, 'fridge'],
         [datetime.datetime(2015, 12, 16, 0, 0, 12), -126, 'fridge'],
-        [datetime.datetime(2015, 12, 16, 0, 0, 13), -127, 'fridge'],
-        [datetime.datetime(2015, 12, 16, 0, 0, 14), -127, 'fridge']
+        [datetime.datetime(2015, 12, 16, 0, 0, 13), -127, 'fridge']
 ]
 
 
@@ -57,42 +56,55 @@ class RandomForestModel(models.BaseClassifier):
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
+    def extract_values(self, data):
+        result = []
+        for i in data:
+            result.append(i[1])
+        return result
+
     def create_samples(self, inputs):
-        # result = []
-        # for i in range(len(inputs)-1):
-        #     result.append([inputs[i][1], inputs[i+1][1]])
-        #
+        if(len(inputs) < self.window_size):
+            print("Input is smaller than window_size! Unpredictable results!")
+        if(len(inputs) % self.window_size != 0):
+            print("Input is not an even multiple of window_size!")
+        result = []
+
         variable_increments = self.input_slice(inputs)
 
-        return variable_increments
+        for i in range(len(variable_increments)):
+            values = self.extract_values(variable_increments[i])
+            stdev = self.get_std_dev(variable_increments[i])
+            peak = max(values)
+            dayofweek = int(variable_increments[i][0][0].weekday())
+            timeofday = int(variable_increments[i][0][0].hour)
+            toInsert = [stdev, peak, dayofweek, timeofday]
+            toInsert.extend(values)
+            result.append(toInsert)
+        return result
 
     def input_slice(self, inputs):
         result = []
-        print(self.window_size)
-        print(int(len(inputs)/self.window_size))
         for i in range(int(len(inputs)/self.window_size)):
             result.append(inputs[i*self.window_size:(i+1)*self.window_size])
-            print(result[i])
         return result
 
-    @staticmethod
-    def create_labels(inputs):
+    def create_labels(self, inputs):
         result = []
-        for i in inputs[:-1]:
-            result.append(ord(i[2][0]))
+        data = self.input_slice(inputs)
+        for datum in data:
+            # for elem in datum:
+            result.append(ord(datum[0][2][0]))
         return result
 
     def classify(self, data):
         toFit = self.create_labels(data)
         return self.model.predict(toFit)
 
-    def train(self, data):
+    def train(self, data=testdata):
         samples = self.create_samples(data)
         features = self.create_labels(data)
-        # self.model.fit(samples, features)
+        self.model.fit(samples, features)
 
-    def train(self):
-        self.train(testdata)
 
 
     def get_std_dev(self, data):
