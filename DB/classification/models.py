@@ -4,7 +4,7 @@ import psycopg2
 import uuid
 import functools
 
-USER = "ianlofgren"
+USER = "seadapi"
 DATABASE = "seads"
 
 
@@ -42,7 +42,6 @@ class BaseClassifier(object):
     """
     model_type = None
     created_at = None
-    id = None
     model = None
 
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
@@ -73,15 +72,15 @@ class BaseClassifier(object):
 
         try:
             con = psycopg2.connect(database=DATABASE, user=USER)
-        except psycopg2.Error() as e:
-            raise ConnectionError("Database connection on model insert", e)
+        except Exception as e:
+            raise psycopg2.Error("Database connection on model insert", e)
 
         try:
             cursor = con.cursor()
             query = insert_query_builder("classifier_model", self.__dict__)
             cursor.execute(query, self.__dict__)
-        except psycopg2.Error as e:
-            raise IOError("Model insert failed", e)
+        except Exception as e:
+            raise psycopg2.Error("Model insert failed", e)
         finally:
             con.commit()
             con.close()
@@ -92,10 +91,11 @@ class BaseClassifier(object):
         """
         raise NotImplementedError
 
-    def classify(self, data):
+    def classify(self, start_time=None, end_time=None):
         """
         :summary: override this method in your derived classifier class to return a vector of labels
-        :param data: data to train with
+        :param start_time: start_time of data to train with
+        :param end_time: end_time of data to train with
         """
         raise NotImplementedError
 
@@ -104,12 +104,12 @@ class BaseClassifier(object):
     def get_model(_id):
         try:
             con = psycopg2.connect(database=DATABASE, user=USER)
-        except psycopg2.Error() as e:
+        except psycopg2.Error as e:
             raise ConnectionError("Database connection on model insert", e)
 
         try:
             cursor = con.cursor()
-            query = "SELECT * FROM classifier_model WHERE id=%s;"
+            query = "SELECT * FROM classifier_model where id = %s;"
             cursor.execute(query, [_id])
             model_row = cursor.fetchall()
         except psycopg2.Error as e:
@@ -119,13 +119,12 @@ class BaseClassifier(object):
 
         try:
             classifier = model_row[0][3]
-            model = {'id': uuid.UUID(model_row[0][0]),
+            model = {'id': model_row[0][0],
                      'created_at': model_row[0][1],
                      'model_type': model_row[0][2],
                      'model': pickle.loads(classifier)}
         except pickle.PickleError as e:
             raise ValueError("Model pickling failed", e)
-
         return model
 
     @staticmethod
@@ -142,21 +141,21 @@ class BaseClassifier(object):
 
         try:
             con = psycopg2.connect(database=DATABASE, user=USER)
-        except psycopg2.Error() as e:
-            raise ConnectionError("Database connection on classification data fetch failed", e)
+        except Exception as e:
+            raise psycopg2.Error("Database connection on classification data fetch failed", e)
         try:
             most_recent = False
             cursor = con.cursor()
             params = {'panel': panel,
                       'id': serial}
             query = "SELECT time, data - lag(data) OVER (ORDER BY time DESC) as data FROM \
-                        data_raw WHERE device=%(panel)s and serial=%(id)s"
+                        data_raw WHERE device='Panel1' OR device='Panel2' OR device='Panel3' and serial=%(id)s"
             if start_time is None and end_time is None:
                 query += "LIMIT 2;"
                 most_recent = True
             else:
-                query += "and time BETWEEN to_timestamp(%(start_time)s) and \
-                to_timestamp(%(end_time)s);"
+                query += " and time BETWEEN to_timestamp(%(start_time)s) and \
+                         to_timestamp(%(end_time)s);"
                 params['start_time'] = start_time
                 params['end_time'] = end_time
 
@@ -166,8 +165,8 @@ class BaseClassifier(object):
                 return results[0]
             else:
                 return results
-        except psycopg2.Error() as e:
-            raise IOError("Training data fetch failed", e)
+        except Exception as e:
+            raise psycopg2.Error("Training data fetch failed", e)
         finally:
             if con:
                 con.close()
@@ -180,8 +179,8 @@ class BaseClassifier(object):
         :return: data between all start_time and end_time in data_label with associated label
         """
         try:
-            con = psycopg2.connect(database="seads", user="ianlofgren")
-        except psycopg2.Error() as e:
+            con = psycopg2.connect(database=DATABASE, user=USER)
+        except psycopg2.Error as e:
             raise ConnectionError("Database connection on training data fetch failed", e)
         try:
             cursor = con.cursor()
@@ -194,7 +193,7 @@ class BaseClassifier(object):
                     AND time BETWEEN data_label.start_time AND data_label.end_time;"
             cursor.execute(query, {'device': panel})
             return cursor.fetchall()
-        except psycopg2.Error() as e:
+        except psycopg2.Error as e:
             raise IOError("Training data fetch failed", e)
         finally:
             if con:
