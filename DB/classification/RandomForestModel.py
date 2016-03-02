@@ -126,6 +126,7 @@ class RandomForestModel(models.BaseClassifier):
         model = RandomForestModel(date_time=model_row.created_at, _id=model_row.id,
                                   model_field=model_row.model)
         return model
+
 '''
 model = RandomForestModel()
 model.store()
@@ -139,7 +140,7 @@ fridge = 5
 microwave = 11
 stove = 14
 
-
+#beyond this point is code that should go away once this module is doneo
 
 def readInput():
     input = []
