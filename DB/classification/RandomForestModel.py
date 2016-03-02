@@ -76,9 +76,9 @@ class RandomForestModel(models.BaseClassifier):
         return result
 
     def create_samples(self, inputs):
-        if (len(inputs) < self.window_size):
+        if len(inputs) < self.window_size:
             print("Input is smaller than window_size! Unpredictable results!")
-        if (len(inputs) % self.window_size != 0):
+        if len(inputs) % self.window_size != 0:
             print("Input is not an even multiple of window_size!")
         result = []
 
