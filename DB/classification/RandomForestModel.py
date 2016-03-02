@@ -1,5 +1,6 @@
 import datetime
 import math
+import uuid
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
 import math
@@ -7,7 +8,6 @@ import statistics
 
 USER = "seadapi"
 DATABASE = "seads"
-
 testdata = [
         [datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
         [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater'],
@@ -30,9 +30,9 @@ testdata = [
 
 class RandomForestModel(models.BaseClassifier):
 
-    def __init__(self, date_time=datetime.datetime.utcnow().timestamp(), model_field=None,
-                 n_estimators=1000, max_depth=None, _id=None, min_samples_split=1, max_features=2,
-                 window_size=2):
+    def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
+                 n_estimators=1000, max_depth=None, _id=str(uuid.uuid4()), min_samples_split=1,
+                 max_features=2, window_size=2):
         """
 
         :param date_time:
@@ -52,9 +52,23 @@ class RandomForestModel(models.BaseClassifier):
                                            max_features=max_features,)
         else:
             model = model_field
-        self.window_size = window_size
+	self.window_size = window_size
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
+
+    def classify(self, start_time=datetime.datetime.now(),
+		end_time=datetime.datetime.now()-date.timedelta(seconds=self.window),
+		panel=None, serial=None):
+        print(end_time)
+        data = models.BaseClassifier.classification_data(start_time=start_time, end_time=end_time,
+                                                         panel=panel, serial=serial)
+        to_fit = RandomForestModel.create_samples(data)
+        return self.model.predict(to_fit)
+
+    def train(self, data=testdata):
+        samples = RandomForestModel.create_samples(data)
+        labels = RandomForestModel.create_labels(data)
+	    self.model.fit(samples, labels)
 
     def extract_values(self, data):
         result = []
@@ -96,17 +110,6 @@ class RandomForestModel(models.BaseClassifier):
             result.append(ord(datum[0][2][0]))
         return result
 
-    def classify(self, data):
-        toFit = self.create_labels(data)
-        return self.model.predict(toFit)
-
-    def train(self, data=testdata):
-        samples = self.create_samples(data)
-        features = self.create_labels(data)
-        self.model.fit(samples, features)
-
-
-
     def get_std_dev(self, data):
         """
         Gets standard deviation. Data is assumed to be [[something, datapoint, ...],[something, datapoint]...].
@@ -117,16 +120,27 @@ class RandomForestModel(models.BaseClassifier):
         mean = 0
         data_arr = []
         for i in data:
-            data_arr.append(i[1])
-        return statistics.stdev(data_arr)
+	    data_arr.append(i[1])
+	return statistics.stdev(data_arr)
+
 
     @staticmethod
     def get_model(_id):
         model_row = super(RandomForestModel, RandomForestModel).get_model(_id)
-        model = RandomForestModel(date_time=model_row.created_at, _id=model_row.id,
-                                  model_field=model_row.model)
+        model = RandomForestModel(date_time=model_row['created_at'], _id=model_row['id'],
+                                  model_field=model_row['model'])
         return model
 
+model2 = RandomForestModel()
+model2.train()
+model2.store()
+modelDict = RandomForestModel.get_model(model2.id)
+print(str(modelDict.model))
+print(modelDict.classify(panel="Panel3", serial=466419818))
+
+ourmodel = RandomForestModel()
+ourmodel.train()
+print(ourmodel.classify())
 '''
 model = RandomForestModel()
 model.store()

@@ -3,6 +3,8 @@ import psycopg2.extras
 
 import DB.classification.Analysis_3 as A
 import DB.classification.detect_events as D
+import DB.classification.RandomForestModel as RMF
+import DB.classification.BaseClassifier as BC
 
 # Database user credentials
 DATABASE = "seads"
@@ -58,6 +60,13 @@ def query(parsed_url):
         results = generate_total_energy(device_id, start_time, end_time, device)
         return results
 
+    if classify and device_id and device:
+        model = RMF.RandomForestModel.get_model()
+        if start_time and end_time:
+            return model.classify(start_time=start_time, end_time=end_time, device=device)
+        else:
+            return model.classify()
+
     results = retrieve_within_filters(
         device_id,
         start_time,
@@ -71,11 +80,6 @@ def query(parsed_url):
         granularity,
         list_format
     )
-
-    if classify:
-        if device_id and start_time and end_time:
-            return A.run(results)
-        raise Exception("Received malformed URL data: missing start_time and end_time")
     
     if events and diff:
         if device and start_time and end_time and data_type == 'P' and list_format == 'event':
