@@ -51,14 +51,14 @@ class RandomForestModel(models.BaseClassifier):
                                            max_features=max_features, )
         else:
             model = model_field
-        self.window_size = window_size
+            self.window_size = window_size
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
     def classify(self, start_time=datetime.datetime.now(), end_time=None, panel=None, serial=None):
-        if end_time is None:
-            end_time = datetime.datetime.now() - datetime.timedelta(seconds=self.window_size)
         print(end_time)
+        if end_time is None:
+            end_time=datetime.datetime.now() - datetime.timedelta(seconds=self.window_size)
         data = models.BaseClassifier.classification_data(start_time=start_time, end_time=end_time,
                                                          panel=panel, serial=serial)
         to_fit = RandomForestModel.create_samples(data)
@@ -76,12 +76,11 @@ class RandomForestModel(models.BaseClassifier):
         return result
 
     def create_samples(self, inputs):
-        if (len(inputs) < self.window_size):
+        if len(inputs) < self.window_size:
             print("Input is smaller than window_size! Unpredictable results!")
-        if (len(inputs) % self.window_size != 0):
+        if len(inputs) % self.window_size != 0:
             print("Input is not an even multiple of window_size!")
         result = []
-
         variable_increments = self.input_slice(inputs)
 
         for i in range(len(variable_increments)):
@@ -90,9 +89,9 @@ class RandomForestModel(models.BaseClassifier):
             peak = max(values)
             dayofweek = int(variable_increments[i][0][0].weekday())
             timeofday = int(variable_increments[i][0][0].hour)
-            toInsert = [stdev, peak, dayofweek, timeofday]
-            toInsert.extend(values)
-            result.append(toInsert)
+            to_insert = [stdev, peak, dayofweek, timeofday]
+            to_insert.extend(values)
+            result.append(to_insert)
         return result
 
     def input_slice(self, inputs):
@@ -125,9 +124,7 @@ class RandomForestModel(models.BaseClassifier):
     @staticmethod
     def get_model(_id):
         model_row = models.BaseClassifier.get_model(_id)
-        model = RandomForestModel(date_time=model_row['created_at'], _id=model_row['id'],
-                                  model_field=model_row['model'])
-        return model
+        return RandomForestModel(date_time=model_row['created_at'], _id=model_row['id'], model_field=model_row['model'])
 
 
 model2 = RandomForestModel()
@@ -162,14 +159,12 @@ def printFeatureInstance(feature):
     print("Energy consumed: %d" % (feature[4]))
     print("Day of the week: %d" % (feature[5]))
 
-
 def isRunning(input, low, high, deviceId):
     for i in range(low, high):
         value = input[i].split()[1]
         if float(value) > 10:
             return 1
     return 0
-
 
 def combineInputs(inputs):
     points = []
@@ -185,14 +180,12 @@ def combineInputs(inputs):
         points.append(entry)
     return points
 
-
 def extractRunningLabels(input, low, high):
     runningLabels = []
     for i in range(low, high, fiveMinutes):
         running = isRunning(input, i, i + fiveMinutes, 5)
         runningLabels.append(running)
     return runningLabels
-
 
 def combineLabels(labels):
     running = []
