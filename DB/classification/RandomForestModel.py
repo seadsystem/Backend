@@ -3,7 +3,6 @@ import math
 import uuid
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
-import math
 import statistics
 
 USER = "seadapi"
@@ -30,13 +29,12 @@ testdata = [
 
 class RandomForestModel(models.BaseClassifier):
     window_size = None
+    labels = []
 
-    def __init__(self, date_time=datetime.datetime.
-                 now(), model_field=None,
+    def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
                  n_estimators=1000, max_depth=None, _id=str(uuid.uuid4()), min_samples_split=1,
                  max_features=2, window_size=2):
         """
-
         :param date_time:
         :param model_field:
         :param n_estimators:
@@ -64,14 +62,82 @@ class RandomForestModel(models.BaseClassifier):
                                                          panel=panel, serial=serial)
         print(data)
         to_fit = self.create_samples(data)
-        return self.model.predict(to_fit)
+        return self.classify_data(to_fit)
+
+    def classify_data(self, data):
+        to_fit = self.create_samples(data)
+        predicted = self.model.predict(to_fit)
+        result = []
+        for i in predicted:
+            result.append(self.disaggregate_labels(i))
+        return result
+
+    def get_index(self, label):
+        """
+        gets the index of the label. If it's not there, adds the label.
+        :param label:
+        :return:
+        """
+        if label in self.labels:
+            return self.labels.index(label)
+        else:
+            self.labels.append(label)
+            return self.labels.index(label)
+
+    def add_all_labels(self, data):
+        for i in data:
+            self.get_index(i[2])
+
+    def aggregate_labels(self, labels):
+        """
+        aggregates array of labels into a binary bitstring
+        binary bitstring gets parsed as int
+        :return:
+        """
+        boolean_arr = []
+        for label in labels:
+            self.get_index(label)
+
+        for label in self.labels:
+            if label in labels:
+                boolean_arr.append(True)
+            else:
+                boolean_arr.append(False)
+        bit_string = ''.join(['1' if x else '0' for x in boolean_arr])
+        #leading 1 to avoid removal of leading 0's
+        bit_string = '1' + bit_string
+        result = int(bit_string)
+        print(result)
+        return result
+
+    def disaggregate_labels(self, labels):
+        """
+
+        :param labels: integer value, of the form 010110, etc.
+        :return:
+        """
+        result = []
+        bitstring = str(labels)
+        #remove leading 1(added to avoid removal of leading 0's
+        bitstring = bitstring[1:]
+        for i in range(len(bitstring)):
+            if(bitstring[i] == '1'):
+                result.append(self.labels[i])
+        return result
 
     def train(self, data=testdata):
+        self.add_all_labels(data)
+        print(self.labels)
         samples = self.create_samples(data)
         labels = self.create_labels(data)
         self.model.fit(samples, labels)
 
     def extract_values(self, data):
+        """
+        Extracts the values from the data and gives them back as an array
+        :param data: In the format [anything, datum, ...], [anything, datum, ...], ...
+        :return: [datum, datum, ...]
+        """
         result = []
         for i in data:
             result.append(i[1])
@@ -98,6 +164,13 @@ class RandomForestModel(models.BaseClassifier):
         return result
 
     def input_slice(self, inputs):
+        """
+        Splits inputs into arrays of size self.window_size.
+        If window_size = 2, behaves like:
+        [a, b, c, d, e, f] -> [[a, b], [c, d], [e, f]]
+        :param inputs:
+        :return:
+        """
         result = []
         for i in range(int(len(inputs) / self.window_size)):
             result.append(inputs[i * self.window_size:(i + 1) * self.window_size])
@@ -107,8 +180,13 @@ class RandomForestModel(models.BaseClassifier):
         result = []
         data = self.input_slice(inputs)
         for datum in data:
-            # for elem in datum:
-            result.append(ord(datum[0][2][0]))
+            datum_labels = []
+            for elem in datum:
+                #aggregate all labels present per input slice
+                if elem[2] not in datum_labels:
+                    datum_labels.append(elem[2])
+
+            result.append(self.aggregate_labels(datum_labels))
         return result
 
     def get_std_dev(self, data):
@@ -129,8 +207,8 @@ class RandomForestModel(models.BaseClassifier):
         model_row = models.BaseClassifier.get_model()
         return RandomForestModel(date_time=model_row['created_at'],
                                  _id=model_row['id'],
-                                 model_field=model_row['model'])
-
+                                 model_field=model_row['model'],
+                                 window_size=model_row['window_size'])
 
 '''
 model = RandomForestModel()

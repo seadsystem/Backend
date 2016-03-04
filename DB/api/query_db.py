@@ -65,7 +65,7 @@ def query(parsed_url):
         print('HERE')
         classification = model.classify(time=start_time, serial=device_id, panel=device)
         print("IDENT: %s" % classification)
-        return format_data(['data'], [classification])
+        return format_data(['data'], classification)
 
     results = retrieve_within_filters(
         device_id,
