@@ -43,6 +43,7 @@ class BaseClassifier(object):
     model_type = None
     created_at = None
     model = None
+    _id = None
 
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
                  model=None, _id=str(uuid.uuid4())):
@@ -64,7 +65,9 @@ class BaseClassifier(object):
             if self.model is None:
                 raise AttributeError("Model not instantiated")
             blob = pickle.dumps(self.model)
+            pickle.loads(blob)
             self.model = psycopg2.Binary(blob)
+
         except pickle.PickleError as e:
             raise ValueError("Model pickling failed", e)
         except AttributeError as e:
@@ -85,23 +88,23 @@ class BaseClassifier(object):
             con.commit()
             con.close()
 
-    def train(self):
+    def train(self, data=None):
         """
         :summary: override this method in your derived classifier class to train your model
+        :param data: data to train with
         """
         raise NotImplementedError
 
-    def classify(self, start_time=None, end_time=None):
+    def classify(self, time=None, serial=None, panel=None):
         """
         :summary: override this method in your derived classifier class to return a vector of labels
-        :param start_time: start_time of data to train with
-        :param end_time: end_time of data to train with
+        :param time: time of data to classify with
         """
         raise NotImplementedError
 
     @staticmethod
     @Memoized
-    def get_model(_id):
+    def get_model():
         try:
             con = psycopg2.connect(database=DATABASE, user=USER)
         except psycopg2.Error as e:
@@ -109,21 +112,21 @@ class BaseClassifier(object):
 
         try:
             cursor = con.cursor()
-            query = "SELECT * FROM classifier_model where id = %s;"
-            cursor.execute(query, [_id])
+            query = "SELECT * FROM classifier_model ORDER BY created_at DESC LIMIT 1;"
+            cursor.execute(query)
             model_row = cursor.fetchall()
         except psycopg2.Error as e:
             raise IOError("Model lookup failed", e)
         finally:
             con.close()
-
         try:
-            classifier = model_row[0][3]
+            classifier_blob = model_row[0][4]
+            classifier = pickle.loads(classifier_blob)
             model = {'id': model_row[0][0],
-                     'created_at': model_row[0][1],
-                     'model_type': model_row[0][2],
-                     'model': pickle.loads(classifier)}
-        except pickle.PickleError as e:
+                     'created_at': model_row[0][2],
+                     'model_type': model_row[0][3],
+                     'model': classifier}
+        except Exception as e:
             raise ValueError("Model pickling failed", e)
         return model
 
@@ -148,25 +151,19 @@ class BaseClassifier(object):
             cursor = con.cursor()
             params = {'panel': panel,
                       'id': serial}
-            query = "SELECT time, data - lag(data) OVER (ORDER BY time DESC) as data FROM \
-                        data_raw WHERE device='Panel1' OR device='Panel2' OR device='Panel3' and serial=%(id)s"
-            if start_time is None and end_time is None:
-                query += "LIMIT 2;"
-                most_recent = True
-            else:
-                query += " and time BETWEEN to_timestamp(%(start_time)s) and \
-                         to_timestamp(%(end_time)s);"
-                params['start_time'] = start_time
-                params['end_time'] = end_time
+            query = "SELECT time, data - lag(data) OVER (ORDER BY time DESC) as data FROM data_raw \
+                    WHERE device=%(panel)s and serial=%(id)s and time >= \
+                    to_timestamp(%(start_time)s) and time <= to_timestamp(%(end_time)s);"
+            params['start_time'] = start_time
+            params['end_time'] = end_time
 
             cursor.execute(query, params)
             results = cursor.fetchall()
-            if most_recent:
-                return results[0]
-            else:
-                return results
+
+            # first result is null data, blows up classifier, so just omit it
+            return results[1:]
         except Exception as e:
-            raise psycopg2.Error("Training data fetch failed", e)
+            raise psycopg2.Error("Classification data fetch failed", e)
         finally:
             if con:
                 con.close()

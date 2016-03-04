@@ -23,6 +23,7 @@ CREATE TABLE data_label (
 
 CREATE TABLE classifier_model (
   id UUID NOT NULL,
+  window_size INT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   model_type TEXT NOT NULL,
   model bytea NOT NULL

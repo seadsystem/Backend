@@ -4,7 +4,7 @@ import psycopg2.extras
 import DB.classification.Analysis_3 as A
 import DB.classification.detect_events as D
 import DB.classification.RandomForestModel as RMF
-import DB.classification.BaseClassifier as BC
+import DB.classification.models as BC
 
 # Database user credentials
 DATABASE = "seads"
@@ -60,12 +60,12 @@ def query(parsed_url):
         results = generate_total_energy(device_id, start_time, end_time, device)
         return results
 
-    if classify and device_id and device:
+    if classify and device and start_time:
         model = RMF.RandomForestModel.get_model()
-        if start_time and end_time:
-            return model.classify(start_time=start_time, end_time=end_time, device=device)
-        else:
-            return model.classify()
+        print('HERE')
+        classification = model.classify(time=start_time, serial=device_id, panel=device)
+        print("IDENT: %s" % classification)
+        return format_data(['data'], [classification])
 
     results = retrieve_within_filters(
         device_id,
@@ -291,13 +291,13 @@ def format_data(header, data, json=False):
     :return: Generator of result strings
     """
     if json:
-        yield '{\n"data": '
-    yield "[\n" + format_data_row(header)  # No comma before header
+        yield '{"data": '
+    yield "[" + format_data_row(header)  # No comma before header
     for row in data:
-        yield ',\n' + format_data_row(row)
-    yield "\n]\n"
+        yield ',' + format_data_row(row)
+    yield "]"
     if json:
-        yield "}\n"
+        yield "}"
 
 
 def write_subsample(query, crosstab=False):

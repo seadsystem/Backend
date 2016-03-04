@@ -29,7 +29,10 @@ testdata = [
 
 
 class RandomForestModel(models.BaseClassifier):
-    def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
+    window_size = None
+
+    def __init__(self, date_time=datetime.datetime.
+                 now(), model_field=None,
                  n_estimators=1000, max_depth=None, _id=str(uuid.uuid4()), min_samples_split=1,
                  max_features=2, window_size=2):
         """
@@ -51,17 +54,16 @@ class RandomForestModel(models.BaseClassifier):
                                            max_features=max_features, )
         else:
             model = model_field
-            self.window_size = window_size
+        self.window_size = window_size
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
-    def classify(self, start_time=datetime.datetime.now(), end_time=None, panel=None, serial=None):
-        print(end_time)
-        if end_time is None:
-            end_time=datetime.datetime.now() - datetime.timedelta(seconds=self.window_size)
-        data = models.BaseClassifier.classification_data(start_time=start_time, end_time=end_time,
+    def classify(self, time=None, serial=None, panel=None):
+        start_time = time - self.window_size
+        data = models.BaseClassifier.classification_data(start_time=start_time, end_time=time,
                                                          panel=panel, serial=serial)
-        to_fit = RandomForestModel.create_samples(data)
+        print(data)
+        to_fit = self.create_samples(data)
         return self.model.predict(to_fit)
 
     def train(self, data=testdata):
@@ -76,6 +78,7 @@ class RandomForestModel(models.BaseClassifier):
         return result
 
     def create_samples(self, inputs):
+        print(self.window_size)
         if len(inputs) < self.window_size:
             print("Input is smaller than window_size! Unpredictable results!")
         if len(inputs) % self.window_size != 0:
@@ -122,21 +125,13 @@ class RandomForestModel(models.BaseClassifier):
         return statistics.stdev(data_arr)
 
     @staticmethod
-    def get_model(_id):
-        model_row = models.BaseClassifier.get_model(_id)
-        return RandomForestModel(date_time=model_row['created_at'], _id=model_row['id'], model_field=model_row['model'])
+    def get_model():
+        model_row = models.BaseClassifier.get_model()
+        return RandomForestModel(date_time=model_row['created_at'],
+                                 _id=model_row['id'],
+                                 model_field=model_row['model'])
 
 
-model2 = RandomForestModel()
-model2.train()
-model2.store()
-modelDict = RandomForestModel.get_model(model2.id)
-print(str(modelDict.model))
-print(modelDict.classify(panel="Panel3", serial=466419818))
-
-ourmodel = RandomForestModel()
-ourmodel.train()
-print(ourmodel.classify())
 '''
 model = RandomForestModel()
 model.store()

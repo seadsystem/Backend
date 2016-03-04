@@ -45,8 +45,7 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
             for line in r:
                 self.wfile.write(line.encode("utf-8"))
         except Exception as inst:
-
-            self.send_error(500)
+            self.send_error(500, message=str(inst))
             print(type(inst))
             print(inst.args)
             print(str(inst))
@@ -76,7 +75,7 @@ class ApiHandler(http.server.CGIHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
         except Exception as e:
-            self.send_error(500)
+            self.send_error(500, message=str(e))
             print(type(e))
             print(e.args)
             print(e)
