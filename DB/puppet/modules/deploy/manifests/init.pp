@@ -26,7 +26,8 @@ CREATE TABLE classifier_model (
   window_size INT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   model_type TEXT NOT NULL,
-  model bytea NOT NULL
+  model bytea NOT NULL,
+  labels text[] NULL
 );
 '
 

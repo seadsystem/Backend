@@ -33,7 +33,7 @@ class RandomForestModel(models.BaseClassifier):
 
     def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
                  n_estimators=1000, max_depth=None, _id=str(uuid.uuid4()), min_samples_split=1,
-                 max_features=2, window_size=2):
+                 max_features=2, window_size=2, labels=[]):
         """
         :param date_time:
         :param model_field:
@@ -53,6 +53,7 @@ class RandomForestModel(models.BaseClassifier):
         else:
             model = model_field
         self.window_size = window_size
+        self.labels = labels
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
@@ -60,9 +61,7 @@ class RandomForestModel(models.BaseClassifier):
         start_time = time - self.window_size
         data = models.BaseClassifier.classification_data(start_time=start_time, end_time=time,
                                                          panel=panel, serial=serial)
-        print(data)
-        to_fit = self.create_samples(data)
-        return self.classify_data(to_fit)
+        return self.classify_data(data)
 
     def classify_data(self, data):
         to_fit = self.create_samples(data)
@@ -107,7 +106,6 @@ class RandomForestModel(models.BaseClassifier):
         #leading 1 to avoid removal of leading 0's
         bit_string = '1' + bit_string
         result = int(bit_string)
-        print(result)
         return result
 
     def disaggregate_labels(self, labels):
@@ -127,7 +125,6 @@ class RandomForestModel(models.BaseClassifier):
 
     def train(self, data=testdata):
         self.add_all_labels(data)
-        print(self.labels)
         samples = self.create_samples(data)
         labels = self.create_labels(data)
         self.model.fit(samples, labels)
@@ -144,7 +141,6 @@ class RandomForestModel(models.BaseClassifier):
         return result
 
     def create_samples(self, inputs):
-        print(self.window_size)
         if len(inputs) < self.window_size:
             print("Input is smaller than window_size! Unpredictable results!")
         if len(inputs) % self.window_size != 0:
@@ -208,7 +204,8 @@ class RandomForestModel(models.BaseClassifier):
         return RandomForestModel(date_time=model_row['created_at'],
                                  _id=model_row['id'],
                                  model_field=model_row['model'],
-                                 window_size=model_row['window_size'])
+                                 window_size=model_row['window_size'],
+                                 labels=model_row['labels'])
 
 '''
 model = RandomForestModel()

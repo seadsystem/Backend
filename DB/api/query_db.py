@@ -62,10 +62,8 @@ def query(parsed_url):
 
     if classify and device and start_time:
         model = RMF.RandomForestModel.get_model()
-        print('HERE')
         classification = model.classify(time=start_time, serial=device_id, panel=device)
-        print("IDENT: %s" % classification)
-        return format_data(['data'], classification)
+        return format_data(['data'], classification, json)
 
     results = retrieve_within_filters(
         device_id,

@@ -126,7 +126,8 @@ class BaseClassifier(object):
                      'created_at': model_row[0][2],
                      'model_type': model_row[0][3],
                      'model': classifier,
-                     'window_size': model_row[0][1]}
+                     'window_size': model_row[0][1],
+                     'labels': model_row[0][5]}
         except Exception as e:
             raise ValueError("Model pickling failed", e)
         return model
