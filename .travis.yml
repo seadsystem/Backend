@@ -36,7 +36,7 @@ before_script:
 script:
   - go vet "$LZONE/..."
   - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
-  - cd "$API"; coverage run --include="$API/*.py" -m unittest discover
+  - cd "$API"; coverage run --include="$(pwd)/*.py" --omit="$(pwd)/test*.py" -m unittest discover
 
 after_success:
   - coveralls
