@@ -1,5 +1,4 @@
 import datetime
-import math
 import uuid
 from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
