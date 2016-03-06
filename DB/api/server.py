@@ -7,7 +7,7 @@ sys.path.append(path[:-7])
 
 import socketserver
 import DB.api.handler as handler
-PORT = 8081
+PORT = 8080
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
