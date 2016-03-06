@@ -12,6 +12,7 @@ env:
     - BACKEND="$HOME/gopath/src/github.com/seadsystem/Backend"
     - API="$BACKEND/DB/api"
     - LZONE="$BACKEND/DB/landingzone"
+    - PYTHONPATH="$BACKEND"
 
 addons:
   apt:
