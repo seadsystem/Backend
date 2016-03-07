@@ -26,10 +26,13 @@ addons:
 services: postgresql
 
 install:
-  - go get github.com/olt/libpq
-  - go get github.com/DATA-DOG/go-sqlmock
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/codecov/example-go
+  - go get -u github.com/olt/libpq
+  - go get -u github.com/DATA-DOG/go-sqlmock
+  - go get -u golang.org/x/tools/cmd/cover
+  - go get -u github.com/codecov/example-go
+  - go get -u google.golang.org/grpc
+  - go get -u github.com/golang/protobuf/proto
+  - go get -u golang.org/x/net/context
   - python3 -V
   - sudo apt-get install -y python3-pip
   - sudo -H pip3 install -U matplotlib
