@@ -20,6 +20,10 @@ func TestNewMock(t *testing.T) {
 	if err := db.Close(); err != nil {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Error("mock expectations were not met")
+	}
 }
 
 func TestNew(t *testing.T) {
@@ -38,6 +42,10 @@ func TestSetMaxOpenConns(t *testing.T) {
 	db.SetMaxOpenConns(5)
 	if err := db.Close(); err != nil {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Error("mock expectations were not met")
 	}
 }
 
@@ -76,6 +84,10 @@ func TestInsert(t *testing.T) {
 
 	if err := db.Insert(iter); err != nil {
 		t.Errorf("got db.Insert(iter) = %v, want = nil", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Error("mock expectations were not met")
 	}
 }
 

@@ -53,7 +53,7 @@ func HandleRequest(res http.ResponseWriter, req *http.Request, db database.DB) {
 	}
 
 	if err := db.Insert(iter); err != nil {
-		log.Println("Error:", err)
+		log.Println("Error inserting into database:", err)
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
