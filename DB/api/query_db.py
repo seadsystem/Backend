@@ -27,8 +27,8 @@ def query(parsed_url):
     device_id = parsed_url['device_id']
 
     header = ['time', 'I', 'W', 'V', 'T']
-    start_time = end_time = data_type = subset = limit = device = granularity = None
-    diff = json = reverse = classify = list_format = False
+    start_time = end_time = data_type = subset = limit = device = granularity =None
+    diff = json = reverse = classify = list_format = events = total_energy = False
     if 'type' in parsed_url.keys():
         data_type = parsed_url['type']
         header = ['time', parsed_url['type']]
@@ -56,15 +56,19 @@ def query(parsed_url):
         list_format = parsed_url['list_format']
     if 'events' in parsed_url.keys():
         events = parsed_url['events']
+    if 'total_energy' in parsed_url.keys():
+        total_energy = parsed_url['total_energy']
 
-    if parsed_url['total_energy']:
+    if classify:
+        if device is not None and start_time is not None:
+            model = RMF.RandomForestModel.get_model()
+            classification = model.classify(time=start_time, serial=device_id, panel=device)
+            return format_data(['data'], classification, json=True)
+        raise Exception("Received malformed URL data: missing start_time")
+
+    if total_energy:
         results = generate_total_energy(device_id, start_time, end_time, device)
         return results
-
-    if classify and device and start_time:
-        model = RMF.RandomForestModel.get_model()
-        classification = model.classify(time=start_time, serial=device_id, panel=device)
-        return format_data(['data'], classification, json)
 
     results = retrieve_within_filters(
         device_id,

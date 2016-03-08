@@ -4,8 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 import DB.classification.models as models
 import statistics
 
-USER = "seadapi"
-DATABASE = "seads"
+
 testdata = [
     [datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
     [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater'],

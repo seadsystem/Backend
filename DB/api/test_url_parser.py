@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import url_parser
+import DB.api.url_parser as url_parser
 import importlib
 import unittest
 

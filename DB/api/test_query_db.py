@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-import query_db
+import DB.api.query_db as query_db
 import importlib
 import DB.classification.Analysis_3 as Analysis_3
 import DB.classification.detect_events as detect_events
@@ -84,6 +84,8 @@ class TestQueryRouting(unittest.TestCase):
         self.retrieve_args[0] = 5
 
         self.query_options['classify'] = True
+        self.query_options['device'] = 'Panel1'
+        self.retrieve_args[7] = 'Panel1'
 
         self.query_options['start_time'] = 6
         self.retrieve_args[1] = 6
@@ -96,9 +98,11 @@ class TestQueryRouting(unittest.TestCase):
 
         self.assertEqual(query_db.query(self.query_options), 'classify called')
 
-    def test_classify_missing_start_end_time(self):
+    def test_classify_missing_start_time(self):
         self.query_options['device_id'] = 10
+        self.query_options['device'] = "Panel1"
         self.retrieve_args[0] = 10
+
 
         self.query_options['classify'] = True
 
@@ -107,7 +111,7 @@ class TestQueryRouting(unittest.TestCase):
             query_db.query(self.query_options)
             self.assertFail()
         except Exception as e:
-            self.assertEqual(str(e), 'Received malformed URL data: missing start_time and end_time')
+            self.assertEqual(str(e), 'Received malformed URL data: missing start_time')
 
     def test_events_and_diff_missing_parameters(self):
         self.query_options['device_id'] = 20
