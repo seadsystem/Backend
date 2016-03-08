@@ -19,6 +19,8 @@ def insert(parsed_url, data):
     data_dict = dict(body['data'])
     if 'device_id' not in parsed_url.keys():
         raise Exception("Received malformed URL data")
+    if 'label' not in parsed_url.keys(): #Whether it is a classification or a label
+        raise Exception("Received malformed URL data")
     if 'label' not in data_dict.keys():
         raise Exception("POST body incorrect")
     if 'start_time' not in  data_dict.keys():
@@ -26,18 +28,21 @@ def insert(parsed_url, data):
     if 'end_time' not in  data_dict.keys():
         raise  Exception("POST body incorrect")
 
+
     query_dict = dict()
     query_dict['start_time'] = datetime.datetime.fromtimestamp(data_dict['start_time'])
     query_dict['end_time'] = datetime.datetime.fromtimestamp(data_dict['end_time'])
     query_dict['label'] = data_dict['label']
     query_dict['serial'] = parsed_url['device_id']
-    query = "INSERT INTO " + TABLE + " (serial, start_time, end_time, label) VALUES (%(serial)s, %(start_time)s, %(end_time)s, %(label)s) RETURNING *;"
+    query_dict['classification'] = parsed_url['label']
+    query = "INSERT INTO " + TABLE + " (serial, start_time, end_time, label, classification) VALUES (%(serial)s, %(start_time)s, %(end_time)s, %(label)s, %(classification)s) RETURNING *;"
     res = perform_insert(query, query_dict)
     result = '{"data":{'
     result += '"device_id":"' + str(res['serial']) + '",'
     result += '"start_time":"' + str(int(res['start_time'].timestamp())) + '",'
     result += '"end_time":"' + str(int(res['end_time'].timestamp())) + '",'
-    result += '"label":"' + res['label'] + '"}}'
+    result += '"label":"' + res['label'] + '",'
+    result += "classification" + res['label'] + '"}}'
     return result
 
 

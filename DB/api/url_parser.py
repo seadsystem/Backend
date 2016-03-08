@@ -79,7 +79,8 @@ def post_parse(url):
     # different query_options for them will go here
     query_options = {
         "device_id": None,
-        "label": None
+        "label": None,
+        "type": "Classify"
     }
 
     ''' Extract device_id from URL '''
@@ -92,6 +93,16 @@ def post_parse(url):
     if label:
         query_options['device_id'] = int(label.group('device_id'))
         query_options['label'] = True
+
+    '''Extract classification from URL'''
+    classify = re.match('^/(?P<device_id>\d+)/classify$', path)
+    if classify:
+        query_options['device_id'] = int(label.group('device_id'))
+        query_options['label'] = False
+
+    '''Default label set for backwards compatibility'''
+    if query_options['label'] == None:
+        query_options['label'] == True
 
     # Serial number required
     if not query_options['device_id']:
