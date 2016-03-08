@@ -3,8 +3,8 @@
 import unittest
 import query_db
 import importlib
-import Analysis_3
-import detect_events
+import DB.classification.Analysis_3 as Analysis_3
+import DB.classification.detect_events as detect_events
 
 
 class TestQueryRouting(unittest.TestCase):
