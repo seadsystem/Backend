@@ -80,7 +80,7 @@ def post_parse(url):
     query_options = {
         "device_id": None,
         "label": None,
-        "type": "Classify"
+        "type": "classify"
     }
 
     ''' Extract device_id from URL '''

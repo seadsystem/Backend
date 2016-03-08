@@ -42,7 +42,7 @@ def insert(parsed_url, data):
     result += '"start_time":"' + str(int(res['start_time'].timestamp())) + '",'
     result += '"end_time":"' + str(int(res['end_time'].timestamp())) + '",'
     result += '"label":"' + res['label'] + '",'
-    result += "classification" + res['label'] + '"}}'
+    result += "classification" + res['classification'] + '"}}'
     return result
 
 
