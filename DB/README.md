@@ -27,7 +27,7 @@ Database Team's repo
  * See the Vagrant docs for more information on using the
    cli: https://docs.vagrantup.com/v2/cli/index.html
 
-## Deplopying to a Server
+## Deploying to a Server
  * On a clean Ubuntu Server 14.04 x64 install, run:
 ```sh
 sudo apt-get update && sudo apt-get dist-upgrade && sudo apt-get install git puppet
