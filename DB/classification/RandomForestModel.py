@@ -135,14 +135,16 @@ class RandomForestModel(models.BaseClassifier):
         """
         result = []
         for i in data:
+            if(len(i) < 2):
+                raise ValueError("Length of input list is less than 2!")
             result.append(i[1])
         return result
 
     def create_samples(self, inputs):
         if len(inputs) < self.window_size:
-            print("Input is smaller than window_size! Unpredictable results!")
+            raise ValueError("Input is smaller than window_size! Unpredictable results!")
         if len(inputs) % self.window_size != 0:
-            print("Input is not an even multiple of window_size!")
+            raise ValueError("Input is not an even multiple of window_size!")
         result = []
         variable_increments = self.input_slice(inputs)
 
