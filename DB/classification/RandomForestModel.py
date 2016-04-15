@@ -53,6 +53,7 @@ class RandomForestModel(models.BaseClassifier):
             model = model_field
         self.window_size = window_size
         self.labels = labels
+        self.trained = False
         super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
@@ -63,6 +64,8 @@ class RandomForestModel(models.BaseClassifier):
         return self.classify_data(data)
 
     def classify_data(self, data):
+        if(not self.trained):
+            raise ValueError("Classifier not trained!")
         to_fit = self.create_samples(data)
         predicted = self.model.predict(to_fit)
         result = []
@@ -127,6 +130,7 @@ class RandomForestModel(models.BaseClassifier):
         samples = self.create_samples(data)
         labels = self.create_labels(data)
         self.model.fit(samples, labels)
+        self.trained = True
 
     def extract_values(self, data):
         """
