@@ -4,7 +4,7 @@ import unittest
 import pickle
 
 DATABASE = "seads"
-USER = "nsokolni"
+USER = "seadapi"
 TABLE = "data_raw"
 
 class TestHDF5Conversion(unittest.TestCase):

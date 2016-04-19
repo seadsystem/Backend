@@ -22,6 +22,7 @@ addons:
     - python3-scipy
     - python3-psycopg2
 
+services: postgresql
 
 install:
   - go get github.com/olt/libpq
