@@ -1,6 +1,6 @@
 import psycopg2
 import unittest
-import RandomForestModel as rfm
+import DB.classification.RandomForestModel as rfm
 import datetime
 import random
 
