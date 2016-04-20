@@ -78,7 +78,8 @@ CREATE TABLE classifier_model (
         
     @classmethod
     def tearDownClass(cls):
-        cls.root_cur.execute("DROP DATABASE " + DATABASE) # beware sql injection
+        cls.root_cur.execute("DROP DATABASE "+DATABASE+";") # beware sql injection
+        cls.root_cur.execute("DROP USER "+USER+";")
         cls.root_cur.close()
         cls.root_con.close()
         bc.BaseClassifier.reset_test_params()
