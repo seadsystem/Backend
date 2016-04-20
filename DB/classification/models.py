@@ -45,6 +45,18 @@ class BaseClassifier(object):
     model = None
     _id = None
 
+    DATABASE=DATABASE#"test_seads"
+    USER=USER#"seadapi"
+
+    @staticmethod
+    def set_test_params(db, user):
+        BaseClassifier.DATABASE = db
+        BaseClassifier.USER = user
+    @staticmethod
+    def reset_test_params():
+        BaseClassifier.DATABASE = DATABASE
+        BaseClassifier.USER = USER
+    
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
                  model=None, _id=str(uuid.uuid4())):
         """
@@ -106,7 +118,7 @@ class BaseClassifier(object):
     @Memoized
     def get_model():
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=BaseClassifier.DATABASE, user=BaseClassifier.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on model insert", e)
 
