@@ -61,7 +61,10 @@ def query(parsed_url):
 
     if classify:
         if device is not None and start_time is not None:
-            model = RMF.RandomForestModel.get_model()
+            #TODO: Uncomment this line as soon as postgres is in CI script
+#            model = RMF.RandomForestModel.get_model()
+            model = RMF.RandomForestModel()
+            model.train()
             classification = model.classify(time=start_time, serial=device_id, panel=device)
             return format_data(['data'], classification, json=True)
         raise Exception("Received malformed URL data: missing start_time")
