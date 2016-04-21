@@ -4,9 +4,8 @@ import psycopg2
 import uuid
 import functools
 
-USER = "seadapi"
-DATABASE = "seads"
-
+DATABASE = None
+USER = None
 
 class Memoized(object):
     """
@@ -40,22 +39,13 @@ class BaseClassifier(object):
     """
     :summary: Base class that all other classifiers will inherit from
     """
-    model_type = None
-    created_at = None
-    model = None
-    _id = None
+    #model_type = None
+    #created_at = None
+    #model = None
+    #_id = None
 
-    DATABASE=DATABASE#"test_seads"
-    USER=USER#"seadapi"
-
-    @staticmethod
-    def set_test_params(db, user):
-        BaseClassifier.DATABASE = db
-        BaseClassifier.USER = user
-    @staticmethod
-    def reset_test_params():
-        BaseClassifier.DATABASE = DATABASE
-        BaseClassifier.USER = USER
+    DATABASE = None
+    USER = None
     
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
                  model=None, _id=str(uuid.uuid4())):
@@ -69,6 +59,23 @@ class BaseClassifier(object):
         self.model = model
         self.id = _id
 
+    @classmethod
+    def reload_db_info(cls):
+        db_info = None
+        try:
+            db_info = open("db_info", 'r')
+            cls.DATABASE = db_info.readline()[:-1]
+            cls.USER = db_info.readline()[:-1]
+        except Exception as e:
+            #print(e)
+            pass
+        finally:
+            try:
+                db_info.close()
+            except:
+                pass
+    
+            
     def store(self):
         """
         :summary: stores *trained* model to db
@@ -86,12 +93,17 @@ class BaseClassifier(object):
             raise AttributeError(e)
 
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            #reload_db_info()
+            #print(BaseClassifier.DATABASE)
+            con = psycopg2.connect(database=BaseClassifier.DATABASE, user=BaseClassifier.USER)
         except Exception as e:
             raise psycopg2.Error("Database connection on model insert", e)
 
         try:
             cursor = con.cursor()
+            #print(DATABASE)
+            #cursor.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
+            #print(cursor.fetchall())
             query = insert_query_builder("classifier_model", self.__dict__)
             cursor.execute(query, self.__dict__)
         except Exception as e:
@@ -114,11 +126,11 @@ class BaseClassifier(object):
         """
         raise NotImplementedError
 
-    @staticmethod
+    @classmethod
     @Memoized
-    def get_model():
+    def get_model(cls):
         try:
-            con = psycopg2.connect(database=BaseClassifier.DATABASE, user=BaseClassifier.USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on model insert", e)
 
@@ -144,8 +156,8 @@ class BaseClassifier(object):
             raise ValueError("Model pickling failed", e)
         return model
 
-    @staticmethod
-    def classification_data(panel="Panel1", start_time=None, end_time=None, serial=None):
+    @classmethod
+    def classification_data(cls, panel="Panel1", start_time=None, end_time=None, serial=None):
         """
         :summary: gets data to run classifier on
         :param panel: panel to get power data from
@@ -157,7 +169,7 @@ class BaseClassifier(object):
         """
 
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except Exception as e:
             raise psycopg2.Error("Database connection on classification data fetch failed", e)
         try:
@@ -182,15 +194,15 @@ class BaseClassifier(object):
             if con:
                 con.close()
 
-    @staticmethod
-    def training_data(panel="Panel1"):
+    @classmethod
+    def training_data(cls, panel="Panel1"):
         """
         :summary: grabs power data in data_raw that corresponds to the labels in data_label
         :param panel: which panel to fetch power data from, for all three call three times
         :return: data between all start_time and end_time in data_label with associated label
         """
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on training data fetch failed", e)
         try:
@@ -209,7 +221,7 @@ class BaseClassifier(object):
         finally:
             if con:
                 con.close()
-
+BaseClassifier.reload_db_info()
 
 def insert_query_builder(table=None, to_insert=None):
     attrs = list(to_insert.keys())

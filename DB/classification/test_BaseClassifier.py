@@ -1,7 +1,9 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import unittest
-import models as bc
+import DB.classification.models as bc
+from DB.classification.RandomForestModel import RandomForestModel
+import os
 
 DATABASE = "test_seads"
 USER = "test_seadapi"
@@ -9,8 +11,18 @@ USER = "test_seadapi"
 class TestBaseClassifier(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        try:
+            os.rename("db_info", "db_info_back")
+        except OSError as e:
+            #print(e)
+            pass
+        db_info = open("db_info", 'w')
+        db_info.write("test_seads\ntest_seadapi\n")
+        db_info.close()
+        bc.BaseClassifier.reload_db_info()
+        #print(bc.DBInfo.DATABASE)
+        
         #print("\nCreating test database")
-        bc.BaseClassifier.set_test_params(DATABASE, USER)
         cls.root_con = psycopg2.connect(database="postgres", user="postgres", port=5432)
         cls.root_con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cls.root_cur = cls.root_con.cursor()
@@ -73,7 +85,10 @@ CREATE TABLE classifier_model (
         except NotImplementedError:
             pass
 
-    def test_get_model(self):
+    def test_store_get_model(self):
+        randommodel = RandomForestModel()
+        randommodel.store()
+
         bc.BaseClassifier.get_model()
         
     @classmethod
@@ -82,8 +97,12 @@ CREATE TABLE classifier_model (
         cls.root_cur.execute("DROP USER "+USER+";")
         cls.root_cur.close()
         cls.root_con.close()
-        bc.BaseClassifier.reset_test_params()
-        
+
+        try:
+            os.rename("db_info_back", "db_info")
+        except:
+            pass
+            
         #print("\nTest database deleted")
     
 
