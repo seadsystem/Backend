@@ -67,7 +67,9 @@ class BaseClassifier(object):
             cls.DATABASE = db_info.readline()[:-1]
             cls.USER = db_info.readline()[:-1]
         except Exception as e:
-            #print(e)
+            if cls.DATABASE == None and cls.USER == None: # default
+                cls.DATABASE = "seads"
+                cls.USER = "seadapi" 
             pass
         finally:
             try:

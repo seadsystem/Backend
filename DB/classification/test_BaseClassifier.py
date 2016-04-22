@@ -101,6 +101,7 @@ CREATE TABLE classifier_model (
         try:
             os.rename("db_info_back", "db_info")
         except:
+            os.remove("db_info")
             pass
             
         #print("\nTest database deleted")
