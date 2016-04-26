@@ -1,7 +1,6 @@
 import psycopg2
 import unittest
-#import DB.classification.RandomForestModel as rfm
-import RandomForestModel as rfm
+import AdaBoostModel as abm
 import datetime
 import random
 
@@ -9,12 +8,12 @@ DATABASE = "seads"
 USER = "seadapi"
 TABLE = "data_raw"
 
-class TestRandomForestModel(unittest.TestCase):
+class TestAdaBoostModel(unittest.TestCase):
 
 
     def test_model_input_not_multiple_of_window_size(self):
         try:
-            model = rfm.RandomForestModel()
+            model = abm.AdaBoostModel()
             model.train()
             model.classify_data([datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'])
         except Exception as e:
@@ -22,7 +21,7 @@ class TestRandomForestModel(unittest.TestCase):
 
     def test_model_training_initial(self):
         try:
-            model = rfm.RandomForestModel()
+            model = abm.AdaBoostModel()
             model.train()
         except Exception as e:
             print(e.str())
@@ -30,7 +29,7 @@ class TestRandomForestModel(unittest.TestCase):
 
     def test_model_classify(self):
         try:
-            model = rfm.RandomForestModel()
+            model = abm.AdaBoostModel()
             model.train()
             model.classify_data([[datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
                 [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater']])
@@ -40,14 +39,14 @@ class TestRandomForestModel(unittest.TestCase):
 
     def test_bad_input_data(self):
         try:
-            model = rfm.RandomForestModel()
+            model = abm.AdaBoostModel()
             model.train()
             model.classify_data(["bad", "input", ["data"], ["bad", "input", "data"]])
         except TypeError as e:
             self.assertEqual(str(e), "can't convert type 'str' to numerator/denominator")
 
     def test_aggregate_disaggregate_labels(self):
-        model = rfm.RandomForestModel()
+        model = abm.AdaBoostModel()
         labels = ['a', 'b', 'c', 'string', 'more', 'otherdata', 'some stuff']
         for i in range(10):
             teststr = [''.join(random.choice('0123456789ABCDEF') for i in range(3))]
@@ -58,7 +57,7 @@ class TestRandomForestModel(unittest.TestCase):
     # this functionality is actually in baseclassifier
     # def test_bad_classify_call(self):
     #     try:
-    #         model = rfm.RandomForestModel()
+    #         model = abm.AdaBoostModel()
     #         model.train()
     #         mode.classify(-1000)
     #     except Exception as e:
@@ -66,7 +65,7 @@ class TestRandomForestModel(unittest.TestCase):
 
     def test_classify_before_train(self):
         try:
-            model = rfm.RandomForestModel()
+            model = abm.AdaBoostModel()
             model.classify_data([[datetime.datetime(2015, 12, 18, 0, 1, 32), -6375, 'heater'],
                 [datetime.datetime(2015, 12, 18, 0, 1, 33), -6375, 'heater']])
         except ValueError as e:

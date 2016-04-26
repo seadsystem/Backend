@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 # import DB.classification.models as models
 import models
 import statistics
@@ -26,34 +26,29 @@ testdata = [
 ]
 
 
-class RandomForestModel(models.BaseClassifier):
-
+class AdaBoostModel(models.BaseClassifier):
+    window_size = None
+    labels = []
 
     def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
-                 n_estimators=1000, max_depth=None, _id=str(uuid.uuid4()), min_samples_split=1,
-                 max_features=2, window_size=2, labels=[]):
+                id=str(uuid.uuid4()), window_size=2, labels=[]):
         """
         :param date_time:
-        :param model_field:
         :param n_estimators:
         :param max_depth:
         :param _id:
         :param min_samples_split:
-        :param max_features:
         :param window_size:
         :return:
         """
         if model_field is None:
-            model = RandomForestClassifier(n_estimators=n_estimators,
-                                           max_depth=max_depth,
-                                           min_samples_split=min_samples_split,
-                                           max_features=max_features, )
+            model = AdaBoostClassifier()
         else:
             model = model_field
         self.window_size = window_size
         self.labels = labels
         self.trained = False
-        super(RandomForestModel, self).__init__(model_type="RandomForestClassifier",
+        super(AdaBoostModel, self).__init__(model_type="AdaBoostClassifier",
                                                 created_at=date_time, model=model, _id=_id)
 
     def classify(self, time=None, serial=None, panel=None):
