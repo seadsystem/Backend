@@ -102,8 +102,9 @@ CREATE TABLE classifier_model (
         try:
             bc.BaseClassifier.get_model()
             self.fail("Successfully got a model when no such model existed")
-        except:
-            pass
+        except ValueError as e:
+            if str(e) != "('Model pickling failed', IndexError('list index out of range',))":
+                raise e
             
         randommodel = RandomForestModel()
         randommodel.store()
