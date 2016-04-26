@@ -55,7 +55,7 @@ class BaseClassifier(object):
     @classmethod
     def reload_db_info(cls):
         """
-        :summary: rReloads which database/user pair to use (for testing). Defaults to seads/seadapi when no file is present (old behavior)
+        :summary: Reloads which database/user pair to use (for testing). Defaults to seads/seadapi when no file is present (old behavior)
         """
         db_info = None
         try:
