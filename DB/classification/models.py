@@ -4,9 +4,6 @@ import psycopg2
 import uuid
 import functools
 
-DATABASE = None
-USER = None
-
 class Memoized(object):
     """
     Decorator. Caches a function's return value each time it is called.
