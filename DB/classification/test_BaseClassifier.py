@@ -17,6 +17,8 @@ class TestBaseClassifier(unittest.TestCase):
         try:
             rename("db_info", "db_info_back")
         except OSError as e:
+            # It is valid for no such db_info file to exist at the test start
+            # This is the case when it is using default behavior (seads/seadapi)
             pass
         db_info = open("db_info", 'w')
         db_info.write("test_seads\ntest_seadapi\n")
