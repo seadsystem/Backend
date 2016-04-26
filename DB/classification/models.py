@@ -39,10 +39,6 @@ class BaseClassifier(object):
     """
     :summary: Base class that all other classifiers will inherit from
     """
-    #model_type = None
-    #created_at = None
-    #model = None
-    #_id = None
 
     DATABASE = None
     USER = None
@@ -61,16 +57,23 @@ class BaseClassifier(object):
 
     @classmethod
     def reload_db_info(cls):
+        """
+        :summary: rReloads which database/user pair to use (for testing). Defaults to seads/seadapi when no file is present (old behavior)
+        """
         db_info = None
         try:
             db_info = open("db_info", 'r')
+            # First line is database name, second line is user name
+            # File must end with a newline!
             cls.DATABASE = db_info.readline()[:-1]
             cls.USER = db_info.readline()[:-1]
         except Exception as e:
-            if cls.DATABASE == None and cls.USER == None: # default
+            if cls.DATABASE == None and cls.USER == None:
+                # default behavior if the file doesnt exist
                 cls.DATABASE = "seads"
-                cls.USER = "seadapi" 
-            pass
+                cls.USER = "seadapi"
+            else:
+                raise e
         finally:
             try:
                 db_info.close()
@@ -95,17 +98,12 @@ class BaseClassifier(object):
             raise AttributeError(e)
 
         try:
-            #reload_db_info()
-            #print(BaseClassifier.DATABASE)
             con = psycopg2.connect(database=BaseClassifier.DATABASE, user=BaseClassifier.USER)
         except Exception as e:
             raise psycopg2.Error("Database connection on model insert", e)
 
         try:
             cursor = con.cursor()
-            #print(DATABASE)
-            #cursor.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
-            #print(cursor.fetchall())
             query = insert_query_builder("classifier_model", self.__dict__)
             cursor.execute(query, self.__dict__)
         except Exception as e:
@@ -223,6 +221,9 @@ class BaseClassifier(object):
         finally:
             if con:
                 con.close()
+
+# Required to set db info on module load
+# Defaults to old behavior if no db info file exists
 BaseClassifier.reload_db_info()
 
 def insert_query_builder(table=None, to_insert=None):
