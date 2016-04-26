@@ -59,7 +59,8 @@ CREATE TABLE classifier_model (
     created_at TIMESTAMP NOT NULL,
     model_type TEXT NOT NULL,
     model bytea NOT NULL,
-    labels text[] NULL
+    labels TEXT[] NULL,
+    trained BOOLEAN NULL
 );
         """)
 
