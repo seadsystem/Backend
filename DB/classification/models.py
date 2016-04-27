@@ -53,31 +53,15 @@ class BaseClassifier(object):
         self.id = _id
 
     @classmethod
-    def reload_db_info(cls):
+    def reload_db_info(cls, database="seads", user="seadapi"):
         """
-        :summary: Reloads which database/user pair to use (for testing). Defaults to seads/seadapi when no file is present (old behavior)
+        :summary: Reloads which database/user pair to use (for testing). Defaults to seads/seadapi
         """
-        db_info = None
-        try:
-            db_info = open("db_info", 'r')
-            # First line is database name, second line is user name
-            # File must end with a newline!
-            cls.DATABASE = db_info.readline()[:-1]
-            cls.USER = db_info.readline()[:-1]
-        except Exception as e:
-            if cls.DATABASE == None and cls.USER == None:
-                # default behavior if the file doesnt exist
-                cls.DATABASE = "seads"
-                cls.USER = "seadapi"
-            else:
-                raise e
-        finally:
-            try:
-                db_info.close()
-            except:
-                pass
-    
-            
+        # Warning: make sure all imports of models use the same type!
+        # Currently using models and not DB.classification.models
+        cls.DATABASE = database
+        cls.USER = user
+
     def store(self):
         """
         :summary: stores *trained* model to db
@@ -220,7 +204,6 @@ class BaseClassifier(object):
                 con.close()
 
 # Required to set db info on module load
-# Defaults to old behavior if no db info file exists
 BaseClassifier.reload_db_info()
 
 def insert_query_builder(table=None, to_insert=None):

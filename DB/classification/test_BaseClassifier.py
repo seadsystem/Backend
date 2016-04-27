@@ -1,9 +1,8 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import unittest
-import DB.classification.models as bc
-from DB.classification.RandomForestModel import RandomForestModel
-from os import rename, remove
+import models as bc
+from RandomForestModel import RandomForestModel
 
 DATABASE = "test_seads"
 USER = "test_seadapi"
@@ -14,16 +13,7 @@ class TestBaseClassifier(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        try:
-            rename("db_info", "db_info_back")
-        except OSError as e:
-            # It is valid for no such db_info file to exist at the test start
-            # This is the case when it is using default behavior (seads/seadapi)
-            pass
-        db_info = open("db_info", 'w')
-        db_info.write("test_seads\ntest_seadapi\n")
-        db_info.close()
-        bc.BaseClassifier.reload_db_info()
+        bc.BaseClassifier.reload_db_info(DATABASE, USER)
 
         cls.root_con = psycopg2.connect(database="postgres", user="postgres", port=5432)
         cls.root_con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -117,12 +107,8 @@ CREATE TABLE classifier_model (
         cls.root_cur.execute("DROP USER "+USER+";")
         cls.root_cur.close()
         cls.root_con.close()
-
-        try:
-            rename("db_info_back", "db_info")
-        except:
-            remove("db_info")
-            pass
+        bc.BaseClassifier.reload_db_info()
+        
 
 if __name__ == '__main__':
     unittest.main()
