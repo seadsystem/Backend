@@ -4,10 +4,6 @@ import psycopg2
 import uuid
 import functools
 
-USER = "seadapi"
-DATABASE = "seads"
-
-
 class Memoized(object):
     """
     Decorator. Caches a function's return value each time it is called.
@@ -40,11 +36,10 @@ class BaseClassifier(object):
     """
     :summary: Base class that all other classifiers will inherit from
     """
-    model_type = None
-    created_at = None
-    model = None
-    _id = None
 
+    DATABASE = None
+    USER = None
+    
     def __init__(self, model_type="default", created_at=datetime.datetime.utcnow(),
                  model=None, _id=str(uuid.uuid4())):
         """
@@ -56,6 +51,16 @@ class BaseClassifier(object):
         self.created_at = created_at
         self.model = model
         self.id = _id
+
+    @classmethod
+    def reload_db_info(cls, database="seads", user="seadapi"):
+        """
+        :summary: Reloads which database/user pair to use (for testing). Defaults to seads/seadapi
+        """
+        # Warning: make sure all imports of models use the same type!
+        # Currently using DB.classification.models and not models
+        cls.DATABASE = database
+        cls.USER = user
 
     def store(self):
         """
@@ -74,7 +79,7 @@ class BaseClassifier(object):
             raise AttributeError(e)
 
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=BaseClassifier.DATABASE, user=BaseClassifier.USER)
         except Exception as e:
             raise psycopg2.Error("Database connection on model insert", e)
 
@@ -102,11 +107,11 @@ class BaseClassifier(object):
         """
         raise NotImplementedError
 
-    @staticmethod
+    @classmethod
     @Memoized
-    def get_model():
+    def get_model(cls):
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on model insert", e)
 
@@ -132,8 +137,8 @@ class BaseClassifier(object):
             raise ValueError("Model pickling failed", e)
         return model
 
-    @staticmethod
-    def classification_data(panel="Panel1", start_time=None, end_time=None, serial=None):
+    @classmethod
+    def classification_data(cls, panel="Panel1", start_time=None, end_time=None, serial=None):
         """
         :summary: gets data to run classifier on
         :param panel: panel to get power data from
@@ -145,7 +150,7 @@ class BaseClassifier(object):
         """
 
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except Exception as e:
             raise psycopg2.Error("Database connection on classification data fetch failed", e)
         try:
@@ -170,15 +175,15 @@ class BaseClassifier(object):
             if con:
                 con.close()
 
-    @staticmethod
-    def training_data(panel="Panel1"):
+    @classmethod
+    def training_data(cls, panel="Panel1"):
         """
         :summary: grabs power data in data_raw that corresponds to the labels in data_label
         :param panel: which panel to fetch power data from, for all three call three times
         :return: data between all start_time and end_time in data_label with associated label
         """
         try:
-            con = psycopg2.connect(database=DATABASE, user=USER)
+            con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on training data fetch failed", e)
         try:
@@ -198,6 +203,8 @@ class BaseClassifier(object):
             if con:
                 con.close()
 
+# Required to set db info on module load
+BaseClassifier.reload_db_info()
 
 def insert_query_builder(table=None, to_insert=None):
     attrs = list(to_insert.keys())
