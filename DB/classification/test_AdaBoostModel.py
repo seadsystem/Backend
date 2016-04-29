@@ -1,6 +1,6 @@
 import psycopg2
 import unittest
-import AdaBoostModel as abm
+import DB.classification.AdaBoostModel as abm
 import datetime
 import random
 
