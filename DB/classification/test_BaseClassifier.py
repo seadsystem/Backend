@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import unittest
-import models as bc
+import DB.classification.models as bc
 from RandomForestModel import RandomForestModel
 
 DATABASE = "test_seads"

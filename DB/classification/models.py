@@ -58,7 +58,7 @@ class BaseClassifier(object):
         :summary: Reloads which database/user pair to use (for testing). Defaults to seads/seadapi
         """
         # Warning: make sure all imports of models use the same type!
-        # Currently using models and not DB.classification.models
+        # Currently using DB.classification.models and not models
         cls.DATABASE = database
         cls.USER = user
 
