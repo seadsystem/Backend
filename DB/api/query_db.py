@@ -1,7 +1,10 @@
 import psycopg2
 import psycopg2.extras
-import Analysis_3 as A
-import detect_events as D
+
+#import DB.classification.Analysis_3 as A
+import DB.classification.detect_events as D
+import DB.classification.RandomForestModel as RMF
+import DB.classification.models as BC
 
 # Database user credentials
 DATABASE = "seads"
@@ -24,8 +27,8 @@ def query(parsed_url):
     device_id = parsed_url['device_id']
 
     header = ['time', 'I', 'W', 'V', 'T']
-    start_time = end_time = data_type = subset = limit = device = granularity = None
-    diff = json = reverse = classify = list_format = False
+    start_time = end_time = data_type = subset = limit = device = granularity =None
+    diff = json = reverse = classify = list_format = events = total_energy = False
     if 'type' in parsed_url.keys():
         data_type = parsed_url['type']
         header = ['time', parsed_url['type']]
@@ -53,8 +56,18 @@ def query(parsed_url):
         list_format = parsed_url['list_format']
     if 'events' in parsed_url.keys():
         events = parsed_url['events']
+    if 'total_energy' in parsed_url.keys():
+        total_energy = parsed_url['total_energy']
 
-    if parsed_url['total_energy']:
+    if classify:
+        if device is not None and start_time is not None:
+            model = RMF.RandomForestModel.get_model()
+            model.train()
+            classification = model.classify(time=start_time, serial=device_id, panel=device)
+            return format_data(['data'], classification, json=True)
+        raise Exception("Received malformed URL data: missing start_time")
+
+    if total_energy:
         results = generate_total_energy(device_id, start_time, end_time, device)
         return results
 
@@ -71,11 +84,6 @@ def query(parsed_url):
         granularity,
         list_format
     )
-
-    if classify:
-        if device_id and start_time and end_time:
-            return A.run(results)
-        raise Exception("Received malformed URL data: missing start_time and end_time")
     
     if events and diff:
         if device and start_time and end_time and data_type == 'P' and list_format == 'event':
@@ -287,13 +295,13 @@ def format_data(header, data, json=False):
     :return: Generator of result strings
     """
     if json:
-        yield '{\n"data": '
-    yield "[\n" + format_data_row(header)  # No comma before header
+        yield '{"data": '
+    yield "[" + format_data_row(header)  # No comma before header
     for row in data:
-        yield ',\n' + format_data_row(row)
-    yield "\n]\n"
+        yield ',' + format_data_row(row)
+    yield "]"
     if json:
-        yield "}\n"
+        yield "}"
 
 
 def write_subsample(query, crosstab=False):

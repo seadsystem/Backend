@@ -1,10 +1,12 @@
-#!/usr/bin/env python3
+import sys
+import os
+# add Backend directory to python path so we can do
+# cross directory imports
+path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(path[:-7])
 
-import http.server
 import socketserver
-import threading
-import handler
-
+import DB.api.handler as handler
 PORT = 8080
 
 
@@ -18,3 +20,4 @@ httpd = ThreadedTCPServer(("", PORT), Handler)
 
 print("serving at port", PORT)
 httpd.serve_forever()
+

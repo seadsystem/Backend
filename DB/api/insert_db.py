@@ -23,10 +23,10 @@ def insert(parsed_url, data):
         raise Exception("Received malformed URL data")
     if 'label' not in data_dict.keys():
         raise Exception("POST body incorrect")
-    if 'start_time' not in  data_dict.keys():
-        raise  Exception("POST body incorrect")
-    if 'end_time' not in  data_dict.keys():
-        raise  Exception("POST body incorrect")
+    if 'start_time' not in data_dict.keys():
+        raise Exception("POST body incorrect")
+    if 'end_time' not in data_dict.keys():
+        raise Exception("POST body incorrect")
 
     query_dict = dict()
     query_dict['start_time'] = datetime.datetime.fromtimestamp(data_dict['start_time'])

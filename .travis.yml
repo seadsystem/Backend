@@ -12,13 +12,18 @@ env:
     - BACKEND="$HOME/gopath/src/github.com/seadsystem/Backend"
     - API="$BACKEND/DB/api"
     - LZONE="$BACKEND/DB/landingzone"
+    - PYTHONPATH="$BACKEND"
 
 addons:
   apt:
     packages:
     - libpq-dev
     - python3-numpy
+    - python3-scipy
     - python3-psycopg2
+    - python-psycopg2
+
+services: postgresql
 
 install:
   - go get github.com/olt/libpq
@@ -28,6 +33,8 @@ install:
   - python3 -V
   - sudo apt-get install -y python3-pip
   - sudo -H pip3 install -U matplotlib
+  - sudo -H pip3 install -U psycopg2
+  - sudo -H pip3 install -U sklearn
   - sudo -H pip3 install coveralls
 
 before_script:
@@ -35,6 +42,7 @@ before_script:
 
 script:
   - go vet "$LZONE/..."
+  - export PYTHONPATH="$PYTHONPATH:$PWD"
   - "$GOPATH/src/github.com/codecov/example-go/go.test.sh"
   - cd "$API"; coverage run --include="$(pwd)/*.py" --omit="$(pwd)/test*.py" -m unittest discover
 

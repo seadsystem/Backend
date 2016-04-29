@@ -4,3 +4,5 @@
 *.iml
 .vagrant
 data_raw.csv
+__pycache__/
+venv/*
