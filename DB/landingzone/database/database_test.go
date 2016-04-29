@@ -98,7 +98,7 @@ func TestInsertPrepareErr(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectRollback()
 
-	want := `call to Prepare stetement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
+	want := `call to Prepare statement with query 'COPY "data_raw" ("serial", "type", "data", "time", "device") FROM STDIN', was not expected, next expectation is: ExpectedRollback => expecting transaction Rollback`
 	if err := db.Insert(func() (*decoders.DataPoint, error) { return nil, nil }); err == nil || err.Error() != want {
 		t.Errorf("got db.Insert() = %v, want = %s", err, want)
 	}

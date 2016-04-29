@@ -1,7 +1,7 @@
 import psycopg2
 import psycopg2.extras
 
-import DB.classification.Analysis_3 as A
+#import DB.classification.Analysis_3 as A
 import DB.classification.detect_events as D
 import DB.classification.RandomForestModel as RMF
 import DB.classification.models as BC
