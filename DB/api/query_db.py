@@ -301,7 +301,7 @@ def format_data(header, data, json=False):
         yield ',' + format_data_row(row)
     yield "]"
     if json:
-        yield "}"
+        yield "}\n" # Newline at Ian's request
 
 
 def write_subsample(query, crosstab=False):

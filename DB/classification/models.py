@@ -117,7 +117,7 @@ class BaseClassifier(object):
 
         try:
             cursor = con.cursor()
-            query = "SELECT * FROM classifier_model ORDER BY created_at DESC LIMIT 1;"
+            query = "SELECT classifier_model.id, classifier_model.window_size, classifier_model.created_at, classifier_model.model_type, classifier_model.model, classifier_model.labels, classifier_model.trained FROM classifier_model ORDER BY created_at DESC LIMIT 1;"
             cursor.execute(query)
             model_row = cursor.fetchall()
         except psycopg2.Error as e:
