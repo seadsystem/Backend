@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import sys
 import os
+
 # add Backend directory to python path so we can do
 # cross directory imports
 path = os.path.dirname(os.path.realpath(__file__))
