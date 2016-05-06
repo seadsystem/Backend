@@ -54,15 +54,6 @@ class TestAdaBoostModel(unittest.TestCase):
             disaggregated = model.disaggregate_labels(aggregated)
             self.assertEqual(teststr, disaggregated)
 
-    # this functionality is actually in baseclassifier
-    # def test_bad_classify_call(self):
-    #     try:
-    #         model = abm.AdaBoostModel()
-    #         model.train()
-    #         mode.classify(-1000)
-    #     except Exception as e:
-    #         self.assertEqual(str(e), "File name: Hello must end with .h5")
-
     def test_classify_before_train(self):
         try:
             model = abm.AdaBoostModel()

@@ -31,7 +31,7 @@ class AdaBoostModel(models.BaseClassifier):
     labels = []
 
     def __init__(self, date_time=datetime.datetime.utcnow(), model_field=None,
-                id=str(uuid.uuid4()), window_size=2, labels=[]):
+                _id=str(uuid.uuid4()), window_size=2, labels=[]):
         """
         :param date_time:
         :param n_estimators:
