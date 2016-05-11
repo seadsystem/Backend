@@ -109,7 +109,7 @@ class BaseClassifier(object):
 
     @classmethod
     @Memoized
-    def get_model(cls):
+    def get_model(cls, model_type="RandomForestClassifier"):
         try:
             con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
@@ -117,8 +117,9 @@ class BaseClassifier(object):
 
         try:
             cursor = con.cursor()
-            query = "SELECT * FROM classifier_model ORDER BY created_at DESC LIMIT 1;"
-            cursor.execute(query)
+            params = {'model_type': model_type}
+            query = "SELECT * FROM classifier_model WHERE type=%(model_type)s ORDER BY created_at DESC LIMIT 1;"
+            cursor.execute(query, params)
             model_row = cursor.fetchall()
         except psycopg2.Error as e:
             raise IOError("Model lookup failed", e)
