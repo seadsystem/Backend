@@ -49,7 +49,7 @@ def get_parse(url):
             query_options[param] = int(params[param][0])
 
     # Set string parameters
-    for param in ['type', 'device', 'list_format']:
+    for param in ['type', 'device', 'list_format', 'model_type']:
         if param in params.keys():
             query_options[param] = params[param][0]
 
