@@ -74,7 +74,7 @@ func TestHandleError(t *testing.T) {
 		{"nil Time", &pb.Packet{}, &pb.Status{Success: false, Msg: grpcDecoders.NillPacket.Error()}, nil},
 		{"too short type", &pb.Packet{Time: &pb.Timestamp{}}, &pb.Status{Success: false, Msg: grpcDecoders.InvalidType.Error()}, nil},
 		{"too long type", &pb.Packet{Type: "fo", Time: &pb.Timestamp{}}, &pb.Status{Success: false, Msg: grpcDecoders.InvalidType.Error()}, nil},
-		{"valid packet", &pb.Packet{Type: "T", Time: &pb.Timestamp{}}, &pb.Status{Success: false, Msg: "call to database transaction Begin, was not expected, next expectation is: ExpectedClose => expecting database Close"}, nil},
+		{"valid packet + database error", &pb.Packet{Type: "T", Time: &pb.Timestamp{}}, &pb.Status{Success: false, Msg: "call to database transaction Begin, was not expected, next expectation is: ExpectedClose => expecting database Close"}, nil},
 	}
 	for _, test := range tests {
 		db, mock, err := database.NewMock()
