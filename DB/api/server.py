@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 # add Backend directory to python path so we can do
@@ -20,4 +22,3 @@ httpd = ThreadedTCPServer(("", PORT), Handler)
 
 print("serving at port", PORT)
 httpd.serve_forever()
-

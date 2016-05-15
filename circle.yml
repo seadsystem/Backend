@@ -1,0 +1,18 @@
+machine:
+  services:
+    - docker
+dependencies:
+  override:
+    - cd /tmp && wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb && sudo dpkg -i vagrant_1.8.1_x86_64.deb
+database:
+  override:
+    - cd DB && wget https://github.com/bubenkoff/vagrant-docker-example/raw/master/Dockerfile
+    - cd DB && mv config.docker.rb config.rb && vagrant up --provider=docker
+test:
+  override:
+    # Test that the eGauge landingzone port is open.
+    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'POST / HTTP/1.1\nHost: localhost\n' | nc ${IP} 9002"
+    # Test that the gRPC landingzone port is open.
+    - cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e "" | nc ${IP} 50051
+    # Test that the api port is open.
+    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc ${IP} 8080"

@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/seadsystem/Backend.svg?style=shield)](https://circleci.com/gh/seadsystem/Backend)
+
 DB
 ==
 

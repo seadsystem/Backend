@@ -35,12 +35,7 @@ class config {
     group   => 'seadapi',
     require => User['seadapi'],
   }
-  file {'/home/landingzone/landingzone':
-    ensure  => directory,
-    owner   => 'landingzone',
-    group   => 'landingzone',
-    require => User['landingzone'],
-  }
+  # landingzone directory set up in the go manifest.
 
   # Set up init scripts
   file {'/etc/init.d/seadapi':
@@ -68,10 +63,9 @@ class config {
     require => File['/etc/init.d/landingzone'],
   }
 
-  package {['python3-pip',
-  'libpq-dev']:
+  package {['python3-pip', 'libpq-dev', 'python3-scipy']:
     ensure => present,
-    before => Exec['psycopg2'],
+    before => [ Exec['psycopg2'], Exec['sklearn'] ],
   }
 
   package {['python3-numpy', 'python3-matplotlib']:
@@ -80,5 +74,9 @@ class config {
 
   exec {'psycopg2':
     command => 'pip3 install psycopg2',
+  }
+
+  exec {'sklearn':
+    command => 'pip3 install sklearn',
   }
 }
