@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+// A Timestamp represents a UTC time.
+message Timestamp {
+  // Represents seconds of UTC time since Unix epoch.
+  int64 seconds = 1;
+
+  // Represents nanosecond offset from seconds. 
+  int32 nanos = 2;
+}
+
+// A Packet is a single bundle of data of a single type from a single device.
+message Packet {
+
+  // serial represents the serial number of the device.
+  int64 serial = 1;
+
+  // time represents the timestamp of the first datapoint.
+  Timestamp time = 2;
+
+  // delta represents the nanosecond time delta between data points.
+  int64 delta = 3;
+
+  // type represents the data type. Must be a single character.
+  string type = 4;
+
+  // device represents the name of the device. Optional.
+  string device = 5;
+
+  // data represents the data points.
+  repeated sint64 data = 6 [packed=true];
+}
+
+// A Status represents the status of an RPC.
+message Status {
+
+  // success represents whether or not the RPC was successful. True means that it was, false means that it was not.
+  bool success = 1;
+
+  // msg is an optional error message.
+  string msg = 2;
+}
+
+service LandingZone {
+
+  // SendPacket stores a Packet in the database.
+  rpc SendPacket (Packet) returns(Status) {}
+}

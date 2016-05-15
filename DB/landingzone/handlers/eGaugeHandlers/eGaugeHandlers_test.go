@@ -15,15 +15,11 @@ func reqOnly(req *http.Request, err error) *http.Request {
 }
 
 func TestHandle(t *testing.T) {
-	oldVerbosity := constants.Verbose
-	constants.Verbose = true
-	defer func() { constants.Verbose = oldVerbosity }()
-
 	db, mock, err := database.NewMock()
-	mock.ExpectClose()
 	if err != nil {
 		t.Fatalf("Creating mock DB: %v", err)
 	}
+	mock.ExpectClose()
 
 	tests := []struct {
 		req  *http.Request
@@ -50,4 +46,12 @@ func TestHandle(t *testing.T) {
 	if err := db.Close(); err != nil {
 		t.Fatalf("got db.Close() = %v, want = nil", err)
 	}
+}
+
+func TestHandleVerbose(t *testing.T) {
+	oldVerbosity := constants.Verbose
+	constants.Verbose = true
+	defer func() { constants.Verbose = oldVerbosity }()
+	t.Log("TestHandle")
+	TestHandle(t)
 }
