@@ -12,6 +12,9 @@ database:
     - cd DB && wget https://github.com/bubenkoff/vagrant-docker-example/raw/master/Dockerfile
     - cd DB && mv config.docker.rb config.rb && vagrant up --provider=docker
 test:
+  pre:
+    - mkdir -p $HOME/.go_workspace/src/github.com/seadsystem/Backend
+    - sudo mount --bind $HOME/Backend/ $HOME/.go_workspace/src/github.com/seadsystem/Backend
   override:
     # Test that the SEAD plug landingzone port is open.
     - cd DB && echo -e '' | nc $(./guestip.sh) 9000
@@ -26,4 +29,4 @@ test:
     - cd DB && echo -e '' | nc $(./guestip.sh) 8080
     - "cd DB && vagrant ssh -c \"echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc localhost 8080\""
     # Run end-to-end tests.
-    - cd DB && go test -v
+    - cd $HOME/.go_workspace/src/github.com/seadsystem/Backend/DB && go test -v
