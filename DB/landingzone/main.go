@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"sync"
 
 	"google.golang.org/grpc"
 
@@ -42,8 +43,17 @@ func main() {
 
 	log.Println("Listening for connections...")
 
-	go log.Fatal(grpcListener(grpcHandlers.Register, constants.GRPC_PORT, db))
-	go log.Fatal(httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db))
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		wg.Done()
+		log.Fatal(grpcListener(grpcHandlers.Register, constants.GRPC_PORT, db))
+	}()
+	go func() {
+		wg.Done()
+		log.Fatal(httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db))
+	}()
+	wg.Wait() // Wait for background servers to get a chance to start.
 	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
 }
 
