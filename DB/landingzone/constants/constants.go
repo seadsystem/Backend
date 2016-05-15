@@ -7,6 +7,7 @@ const (
 	HOST           = "0.0.0.0" // All host names
 	SEAD_PLUG_PORT = "9000"
 	EGAUGE_PORT    = "9002"
+	GRPC_PORT      = "50051"
 
 	LENGTH_HEADER_SIZE = 3 // Measured in bytes
 

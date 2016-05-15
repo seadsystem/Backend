@@ -10,9 +10,12 @@ import (
 	"net"
 	"net/http"
 
+	"google.golang.org/grpc"
+
 	"github.com/seadsystem/Backend/DB/landingzone/constants"
 	"github.com/seadsystem/Backend/DB/landingzone/database"
 	"github.com/seadsystem/Backend/DB/landingzone/handlers/eGaugeHandlers"
+	"github.com/seadsystem/Backend/DB/landingzone/handlers/grpcHandlers"
 	"github.com/seadsystem/Backend/DB/landingzone/handlers/seadPlugHandlers"
 )
 
@@ -39,7 +42,8 @@ func main() {
 
 	log.Println("Listening for connections...")
 
-	go httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db)
+	go log.Fatal(grpcListener(grpcHandlers.Register, constants.GRPC_PORT, db))
+	go log.Fatal(httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db))
 	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
 }
 
@@ -63,11 +67,21 @@ func listener(handler func(net.Conn, database.DB), port string, db database.DB) 
 	}
 }
 
-func httpListener(handler func(http.ResponseWriter, *http.Request, database.DB), port string, db database.DB) {
+func httpListener(handler func(http.ResponseWriter, *http.Request, database.DB), port string, db database.DB) error {
 	serverMux := http.NewServeMux()
 
 	// Setup HTTP handler for all URLs on the specified port.
 	serverMux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) { handler(res, req, db) })
 
-	http.ListenAndServe(constants.HOST+":"+port, serverMux)
+	return http.ListenAndServe(constants.HOST+":"+port, serverMux)
+}
+
+func grpcListener(register func(*grpc.Server, database.DB), port string, db database.DB) error {
+	lis, err := net.Listen("tcp", constants.HOST+":"+port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	register(s, db)
+	return s.Serve(lis)
 }
