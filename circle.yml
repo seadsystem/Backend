@@ -1,4 +1,7 @@
 machine:
+  python:
+    version:
+      3.5.0
   services:
     - docker
 dependencies:
@@ -10,9 +13,17 @@ database:
     - cd DB && mv config.docker.rb config.rb && vagrant up --provider=docker
 test:
   override:
+    # Test that the SEAD plug landingzone port is open.
+    - cd DB && echo -e '' | nc $(./guestip.sh) 9000
+    - cd DB && vagrant ssh -c "echo -e '' | nc localhost 9000"
     # Test that the eGauge landingzone port is open.
-    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'POST / HTTP/1.1\nHost: localhost\n' | nc ${IP} 9002"
+    - cd DB && echo -e '' | nc $(./guestip.sh) 9002
+    - "cd DB && vagrant ssh -c \"echo -e 'POST / HTTP/1.1\nHost: localhost\n' | nc localhost 9002\""
     # Test that the gRPC landingzone port is open.
-    - cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e "" | nc ${IP} 50051
+    - cd DB && echo -e '' | nc $(./guestip.sh) 50051
+    - cd DB && vagrant ssh -c "echo -e '' | nc localhost 50051"
     # Test that the api port is open.
-    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc ${IP} 8080"
+    - cd DB && echo -e '' | nc $(./guestip.sh) 8080
+    - "cd DB && vagrant ssh -c \"echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc localhost 8080\""
+    # Run end-to-end tests.
+    - cd DB && go test -v

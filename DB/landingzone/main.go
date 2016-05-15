@@ -41,10 +41,10 @@ func main() {
 	// Causes operations which require a new connection to block instead of failing.
 	db.SetMaxOpenConns(constants.DB_MAX_CONNS)
 
-	log.Println("Listening for connections...")
+	log.Println("Starting servers...")
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		wg.Done()
 		log.Fatal(grpcListener(grpcHandlers.Register, constants.GRPC_PORT, db))
@@ -53,8 +53,15 @@ func main() {
 		wg.Done()
 		log.Fatal(httpListener(eGaugeHandlers.HandleRequest, constants.EGAUGE_PORT, db))
 	}()
+	go func() {
+		wg.Done()
+		listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
+	}()
+
 	wg.Wait() // Wait for background servers to get a chance to start.
-	listener(seadPlugHandlers.HandleRequest, constants.SEAD_PLUG_PORT, db)
+
+	log.Println("Started servers.")
+	select{}
 }
 
 func listener(handler func(net.Conn, database.DB), port string, db database.DB) {
