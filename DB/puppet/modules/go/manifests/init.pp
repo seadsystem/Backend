@@ -1,4 +1,4 @@
-# Install golang and libpq for the landingzone user
+# Install golang and libraries for the landingzone user
 class go {
   # Install godeb and go
   $bin_url = 'https://godeb.s3.amazonaws.com/godeb-amd64.tar.gz'
@@ -31,6 +31,24 @@ class go {
   # Install go sqlmock library
   exec {'go-sqlmock':
     command => 'env GOPATH=/home/landingzone/go go get -u github.com/DATA-DOG/go-sqlmock',
+    require => Exec['godeb install'],
+  }
+
+  # Install go grpc library
+  exec {'go-grpc':
+    command => 'env GOPATH=/home/landingzone/go go get -u google.golang.org/grpc',
+    require => Exec['godeb install'],
+  }
+
+  # Install go protobuf library
+  exec {'go-protobuf':
+    command => 'env GOPATH=/home/landingzone/go go get -u github.com/golang/protobuf/proto',
+    require => Exec['godeb install'],
+  }
+
+  # Install go context library
+  exec {'go-context':
+    command => 'env GOPATH=/home/landingzone/go go get -u golang.org/x/net/context',
     require => Exec['godeb install'],
   }
 }

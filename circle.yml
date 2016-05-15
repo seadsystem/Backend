@@ -10,8 +10,9 @@ database:
     - cd DB && mv config.docker.rb config.rb && vagrant up --provider=docker
 test:
   override:
-    # Test eGauge landingzone
-    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'POST / HTTP/1.1\nHost: localhost\n' | nc $IP 9002"
-    # Test api
-    # TODO: Fix the API.
-    #- "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc $IP 8080"
+    # Test that the eGauge landingzone port is open.
+    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'POST / HTTP/1.1\nHost: localhost\n' | nc ${IP} 9002"
+    # Test that the gRPC landingzone port is open.
+    - cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e "" | nc ${IP} 50051
+    # Test that the api port is open.
+    - "cd DB && IP=$(vagrant ssh-config | head -2 | tail -1 | awk '{print $2}') && echo -e 'GET / HTTP/1.1\nHost: localhost\n' | nc ${IP} 8080"

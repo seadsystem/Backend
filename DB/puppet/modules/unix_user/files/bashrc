@@ -114,7 +114,6 @@ if ! shopt -oq posix; then
 fi
 
 # For programming language Go
-export GOROOT=/usr/lib/go
 export GOARCH=amd64
 export GOOS=linux
 export GOPATH=$HOME/go
