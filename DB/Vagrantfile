@@ -29,9 +29,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   when :virtualbox
   	config.vm.box = "ubuntu/trusty64"
 
-    # godeb requires more than 1GB of memory.
     config.vm.provider "virtualbox" do |v|
+      # godeb requires more than 1GB of memory.
       v.memory = 2048
+      # The landingzone needs 1 cpu per server + the API needs one.
+      v.cpus = 4
     end
 
   	# Create a forwarded port mapping which allows access to a specific port
