@@ -1,3 +1,4 @@
+// +build arm
 #ifndef _SPI_H_   /* Include guard */
 #define _SPI_H_
 

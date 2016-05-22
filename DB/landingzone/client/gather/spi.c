@@ -1,3 +1,4 @@
+// +build arm
 #include "spi.h"
 
 sample sample_data(int frequency) {
