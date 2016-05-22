@@ -9,8 +9,6 @@ import (
 	pb "github.com/seadsystem/Backend/DB/landingzone/proto/packet"
 )
 
-const rate = 19000
-
 func GatherData(ctx context.Context, c chan<- *pb.Packet, serial int64) {
 	// Start on a whole second
 	now := time.Now()
@@ -28,14 +26,7 @@ loop:
 			break loop
 		case <-time.After(offset):
 			select {
-			case c <- &pb.Packet{
-				Serial: serial,
-				Time:   &pb.Timestamp{next.Unix(), int32(next.Nanosecond())},
-				Delta:  int64(time.Second / rate),
-				Type:   "P",
-				Device: "fake",
-				Data:   make([]int64, rate),
-			}:
+			case c <- gatherData(serial, next):
 			default:
 				log.Println("Dropping packet for:", next)
 			}

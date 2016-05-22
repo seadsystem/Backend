@@ -37,7 +37,7 @@ func TestGatherDataCancel2(t *testing.T) {
 	cancel()
 	select {
 	case <-done:
-	case <-time.After(2*time.Second):
+	case <-time.After(2 * time.Second):
 		t.Error("GatherData timed out")
 	}
 }
@@ -54,7 +54,7 @@ func TestGatherDataDropPacket(t *testing.T) {
 	cancel()
 	select {
 	case <-done:
-	case <-time.After(2*time.Second):
+	case <-time.After(2 * time.Second):
 		t.Error("GatherData timed out")
 	}
 }
@@ -72,13 +72,13 @@ func TestGatherData(t *testing.T) {
 		if msg == nil {
 			t.Error("got msg = nil, want != nil")
 		}
-	case <-time.After(2*time.Second):
+	case <-time.After(2 * time.Second):
 		t.Error("getting data from GatherData timed out")
 	}
 	cancel()
 	select {
 	case <-done:
-	case <-time.After(2*time.Second):
+	case <-time.After(2 * time.Second):
 		t.Error("GatherData timed out")
 	}
 }
