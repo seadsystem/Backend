@@ -81,7 +81,8 @@ class AdaBoostModel(models.BaseClassifier):
 
     def add_all_labels(self, data):
         for i in data:
-            self.get_index(i[2])
+            for label in data[2:]:
+                self.get_index(label)
 
     def aggregate_labels(self, labels):
         """
@@ -178,8 +179,9 @@ class AdaBoostModel(models.BaseClassifier):
             datum_labels = []
             for elem in datum:
                 #aggregate all labels present per input slice
-                if elem[2] not in datum_labels:
-                    datum_labels.append(elem[2])
+                for label in elem[2:]:
+                    if label not in datum_labels:
+                        datum_labels.append(label)
 
             result.append(self.aggregate_labels(datum_labels))
         return result

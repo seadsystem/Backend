@@ -12,7 +12,7 @@ testdata = [
     [datetime.datetime(2015, 12, 18, 0, 1, 34), -6377, 'heater'],
     [datetime.datetime(2015, 12, 18, 0, 1, 35), -6381, 'heater'],
     [datetime.datetime(2015, 12, 18, 0, 1, 36), -6376, 'heater'],
-    [datetime.datetime(2015, 12, 18, 0, 1, 37), -6373, 'heater'],
+    [datetime.datetime(2015, 12, 18, 0, 1, 37), -6373, 'heater', 'blender'],
     [datetime.datetime(2015, 12, 16, 0, 0, 4), -125, 'fridge'],
     [datetime.datetime(2015, 12, 16, 0, 0, 5), -126, 'fridge'],
     [datetime.datetime(2015, 12, 16, 0, 0, 6), -126, 'fridge'],
@@ -86,7 +86,8 @@ class RandomForestModel(models.BaseClassifier):
 
     def add_all_labels(self, data):
         for i in data:
-            self.get_index(i[2])
+            for label in i[2:]:
+                self.get_index(label)
 
     def aggregate_labels(self, labels):
         """
@@ -183,8 +184,9 @@ class RandomForestModel(models.BaseClassifier):
             datum_labels = []
             for elem in datum:
                 #aggregate all labels present per input slice
-                if elem[2] not in datum_labels:
-                    datum_labels.append(elem[2])
+                for label in elem[2:]:
+                    if label not in datum_labels:
+                        datum_labels.append(label)
 
             result.append(self.aggregate_labels(datum_labels))
         return result
@@ -210,3 +212,4 @@ class RandomForestModel(models.BaseClassifier):
                                  model_field=model_row['model'],
                                  window_size=model_row['window_size'],
                                  labels=model_row['labels'])
+
