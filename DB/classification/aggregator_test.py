@@ -20,7 +20,9 @@ def aggregate_data():
         query = "select * from data_raw order by time desc limit 100;"
         cursor.execute(query)
         dataraw = cursor.fetchall()
-        
+
+        for i in range(len(dataraw)):
+                dataraw[i] = list(dataraw[i])
         result = []
         for datum in dataraw:
                 for label in labels:
@@ -28,10 +30,13 @@ def aggregate_data():
                         #label 1, 2 are the limits of the label
                         #label 3 is the label
                         print("" + str(datum[3]) + " < " + str(label[2]) + " : " + str(datum[3]<label[2]) + " | " + str(datum[3]) + " > " + str(label[1]) + " : " + str(datum[3]>label[1]))
+
                         if(datum[3] < label[2] and datum[3] > label[1]):
-                                datum = datum + (label[3],)
-                                print(datum)
-		result = [elem for elem in dataraw if len(elem) > 5]
+                                datum.append(label[3])
+                                #print(datum)
+        for datum in dataraw:
+                if(len(datum) > 5):
+                        result.append(datum)
         print(result)
 
 
