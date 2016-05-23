@@ -16,7 +16,10 @@ def aggregate_data():
         query = "select * from data_label"
         cursor.execute(query, params)
         results = cursor.fetchall()
-        print(results)
 
+        query = "select * from data_raw order by time asc limit 200;"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        print(results)
 
 aggregate_data()
