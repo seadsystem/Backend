@@ -29,9 +29,9 @@ def aggregate_data():
                         #label 3 is the label
                         print("" + str(datum[3]) + " < " + str(label[2]) + " : " + str(datum[3]<label[2]) + " | " + str(datum[3]) + " > " + str(label[1]) + " : " + str(datum[3]>label[1]))
                         if(datum[3] < label[2] and datum[3] > label[1]):
-                                result.append(datum + (label[3],))
+                                datum = datum + (label[3],)
                                 print(datum)
-#        result = [elem for elem in dataraw if len(elem) > 5]
+		result = [elem for elem in dataraw if len(elem) > 5]
         print(result)
 
 
