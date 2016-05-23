@@ -177,37 +177,6 @@ class BaseClassifier(object):
                 con.close()
 
     @classmethod
-    def aggregate_data(cls):
-        con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
-        cursor = con.cursor()
-        params = {'panel': 'Panel1',
-                  'id': None}
-        query = "select * from data_label"
-        cursor.execute(query, params)
-        labels = cursor.fetchall()
-
-        query = "select * from data_raw order by time desc limit 100;"
-        cursor.execute(query)
-        dataraw = cursor.fetchall()
-
-        con.close()
-
-        for i in range(len(dataraw)):
-                dataraw[i] = list(dataraw[i])
-        result = []
-        for datum in dataraw:
-                for label in labels:
-                        #datum[3] is the timestamp of the datum
-                        #label 1, 2 are the limits of the label
-                        #label 3 is the label
-                        if(datum[3] < label[2] and datum[3] > label[1]):
-                                datum.append(label[3])
-        for datum in dataraw:
-                if(len(datum) > 5):
-                        result.append(datum)
-        return result
-
-    @classmethod
     def training_data(cls, panel="Panel1"):
         """
         :summary: grabs power data in data_raw that corresponds to the labels in data_label
@@ -218,16 +187,38 @@ class BaseClassifier(object):
             con = psycopg2.connect(database=cls.DATABASE, user=cls.USER)
         except psycopg2.Error as e:
             raise ConnectionError("Database connection on training data fetch failed", e)
+
         try:
             cursor = con.cursor()
-            query = "SELECT data_raw.time, data_raw.data- lag(data_raw.data) OVER  \
-                    (ORDER BY data_raw.time) as data, data_label.label  \
-                    FROM data_raw, data_label  \
-                    WHERE data_raw.serial=data_label.serial  \
-                    AND data_raw.type='P'  \
-                    AND data_raw.device=%(device)s \
-            cursor.execute(query, {'device': panel})
-            return cursor.fetchall()
+            params = {'panel': 'Panel1',
+                      'id': None}
+            query = "select * from data_label"
+            cursor.execute(query, params)
+            labels = cursor.fetchall()
+
+            query = "select * from data_raw order by time desc limit 100;"
+            cursor.execute(query)
+            dataraw = cursor.fetchall()
+
+            con.close()
+
+            for i in range(len(dataraw)):
+                dataraw[i] = list(dataraw[i])
+                result = []
+            for datum in dataraw:
+                for label in labels:
+                    #datum[3] is the timestamp of the datum
+                    #label 1, 2 are the limits of the label
+                    #label 3 is the label
+                    if(datum[3] < label[2] and datum[3] > label[1]):
+                        datum.append(label[3])
+            for datum in dataraw:
+                if(len(datum) > 5):
+                    new_datum = [datum[3], datum[2]]
+                    new_datum.extend(datum[5:])
+                    result.append(new_datum)
+
+            return result
         except psycopg2.Error as e:
             raise IOError("Training data fetch failed", e)
         finally:

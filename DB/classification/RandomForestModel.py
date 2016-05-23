@@ -87,7 +87,7 @@ class RandomForestModel(models.BaseClassifier):
     def add_all_labels(self, data):
         for i in data:
             for label in i[2:]:
-                print(label)
+                #print(label)
                 self.get_index(label)
 
     def aggregate_labels(self, labels):
