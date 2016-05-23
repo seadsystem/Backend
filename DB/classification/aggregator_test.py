@@ -15,11 +15,22 @@ def aggregate_data():
                   'id': None}
         query = "select * from data_label"
         cursor.execute(query, params)
-        results = cursor.fetchall()
+        labels = cursor.fetchall()
 
-        query = "select * from data_raw order by time asc limit 200;"
+        query = "select * from data_raw order by time asc limit 50;"
         cursor.execute(query)
-        results = cursor.fetchall()
-        print(results)
+        dataraw = cursor.fetchall()
+        
+
+        for datum in dataraw:
+        	for label in labels:
+        		#datum[3] is the timestamp of the datum
+        		#label 1, 2 are the limits of the label
+        		#label 3 is the label
+        		if(datum[3] < label[2] and datum[3] > label[1]):
+        			datum.append(label[3])
+        result = [elem for elem in dataraw if len(elem) > 5]
+        print(result)
+
 
 aggregate_data()

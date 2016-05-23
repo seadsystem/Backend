@@ -1,8 +1,8 @@
 import datetime
 import uuid
 from sklearn.ensemble import RandomForestClassifier
-# import DB.classification.models as models
-import DB.classification.models as models
+#import DB.classification.models as models
+import models
 import statistics
 
 
@@ -87,6 +87,7 @@ class RandomForestModel(models.BaseClassifier):
     def add_all_labels(self, data):
         for i in data:
             for label in i[2:]:
+                print(label)
                 self.get_index(label)
 
     def aggregate_labels(self, labels):
@@ -212,4 +213,3 @@ class RandomForestModel(models.BaseClassifier):
                                  model_field=model_row['model'],
                                  window_size=model_row['window_size'],
                                  labels=model_row['labels'])
-
