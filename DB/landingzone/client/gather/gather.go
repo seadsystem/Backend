@@ -1,5 +1,6 @@
 package gather
 
+
 import (
 	"log"
 	"time"
@@ -9,7 +10,8 @@ import (
 	pb "github.com/seadsystem/Backend/DB/landingzone/proto/packet"
 )
 
-func GatherData(ctx context.Context, c chan<- *pb.Packet, serial int64) {
+
+func GatherData(ctx context.Context, packets []chan *pb.Packet, serial int64, channels_vector []int) {
 	// Start on a whole second
 	now := time.Now()
 	offset := now.Sub(time.Unix(now.Unix(), 0))
@@ -17,7 +19,7 @@ func GatherData(ctx context.Context, c chan<- *pb.Packet, serial int64) {
 
 loop:
 	for {
-		offset := next.Sub(time.Now())
+		offset = next.Sub(time.Now())
 		if offset < 0 {
 			offset = 0
 		}
@@ -25,12 +27,15 @@ loop:
 		case <-ctx.Done():
 			break loop
 		case <-time.After(offset):
-			select {
-			case c <- gatherData(serial, next):
-			default:
-				log.Println("Dropping packet for:", next)
-			}
+			data  := gatherData(serial, next, channels_vector)
+			for i := 0; i < 8; i++ {
+				select {
+				case packets[i] <- data[i]:
+				default:
+					log.Println("Dropping packet for:", next)
+				}
 		}
 		next = next.Add(time.Second)
 	}
+}
 }
